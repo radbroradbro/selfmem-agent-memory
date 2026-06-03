@@ -20,6 +20,11 @@ behavior.
 See `docs/GITHUB_RULES.md` for the intended branch protection and agent
 permission model.
 
+When code checks pass but GitHub automation cannot update the PR body, create a
+blocker issue, or add a PR comment, use `docs/UPDATE_FLOW.md` and the checked-in
+release drafts as the public-safe fallback. Keep the launch verdict separate
+from code health.
+
 ## Issue Template Guidance
 
 Good issue material:

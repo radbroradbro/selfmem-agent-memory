@@ -1,0 +1,281 @@
+{
+  "ok": true,
+  "mode": "hosted-baseline-discovery",
+  "schemaVersion": 1,
+  "fixtureOnly": false,
+  "evidenceType": "live-hosted-baseline-discovery",
+  "writesRealFiles": true,
+  "callsHostedProvider": true,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawLabelsIncluded": false,
+  "rawTitlesIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawAnswerIncluded": false,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "runAt": "2026-05-23T11:23:16.458Z",
+  "discoveryConfig": {
+    "endpoint": "https://api.supermemory.ai/v3/documents/list",
+    "includeContent": false,
+    "limit": 50,
+    "maxPages": 4,
+    "sort": "updatedAt",
+    "order": "desc"
+  },
+  "sourceStats": {
+    "pagesRead": 4,
+    "documentsSeen": 200,
+    "errors": []
+  },
+  "containerCandidateCount": 14,
+  "recommendedCandidateId": "c_4b1f9e153ffcd35e",
+  "containerCandidates": [
+    {
+      "candidateId": "c_4b1f9e153ffcd35e",
+      "documentCount": 47,
+      "firstCreatedAt": "2026-05-17T00:33:02.977Z",
+      "lastUpdatedAt": "2026-05-17T00:34:56.906Z",
+      "typeCounts": {
+        "text": 47
+      },
+      "statusCounts": {
+        "done": 47
+      },
+      "sampleDocumentHashes": [
+        "sha256:2786ca7e6e587883",
+        "sha256:ee9f3a6d1f80cc46",
+        "sha256:8bd929ab819acc75"
+      ]
+    },
+    {
+      "candidateId": "c_6a2feb97651dd64b",
+      "documentCount": 46,
+      "firstCreatedAt": "2026-05-17T00:34:08.131Z",
+      "lastUpdatedAt": "2026-05-17T00:36:07.314Z",
+      "typeCounts": {
+        "text": 46
+      },
+      "statusCounts": {
+        "done": 46
+      },
+      "sampleDocumentHashes": [
+        "sha256:22d99a8990c3332d",
+        "sha256:2162ea40281ab9a8",
+        "sha256:d521a915866a8341"
+      ]
+    },
+    {
+      "candidateId": "c_47366fb480cde42d",
+      "documentCount": 44,
+      "firstCreatedAt": "2026-05-17T00:32:06.393Z",
+      "lastUpdatedAt": "2026-05-17T00:33:53.687Z",
+      "typeCounts": {
+        "text": 44
+      },
+      "statusCounts": {
+        "done": 44
+      },
+      "sampleDocumentHashes": [
+        "sha256:f92c698bb1b46f9c",
+        "sha256:911111905c5f2b97",
+        "sha256:72c5f72a8801bf08"
+      ]
+    },
+    {
+      "candidateId": "c_bfb68a9e8aa2a4b6",
+      "documentCount": 43,
+      "firstCreatedAt": "2026-05-17T00:35:12.128Z",
+      "lastUpdatedAt": "2026-05-17T00:36:54.865Z",
+      "typeCounts": {
+        "text": 43
+      },
+      "statusCounts": {
+        "done": 43
+      },
+      "sampleDocumentHashes": [
+        "sha256:7ad54b5e09961ce9",
+        "sha256:051725c194bd2ccd",
+        "sha256:c42b7b370f4c9dcb"
+      ]
+    },
+    {
+      "candidateId": "c_35502fc52ddaf573",
+      "documentCount": 9,
+      "firstCreatedAt": "2026-05-16T15:51:54.562Z",
+      "lastUpdatedAt": "2026-05-17T00:30:05.553Z",
+      "typeCounts": {
+        "text": 9
+      },
+      "statusCounts": {
+        "done": 9
+      },
+      "sampleDocumentHashes": [
+        "sha256:c39e9cfd5eec750d",
+        "sha256:1f5376d5adc1cec9",
+        "sha256:b2d896e3bc6054ea"
+      ]
+    },
+    {
+      "candidateId": "c_502c10434de1fadf",
+      "documentCount": 3,
+      "firstCreatedAt": "2026-05-16T23:17:19.706Z",
+      "lastUpdatedAt": "2026-05-16T23:38:01.718Z",
+      "typeCounts": {
+        "text": 3
+      },
+      "statusCounts": {
+        "done": 3
+      },
+      "sampleDocumentHashes": [
+        "sha256:51f42ccfac1f39ba",
+        "sha256:8c704346e26ad69c",
+        "sha256:9f3708a277e1dc8c"
+      ]
+    },
+    {
+      "candidateId": "c_e277ec04b7265b52",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-18T02:16:38.713Z",
+      "lastUpdatedAt": "2026-05-18T02:16:38.713Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:d7351845cb8ddeba"
+      ]
+    },
+    {
+      "candidateId": "c_9b07e9d97d306599",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:44:01.212Z",
+      "lastUpdatedAt": "2026-05-16T23:44:01.212Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:84b344588ba7f0bc"
+      ]
+    },
+    {
+      "candidateId": "c_0db8a9604dc3e20b",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:37:55.090Z",
+      "lastUpdatedAt": "2026-05-16T23:37:55.090Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:7834ace3a491652b"
+      ]
+    },
+    {
+      "candidateId": "c_da35f8f6cc482480",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:34:10.922Z",
+      "lastUpdatedAt": "2026-05-16T23:35:07.328Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:3e1cee2f38b0fcc1"
+      ]
+    },
+    {
+      "candidateId": "c_5f5e7a635fcb7497",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:33:09.291Z",
+      "lastUpdatedAt": "2026-05-16T23:33:09.291Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:f701c320752608ec"
+      ]
+    },
+    {
+      "candidateId": "c_b6d1ac60f6765bb4",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:30:50.365Z",
+      "lastUpdatedAt": "2026-05-16T23:30:50.365Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:73b05d5c0c40bf77"
+      ]
+    },
+    {
+      "candidateId": "c_5b0c2a9ac5e6e7d5",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:15:08.464Z",
+      "lastUpdatedAt": "2026-05-16T23:15:08.464Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:32c58d60dc0237ca"
+      ]
+    },
+    {
+      "candidateId": "c_c28a26aa268b0274",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:13:56.444Z",
+      "lastUpdatedAt": "2026-05-16T23:13:56.444Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:ed4b77014986d172"
+      ]
+    }
+  ],
+  "privateMap": {
+    "written": true,
+    "basename": "recallweave-hosted-container-map-20260523.private.jsonl",
+    "mode": "0600",
+    "entryCount": 14,
+    "containsRawLabels": true,
+    "attachToPublicEvidence": false
+  },
+  "nextActions": [
+    "Use the candidate ids and counts to choose the likely hosted baseline source.",
+    "If raw hosted container labels are needed, rerun with RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 and --private-map-output pointing outside the repository.",
+    "Copy the selected raw label from the private map into RECALLWEAVE_BASELINE_CONTAINER on that local machine only.",
+    "Run baseline:collect with the same source-locked query set and metrics-only flags."
+  ],
+  "safety": {
+    "printsCredentialValues": false,
+    "printsRawContainerLabels": false,
+    "printsMemoryText": false,
+    "privateMapRequiresExplicitOptIn": true,
+    "privateMapRejectedInsideRepository": true,
+    "liveHostedWriteBack": false
+  }
+}

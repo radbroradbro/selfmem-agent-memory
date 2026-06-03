@@ -51,17 +51,20 @@ flowchart TD
 
 ## Brain UI Direction
 
-The future Brain UI should inspect local stores directly:
+The Brain UI starts with fixture-safe views and a gated read-only selected
+container audit:
 
 ```mermaid
 flowchart LR
   A["Local container"] --> B["Memory counts"]
   A --> C["Duplicate clusters"]
   A --> D["Lifecycle health"]
-  A --> E["Search preview"]
+  A --> E["Read-only audit preview"]
   A --> F["Wiki graph"]
-  F --> G["Obsidian optional"]
-  F --> H["Self-hosted browser UI"]
+  E --> G["Redacted path label"]
+  E --> H["Counts and health reasons"]
+  F --> I["Obsidian optional"]
+  F --> J["Self-hosted browser UI"]
 ```
 
 The UI should never upload memory content by default.

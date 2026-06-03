@@ -10,3 +10,7 @@
 - Added public security, compatibility, visual, and release-checklist docs.
 - Preserved the rule that credentials, raw memories, private diagnostics, and
   personal container mappings never belong in the repository.
+- Added local-full LongMemEval answer-quality shard evidence for the Qwen3
+  local reranker arm, plus gate and intake reports that keep SOTA and launch
+  claims blocked until the full 500-query coverage, provider comparison, and
+  reviewer gates pass.

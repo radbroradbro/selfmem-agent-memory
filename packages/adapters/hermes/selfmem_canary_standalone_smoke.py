@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import re
 import sys
 import tempfile
@@ -97,10 +98,68 @@ def main() -> None:
         status = json.loads(provider.handle_tool_call("supermemory_status", {}))
         provider.shutdown()
 
+        old_search_disabled = os.environ.get("SELFMEM_SUPERMEMORY_SEARCH_DISABLED")
+        old_supermemory_key = os.environ.get("SUPERMEMORY_API_KEY")
+        os.environ["SELFMEM_SUPERMEMORY_SEARCH_DISABLED"] = "1"
+        os.environ["SUPERMEMORY_API_KEY"] = "test-read-through-key"
+        try:
+            disabled_home = Path(tmp) / ".hermes-disabled-supermemory"
+            disabled_home.mkdir(parents=True, exist_ok=True)
+            disabled_provider = module.SelfmemCanaryProvider()
+            disabled_provider.initialize(
+                "standalone-disabled-smoke",
+                hermes_home=str(disabled_home),
+                agent_identity="standalone-disabled-agent",
+                supermemory_container="hermes_disabled_source",
+            )
+
+            def fail_supermemory_search(query: str, limit: int):
+                raise AssertionError("Supermemory search should be disabled for benchmark methodology")
+
+            disabled_provider._search_supermemory = fail_supermemory_search
+            disabled_alias_search = json.loads(disabled_provider.handle_tool_call("supermemory_search", {
+                "query": "Remote Supermemory history should be disabled for benchmark methodology.",
+                "limit": 5,
+            }))
+            disabled_status = json.loads(disabled_provider.handle_tool_call("supermemory_status", {}))
+            disabled_provider.shutdown()
+        finally:
+            if old_search_disabled is None:
+                os.environ.pop("SELFMEM_SUPERMEMORY_SEARCH_DISABLED", None)
+            else:
+                os.environ["SELFMEM_SUPERMEMORY_SEARCH_DISABLED"] = old_search_disabled
+            if old_supermemory_key is None:
+                os.environ.pop("SUPERMEMORY_API_KEY", None)
+            else:
+                os.environ["SUPERMEMORY_API_KEY"] = old_supermemory_key
+
         memories = Path(status["memories_path"]).read_text(encoding="utf-8", errors="ignore")
+        container_map = json.loads(Path(status["container_map_path"]).read_text(encoding="utf-8", errors="ignore"))
         trace = Path(status["trace_path"]).read_text(encoding="utf-8", errors="ignore")
         lossless = Path(status["lossless_path"]).read_text(encoding="utf-8", errors="ignore")
         raw = Path(status["raw_path"]).read_text(encoding="utf-8", errors="ignore")
+        disabled_trace = Path(disabled_status["trace_path"]).read_text(encoding="utf-8", errors="ignore")
+        trace_events = [json.loads(line) for line in trace.splitlines() if line.strip()]
+        disabled_trace_events = [json.loads(line) for line in disabled_trace.splitlines() if line.strip()]
+        search_trace = next(
+            (
+                event
+                for event in trace_events
+                if event.get("event") == "search" and event.get("data", {}).get("supermemory_attempted") is True
+            ),
+            {},
+        )
+        disabled_search_trace = next(
+            (
+                event
+                for event in disabled_trace_events
+                if event.get("event") == "search"
+            ),
+            {},
+        )
+        search_trace_data = search_trace.get("data", {})
+        disabled_search_trace_data = disabled_search_trace.get("data", {})
+        store_traces = [event for event in trace_events if event.get("event") == "store"]
         leaks = count_leaks("\n".join([memories, trace, lossless, raw, prefetch]))
         output = {
             "ok": True,
@@ -116,6 +175,27 @@ def main() -> None:
             "hybridSearchCovered": any(item.get("memory_source") == "supermemory_read_through" for item in alias_search.get("results", [])),
             "sourceSupermemoryContainer": status.get("source_supermemory_container"),
             "localContainer": status.get("local_container"),
+            "adapterContractCovered": status.get("adapter_contract", {}).get("name") == "recallweave-selfmem-canary"
+            and status.get("adapter_contract", {}).get("strictCanaryContract") == "v1"
+            and status.get("adapter_contract", {}).get("searchLatencyInstrumentation") is True
+            and status.get("adapter_contract", {}).get("storeLatencyInstrumentation") is True
+            and container_map.get("adapter_contract", {}).get("strictCanaryContract") == "v1",
+            "boundedReadThroughPolicyCovered": status.get("search_policy") == "local_first_then_bounded_supermemory_read_through"
+            and status.get("recall_policy", {}).get("remote_read_through") == "explicit_history_intent_or_thin_local_results",
+            "benchmarkSupermemoryDisableCovered": disabled_status.get("live_credentials", {}).get("supermemory_search_disabled") is True
+            and disabled_status.get("supermemory_read_through") is False
+            and disabled_status.get("recall_policy", {}).get("remote_read_through") == "disabled_for_benchmark"
+            and len(disabled_alias_search.get("results", [])) == 0
+            and disabled_search_trace_data.get("supermemory_attempted") is False
+            and disabled_search_trace_data.get("supermemory_skip_reason") == "read_through_disabled",
+            "searchLatencyInstrumentationCovered": float(search_trace_data.get("elapsed_ms") or 0) > 0
+            and float(search_trace_data.get("local_elapsed_ms") or 0) > 0
+            and float(search_trace_data.get("remote_elapsed_ms") or 0) > 0,
+            "storeLatencyInstrumentationCovered": bool(store_traces)
+            and all(float(event.get("data", {}).get("elapsed_ms") or 0) > 0 for event in store_traces),
+            "storeLatencySampleCount": sum(
+                1 for event in store_traces if float(event.get("data", {}).get("elapsed_ms") or 0) > 0
+            ),
             "prefetchHasContext": bool(prefetch.strip()),
             "maintenanceRecallGateCovered": skipped_prefetch == "" and "prefetch_skipped" in trace,
             "statusLikeRecallCovered": bool(status_like_prefetch.strip()),
@@ -138,9 +218,14 @@ def main() -> None:
         print(json.dumps(output, indent=2, sort_keys=True))
         if not all([
             output["toolAliasCoverage"],
+            output["adapterContractCovered"],
             output["aliasStoreSuccess"],
             output["aliasSearchResultCount"] > 0,
             output["hybridSearchCovered"],
+            output["boundedReadThroughPolicyCovered"],
+            output["benchmarkSupermemoryDisableCovered"],
+            output["searchLatencyInstrumentationCovered"],
+            output["storeLatencyInstrumentationCovered"],
             output["sourceSupermemoryContainer"] == "hermes_standalone_source",
             output["localContainer"] == "selfmem_hermes_standalone_source",
             output["prefetchHasContext"],

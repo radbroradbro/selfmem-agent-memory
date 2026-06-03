@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-embedding-durability-smoke",
+  "status": "READY_LOCAL_EMBEDDING_DURABILITY",
+  "generatedAt": "2026-05-28T22:07:20.266Z",
+  "strategy": "local-apple-qwen3-0_6b",
+  "model": "Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0",
+  "localEndpointConfigured": true,
+  "baseUrlPrinted": false,
+  "endpointPrinted": false,
+  "syntheticOnly": true,
+  "rawSyntheticInputIncluded": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForLocalAppleArmExport": true,
+  "expectedDimensions": 1024,
+  "tokenCounts": [
+    16,
+    128,
+    700
+  ],
+  "timeoutMs": 60000,
+  "probes": [
+    {
+      "tokenCount": 16,
+      "inputHash": "sha256:217a9dbec2401b44565862bff16f1c5812f23c6225e0320c55802d2c2b04b3be",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 134,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 128,
+      "inputHash": "sha256:bddf7e95cd36cf18bb689e3e17a5cc53088e0d3eee0983dd4b3b6a003b299659",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 183,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 700,
+      "inputHash": "sha256:6989c347600636fbc131a1d6c8912093d97c84e395c861de9db3659868757562",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 1357,
+      "failureClass": null
+    }
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Use this report as the local Apple embedding preflight before response-arm export.",
+    "Run the local-full answer-quality shard export with the same local embedding server still alive.",
+    "Keep raw benchmark inputs and response files outside the repository."
+  ]
+}

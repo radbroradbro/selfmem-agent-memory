@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-03T11:56:50Z",
+  "mode": "model-challenger-contextual-source-shard-local-control-blocker",
+  "status": "BLOCKED_LOCAL_APPLE_AND_LOCAL_RERANK_CONTROLS",
+  "ok": false,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "claimScope": "model-challenger diagnostic evidence only; not full-SOTA evidence and not public benchmark claim evidence",
+  "target": {
+    "benchmark": "LongMemEval",
+    "memoryMethod": "contextual-source-chunk-v1",
+    "shardId": "shard-001",
+    "startIndex": 0,
+    "endIndexExclusive": 25,
+    "selectedQueryCount": 25,
+    "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+  },
+  "completedEvidence": {
+    "materializationReport": "public-longmemeval-model-challenger-contextual-source-materialize-shard-001-20260603.json",
+    "sevenArmExportReport": "answer-quality-model-challenger-contextual-source-shard-001-arm-export-with-dense-20260603.json",
+    "sevenArmPreflightReport": "answer-quality-model-challenger-contextual-source-preflight-shard-001-with-dense-20260603.json",
+    "sevenArmAnswerQualityReport": "answer-quality-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-20260603.json",
+    "sevenArmResultGateReport": "memory-score-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-result-gate-20260603.json",
+    "directScorerEndpointLabel": "https://api.deepseek.com",
+    "answerModel": "deepseek-v4-flash",
+    "judgeModel": "deepseek-v4-flash",
+    "answerQualityCallsMade": 350,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "denseControlPresent": true,
+    "bm25Score": 34,
+    "denseProxyScore": 20,
+    "winnerStrategy": "cloud-voyage4-voyage-lite-rerank",
+    "winnerAnswerQuality": 42,
+    "nvidiaAnswerQuality": 33.2
+  },
+  "resultGate": {
+    "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsModelChallengerReportedScoreEvidence": false,
+    "remainingBlockers": [
+      "missing-local-apple-arm",
+      "missing-local-rerank-arm"
+    ]
+  },
+  "liveLocalReadinessObserved": {
+    "localEndpointEnvPresent": false,
+    "localEmbeddingListenerObserved": false,
+    "localRerankListenerObserved": false,
+    "localAppleArmPresent": false,
+    "localRerankArmPresent": false
+  },
+  "safety": {
+    "rawQuestionIdsIncluded": false,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPrivateOutputPathIncluded": false,
+    "credentialsIncluded": false,
+    "privateInputsStoredOutsideRepository": true
+  },
+  "nextActions": [
+    "Start or locate the local Apple embedding endpoint and local rerank endpoint for the same shard.",
+    "Export local-apple-qwen3-0_6b and local-apple-qwen3-0_6b-local-rerank response arms against the existing private shard files.",
+    "Rerun answer-quality preflight and DeepSeek direct scoring with the local arms included.",
+    "Rerun the model-challenger memory-score result gate; do not make public SOTA or reported-score claims until the gate passes and reviewer approval is attached."
+  ]
+}

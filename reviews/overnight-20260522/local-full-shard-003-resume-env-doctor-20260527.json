@@ -1,0 +1,578 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-full-shard-resume-env-doctor",
+  "fixtureOnly": false,
+  "status": "READY_LOCAL_FULL_SHARD_RESUME_ENV",
+  "generatedAt": "2026-05-27T14:14:02.166Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsEnvValues": false,
+  "printsPrivatePaths": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForMissingArmExport": true,
+  "readyForAnswerQualityPreflight": true,
+  "readyForShardAnswerQuality": true,
+  "readyForLocalShardIntake": true,
+  "readyForCommandMaterialization": true,
+  "privateInputFilesReady": true,
+  "completedPrivateArmFilesReady": true,
+  "readyForMissingArmExportExceptEnv": true,
+  "localResumeExecutionEnvReady": true,
+  "answerQualityEnvReady": true,
+  "resumePacketCommandsRunnableAsPrinted": false,
+  "resumePacket": {
+    "path": "reviews/overnight-20260522/local-full-shard-003-resume-packet-20260526.json",
+    "hash": "sha256:6f30f10c19b5f4f0929c48a0ca3c07723e459cae8f3c8dddb20896226eb020e9",
+    "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
+    "targetShard": {
+      "shardId": "shard-003",
+      "startIndex": 50,
+      "endIndexExclusive": 75,
+      "queryOffset": 50,
+      "maxQueries": 25,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-local-full-shard-003.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-local-full-shard-003.md",
+      "expectedPrivateArmDirectoryLabel": "<private-output-dir>/arms/shard-003"
+    },
+    "missingStrategies": [
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "completedStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b"
+    ]
+  },
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "hash": "sha256:99543578972eee549dc79af0b3a1b68e1750aad12e19d9320315a8b437ee2737",
+    "claimScope": "local-full",
+    "queryCount": 500,
+    "shardCount": 20,
+    "maxMemoryBytes": 300000000
+  },
+  "privateDir": {
+    "provided": true,
+    "label": "external-private-dir",
+    "present": true,
+    "outsideRepository": true,
+    "pathPrinted": false
+  },
+  "sourceRetention": {
+    "materializeReport": {
+      "path": "reviews/overnight-20260522/public-longmemeval-full-materialize-run.json",
+      "hash": "sha256:bee741fc5806754c3d9d214d5b9372ac27f991beb1965623ce0344eb1df8e459",
+      "mode": "public-benchmark-materialize-run"
+    },
+    "contractReady": true,
+    "rawSourcesRetainedPrivately": true,
+    "publicReportIsSafe": true,
+    "readyForPrivateAudit": true,
+    "compressedDefaultRetrievalAllowed": true,
+    "uiMayUseCompressedDefaultButAuditRetainsRawSource": true,
+    "rawTextPubliclyIncluded": false,
+    "privateOutputPathIncluded": false,
+    "privateOutputDirectoryLabel": "operator-private-output-dir",
+    "directoryInsideRepository": false,
+    "fileMode": "0600",
+    "directoryMode": "0700",
+    "requiredMaterializeRoles": [
+      "queryset",
+      "memories",
+      "answer-labels",
+      "raw-dataset",
+      "selected-raw-rows",
+      "source-manifest"
+    ],
+    "requiredPrivateAuditRoles": [
+      "raw-dataset",
+      "selected-raw-rows",
+      "source-manifest"
+    ],
+    "missingMaterializeRoles": [],
+    "rawDatasetItemCount": 500,
+    "selectedRawRowsCount": 500,
+    "rawDatasetHash": "sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a",
+    "selectedRawRowsHash": "sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb",
+    "sourceManifestHash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
+    "rawSourcePrivateFiles": [
+      {
+        "role": "raw-dataset",
+        "name": "longmemeval-raw-dataset.private.json",
+        "pathLabel": "external-private-file",
+        "present": true,
+        "nonEmpty": true,
+        "sizeBytes": 277383468,
+        "hashKind": "file-sha256",
+        "hashSource": "file-bytes",
+        "parseOk": null,
+        "contractPresent": true,
+        "expectedHash": "sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a",
+        "actualHash": "sha256:<redacted-public-hash>",
+        "hashMatches": true
+      },
+      {
+        "role": "selected-raw-rows",
+        "name": "longmemeval-selected-raw-rows.private.json",
+        "pathLabel": "external-private-file",
+        "present": true,
+        "nonEmpty": true,
+        "sizeBytes": 267784372,
+        "hashKind": "file-sha256",
+        "hashSource": "file-bytes",
+        "parseOk": null,
+        "contractPresent": true,
+        "expectedHash": "sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb",
+        "actualHash": "sha256:<redacted-public-hash>",
+        "hashMatches": true
+      },
+      {
+        "role": "source-manifest",
+        "name": "longmemeval-source-manifest.private.json",
+        "pathLabel": "external-private-file",
+        "present": true,
+        "nonEmpty": true,
+        "sizeBytes": 1426,
+        "hashKind": "file-sha256",
+        "hashSource": "file-bytes",
+        "parseOk": null,
+        "contractPresent": true,
+        "expectedHash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
+        "actualHash": "sha256:<redacted-public-hash>",
+        "hashMatches": true
+      }
+    ]
+  },
+  "localEmbeddingDurability": {
+    "report": {
+      "path": "reviews/overnight-20260522/local-embedding-durability-smoke-20260527.json",
+      "hash": "sha256:281af4fe011b7c453be3adf19244cf0624f0ddea1182d230626e3c4c16359bc2",
+      "mode": "local-embedding-durability-smoke",
+      "status": "READY_LOCAL_EMBEDDING_DURABILITY"
+    },
+    "runtimeBlocker": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json",
+      "hash": "sha256:86e5c89bed4541a2b5641ab4e4a7f4bcefab574b889913211b3c8c62c652d4ef",
+      "mode": "answer-quality-local-full-shard-runtime-blocker",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+      "failedArm": "local-apple-qwen3-0_6b-local-rerank",
+      "failureClass": "local-rerank-response-body-stall"
+    },
+    "reportReady": true,
+    "longProbeReady": true,
+    "generatedAfterRuntimeBlocker": true,
+    "readyForLocalFullResume": true,
+    "minRequiredTokenCount": 700,
+    "maxProbeTokenCount": 700,
+    "probeCount": 4,
+    "passProbeCount": 4,
+    "tokenCounts": [
+      16,
+      128,
+      512,
+      700
+    ],
+    "failedProbeClasses": [],
+    "rawSyntheticInputIncluded": false,
+    "baseUrlPrinted": false,
+    "endpointPrinted": false,
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsFullMemorySotaEvidence": false
+  },
+  "env": {
+    "localEmbedding": {
+      "ready": true,
+      "requiredNames": [
+        "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "SELFMEM_LOCAL_EMBED_MODEL",
+        "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
+        "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+        "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT"
+      ],
+      "presentNames": [
+        "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "SELFMEM_LOCAL_EMBED_MODEL",
+        "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
+        "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+        "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT"
+      ],
+      "missingNames": [],
+      "nonTruthyNames": [],
+      "printsValues": false
+    },
+    "localRerank": {
+      "ready": true,
+      "requiredNames": [
+        "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "SELFMEM_LOCAL_RERANK_MODEL",
+        "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT"
+      ],
+      "presentNames": [
+        "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "SELFMEM_LOCAL_RERANK_MODEL",
+        "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT"
+      ],
+      "missingNames": [],
+      "nonTruthyNames": [],
+      "printsValues": false
+    },
+    "localSafety": {
+      "ready": true,
+      "requiredNames": [
+        "RECALLWEAVE_BASELINE_LIVE",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"
+      ],
+      "presentNames": [
+        "RECALLWEAVE_BASELINE_LIVE",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"
+      ],
+      "missingNames": [],
+      "nonTruthyNames": [],
+      "printsValues": false
+    },
+    "answerQuality": {
+      "ready": true,
+      "requiredNames": [
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"
+      ],
+      "presentNames": [
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"
+      ],
+      "missingNames": [],
+      "nonTruthyNames": [],
+      "printsValues": false
+    },
+    "optionalQueryExpansionForResume": {
+      "requiredForMissingArmStrategies": false,
+      "presentNames": []
+    }
+  },
+  "commandPlaceholders": {
+    "count": 17,
+    "names": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-answer-model",
+      "local-embedding-base-url",
+      "local-embedding-model",
+      "local-judge-model",
+      "local-query-expansion-base-url-if-used",
+      "local-rerank-base-url",
+      "local-rerank-candidate-limit",
+      "local-rerank-model",
+      "openai-compatible-base-url",
+      "private-output-dir",
+      "public-review-dir",
+      "query-expansion-model-if-used",
+      "safe-local-dense-candidate-limit",
+      "safe-local-embedding-batch-token-limit",
+      "safe-local-embedding-max-token-limit"
+    ],
+    "privateOutputDirPlaceholderPresent": true,
+    "publicReviewDirPlaceholderPresent": true,
+    "envValuePlaceholdersPresent": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-answer-model",
+      "local-embedding-base-url",
+      "local-embedding-model",
+      "local-judge-model",
+      "local-query-expansion-base-url-if-used",
+      "local-rerank-base-url",
+      "local-rerank-candidate-limit",
+      "local-rerank-model",
+      "openai-compatible-base-url",
+      "query-expansion-model-if-used",
+      "safe-local-dense-candidate-limit",
+      "safe-local-embedding-batch-token-limit",
+      "safe-local-embedding-max-token-limit"
+    ]
+  },
+  "commandMaterialization": {
+    "templatePlaceholdersPresent": true,
+    "commandsRunnableAsPrinted": false,
+    "requiresOperatorPlaceholderSubstitution": true,
+    "readyForCommandMaterialization": true,
+    "requiredPlaceholderCount": 13,
+    "requiredPlaceholdersReady": true,
+    "requiredPlaceholders": [
+      {
+        "name": "local-answer-model",
+        "source": "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "local-embedding-base-url",
+        "source": "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "local-embedding-model",
+        "source": "SELFMEM_LOCAL_EMBED_MODEL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "local-judge-model",
+        "source": "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "local-rerank-base-url",
+        "source": "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "local-rerank-candidate-limit",
+        "source": "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "local-rerank-model",
+        "source": "SELFMEM_LOCAL_RERANK_MODEL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "openai-compatible-base-url",
+        "source": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "private-output-dir",
+        "source": "RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "public-review-dir",
+        "source": "--review-dir or RECALLWEAVE_REVIEW_DIR",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-dense-candidate-limit",
+        "source": "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-embedding-batch-token-limit",
+        "source": "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-embedding-max-token-limit",
+        "source": "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
+        "ready": true,
+        "printsValue": false
+      }
+    ],
+    "unresolvedRequiredPlaceholderNames": [],
+    "optionalPlaceholderCount": 4,
+    "optionalPlaceholders": [
+      {
+        "name": "1-when-cloud-query-expansion-runs",
+        "operatorChoiceRequired": true,
+        "policy": "Set to 1 only when a cloud query-expansion arm is intentionally enabled; otherwise remove or set to 0.",
+        "printsValue": false
+      },
+      {
+        "name": "env-only-if-cloud-endpoint",
+        "operatorChoiceRequired": true,
+        "policy": "Provide only for an authenticated cloud scoring endpoint; omit for local no-auth scoring endpoints.",
+        "printsValue": false
+      },
+      {
+        "name": "local-query-expansion-base-url-if-used",
+        "operatorChoiceRequired": true,
+        "policy": "Fill only when a local query-expansion sidecar is used for the retry.",
+        "printsValue": false
+      },
+      {
+        "name": "query-expansion-model-if-used",
+        "operatorChoiceRequired": true,
+        "policy": "Fill only when a query-expansion sidecar is used for the retry.",
+        "printsValue": false
+      }
+    ],
+    "optionalPlaceholderNames": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-query-expansion-base-url-if-used",
+      "query-expansion-model-if-used"
+    ],
+    "printsMaterializedCommands": false,
+    "printsPrivatePaths": false,
+    "printsEnvValues": false,
+    "materializedCommandHashesIncluded": false
+  },
+  "requiredInputFiles": [
+    {
+      "role": "queryset",
+      "name": "longmemeval-queryset.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 278725,
+      "hashKind": "collector-compatible-queryset",
+      "hashSource": "semantic-json-contract",
+      "parseOk": true,
+      "contractPresent": true,
+      "expectedHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": true
+    },
+    {
+      "role": "memories",
+      "name": "longmemeval-memories.private.jsonl",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 203831507,
+      "hashKind": "file-sha256",
+      "hashSource": "file-bytes",
+      "parseOk": null,
+      "contractPresent": true,
+      "expectedHash": null,
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": null
+    },
+    {
+      "role": "answer-labels",
+      "name": "longmemeval-answer-labels.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 105250,
+      "hashKind": "embedded-answer-labels",
+      "hashSource": "semantic-json-contract",
+      "parseOk": true,
+      "contractPresent": true,
+      "expectedHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": true
+    }
+  ],
+  "completedArmFiles": [
+    {
+      "role": "bm25-lite",
+      "name": "bm25-lite-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 19405,
+      "hashKind": "file-sha256",
+      "hashSource": "file-bytes",
+      "parseOk": null,
+      "contractPresent": true,
+      "expectedHash": "sha256:9bdd5ff38882f650ede7d17b7accb140007286223e008c1e96f9ff4b6ca737da",
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": true
+    },
+    {
+      "role": "full-hybrid-rerank",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 19398,
+      "hashKind": "file-sha256",
+      "hashSource": "file-bytes",
+      "parseOk": null,
+      "contractPresent": true,
+      "expectedHash": "sha256:c4666efc2ca1af18e961fb9e9762e09968bab293618bff993fdc70d78a90caf9",
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": true
+    },
+    {
+      "role": "query-expanded-full-hybrid-rerank",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 19481,
+      "hashKind": "file-sha256",
+      "hashSource": "file-bytes",
+      "parseOk": null,
+      "contractPresent": true,
+      "expectedHash": "sha256:1a53a216e585ed54cbf1f10eafbcd783ace7f2f39f8213c3ea0a609d38cbdc81",
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": true
+    },
+    {
+      "role": "local-apple-qwen3-0_6b",
+      "name": "local-apple-qwen3-0_6b-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 19556,
+      "hashKind": "file-sha256",
+      "hashSource": "file-bytes",
+      "parseOk": null,
+      "contractPresent": true,
+      "expectedHash": "sha256:cc99920f9deb3130e3f0d60def6c5ef8a51e8ff78ef3e0e7d428339d9a675d6d",
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": true
+    }
+  ],
+  "missingArmFiles": [
+    {
+      "role": "local-apple-qwen3-0_6b-local-rerank",
+      "name": "local-apple-qwen3-0_6b-local-rerank-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": true,
+      "nonEmpty": true,
+      "sizeBytes": 19676,
+      "hashKind": "file-sha256",
+      "hashSource": "file-bytes",
+      "parseOk": null,
+      "contractPresent": true,
+      "expectedHash": null,
+      "actualHash": "sha256:<redacted-public-hash>",
+      "hashMatches": null
+    }
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Run the shard-003 missing-arm response export from the resume packet if the recovered arm file has not already been written.",
+    "Run shard-003 answer-quality preflight and answer-quality after all private arm files exist.",
+    "Run local shard intake including public result JSONs through shard-003."
+  ]
+}

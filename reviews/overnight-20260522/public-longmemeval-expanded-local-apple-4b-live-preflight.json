@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "provider-benchmark-live-preflight",
+  "status": "READY_FOR_LIVE_PROVIDER_BENCHMARK",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicSafe": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "printsCredentials": false,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "querySelectionPolicyHash": "sha256:b24524da13771152c315c7890859c678fd1310b4d997abc000fb090e003c6b9b",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "strategies": [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "local-apple-qwen3-4b"
+  ],
+  "requiredProviders": [
+    "local-apple"
+  ],
+  "providerCallsEnabled": true,
+  "publicDataConfirmed": true,
+  "credentialPresence": {
+    "local-apple": {
+      "present": true,
+      "keyCount": 1,
+      "envNames": [
+        "SELFMEM_LOCAL_EMBED_BASE_URL"
+      ]
+    }
+  },
+  "missingCredentialProviders": [],
+  "singleProviderArmReady": true,
+  "liveRunAllowed": true,
+  "blockers": [],
+  "nextActions": [
+    "Run benchmark:public-provider with --live against the source-locked target.",
+    "Keep reports metrics-only until MemoryBench answer-quality or another end-to-end memory score is run."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+    "SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-local-apple-server-url>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,local-apple-qwen3-4b"
+  ]
+}

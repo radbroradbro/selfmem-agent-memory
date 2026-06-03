@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "mode": "baseline-reviewer-approval-intake",
+  "writesRealFiles": true,
+  "callsHostedProvider": false,
+  "metricsOnly": true,
+  "publicLaunchAllowed": false,
+  "publicBenchmarkApprovalReady": true,
+  "reviewerApprovalCount": 2,
+  "independentReviewerCount": 2,
+  "reviewsSubmitted": 2,
+  "target": {
+    "packetSha256": null,
+    "runHash": "b3a2207a584827e5ad0bfeca9edd53834df64518af6e921ee7f5ede604f31221",
+    "comparisonHash": null,
+    "querySetHash": "sha256:9403d36215cb92e643bd0c640690695d57d98fe946f3dfef30b54aafc0eea5e4",
+    "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+    "sourceCommit": null,
+    "datasetSlice": null,
+    "judgeModel": null,
+    "answerModel": null,
+    "fixtureOnly": false,
+    "hasAnyTarget": true
+  },
+  "reviews": [
+    {
+      "sourceLabel": "codex-5-5-budgeted-baseline-approval.json",
+      "reviewerKeyHash": "5b7ffe0b84ff1bc3",
+      "provider": "codex",
+      "model": "gpt-5.5",
+      "verdict": "APPROVE_SOURCE_MATCHED_BASELINE",
+      "claimScope": "source-matched-canary",
+      "targetBound": true,
+      "countable": true,
+      "duplicateReviewer": false,
+      "failedChecks": []
+    },
+    {
+      "sourceLabel": "gemini-3-1-pro-budgeted-baseline-approval.json",
+      "reviewerKeyHash": "96e984d5fca8b991",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "verdict": "APPROVE_SOURCE_MATCHED_BASELINE",
+      "claimScope": "source-matched-canary",
+      "targetBound": true,
+      "countable": true,
+      "duplicateReviewer": false,
+      "failedChecks": []
+    }
+  ],
+  "failedChecks": [],
+  "safety": {
+    "printsCredentialValues": false,
+    "includesRawMemoryText": false,
+    "includesRawTranscriptText": false,
+    "includesRawPromptText": false,
+    "includesRawAnswerText": false,
+    "acceptsOnlyMetricsOnlyReviewArtifacts": true,
+    "requiresPacketOrRunBinding": true,
+    "requiresTwoIndependentReviewersForClaims": true
+  },
+  "nextActions": [
+    "Rerun baseline:compare with --reviewer-approval-report pointing to this intake report.",
+    "Rebuild the metrics-only baseline packet so publicBenchmarkClaimsAllowed reflects the verified reviewer approvals.",
+    "Public launch still remains blocked until owner approval."
+  ]
+}

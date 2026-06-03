@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-materialize-run",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "claimTier": "run-only",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesPrivateFiles": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "rawSourcesRetainedPrivate": true,
+  "generatedAt": "2026-05-26T02:11:06.352Z",
+  "source": {
+    "memoryBenchCommit": "118209a746d97d0d85e5a7234267f0b6962857e9",
+    "datasetHost": "huggingface.co",
+    "datasetHash": "sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "datasetByteSize": 277383467,
+    "datasetItemCount": 500
+  },
+  "target": {
+    "targetIdHash": "1abb3e0ccf1bcede",
+    "targetFileHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "sourceLockHash": "sha256:dae7e055cfa65b82e9ee1d03a8cab874839c740789a4a19d2b1501ae454824e4",
+    "splitHash": "cf5409e5a655e553",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o",
+    "contextTokenBudget": 800,
+    "limit": 5,
+    "retrievalStrategy": "bm25-lite"
+  },
+  "selection": {
+    "selectedCount": 500,
+    "questionTypeCount": 6,
+    "selectedQuestionIdsHash": "sha256:702287feda46afbb122e7d61f8fb1530e6b571b8172e248376c4f887d0527f42",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
+    "queryCount": 500,
+    "haystackSessionCount": 19195,
+    "expectedResultRefCount": 1896,
+    "redactionStats": {
+      "keyShapedTokenRedactionCount": 4,
+      "privateTagRedactionCount": 0
+    },
+    "querySetHash": "sha256:785c182b2f234933e0711edd6e6c6f5ee97900f62e6e73f7f207b7d39d2fa990",
+    "collectorCompatibleQuerySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "memoriesFileHash": "sha256:722ded72893be2d451f8f4c6c98650dc8fe6a3f2fedf35e1d9ce1f906826babf",
+    "answerLabelsFileHash": "sha256:302bf9ce65a7471a56fe65529177c9b4d82576096a67e2e345280fa3418c8402"
+  },
+  "sourceRetention": {
+    "rawDatasetRetainedPrivate": true,
+    "selectedRawRowsRetainedPrivate": true,
+    "sourceManifestRetainedPrivate": true,
+    "rawTextPubliclyIncluded": false,
+    "privateOutputPathIncluded": false,
+    "rawDatasetHash": "sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a",
+    "selectedRawRowsHash": "sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb",
+    "sourceManifestHash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
+    "rawDatasetByteSize": 277383467,
+    "rawDatasetItemCount": 500,
+    "selectedRawRowsCount": 500
+  },
+  "privateOutputs": {
+    "directoryLabel": "operator-private-output-dir",
+    "directoryInsideRepository": false,
+    "fileMode": "0600",
+    "directoryMode": "0700",
+    "files": [
+      {
+        "role": "queryset",
+        "name": "longmemeval-queryset.private.json",
+        "hash": "sha256:9cd221a53f8692f2035a87fc6d5f46495505c5c2571679fdfbdb2fe3f751d89b",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "memories",
+        "name": "longmemeval-memories.private.jsonl",
+        "hash": "sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "answer-labels",
+        "name": "longmemeval-answer-labels.private.json",
+        "hash": "sha256:302bf9ce65a7471a56fe65529177c9b4d82576096a67e2e345280fa3418c8402",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "raw-dataset",
+        "name": "longmemeval-raw-dataset.private.json",
+        "hash": "sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "selected-raw-rows",
+        "name": "longmemeval-selected-raw-rows.private.json",
+        "hash": "sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "source-manifest",
+        "name": "longmemeval-source-manifest.private.json",
+        "hash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
+        "rawTextPrivate": false
+      },
+      {
+        "role": "readme",
+        "name": "README.private.txt",
+        "hash": "sha256:6e64245a856e59013ea576f493657b52f43cdc0a6b477d810993da70f25d6255",
+        "rawTextPrivate": false
+      }
+    ]
+  },
+  "runCommands": {
+    "exportResponses": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --preserve-ids --strategy bm25-lite --context-token-budget 800 --limit 5 --output <private-output-dir>/longmemeval-recallweave-responses.private.json",
+    "collectMetrics": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --retrieval-mode strategy:bm25-lite --limit 5 --output <public-metrics-output.json>",
+    "scoreAnswerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 pnpm benchmark:answer-quality -- --live --target <target.json> --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --arm bm25-lite=<private-output-dir>/longmemeval-recallweave-responses.private.json --output <public-answer-quality-output.json>"
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "rawQuestionIdsIncluded": false,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPrivateOutputPathIncluded": false,
+    "rawSourcesRetainedPrivate": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Run the RecallWeave response exporter against the private query set and memories file.",
+    "Run the RecallWeave baseline collector against the private query set and exported responses.",
+    "Attach only the metrics-only result file before moving this target beyond run-only."
+  ]
+}

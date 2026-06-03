@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-embedding-durability-smoke",
+  "status": "READY_LOCAL_EMBEDDING_DURABILITY",
+  "generatedAt": "2026-05-27T17:45:38.547Z",
+  "strategy": "local-apple-qwen3-0_6b",
+  "model": "Qwen/Qwen3-Embedding-0.6B-GGUF",
+  "localEndpointConfigured": true,
+  "baseUrlPrinted": false,
+  "endpointPrinted": false,
+  "syntheticOnly": true,
+  "rawSyntheticInputIncluded": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForLocalAppleArmExport": true,
+  "expectedDimensions": 1024,
+  "tokenCounts": [
+    16,
+    128,
+    512,
+    700
+  ],
+  "timeoutMs": 60000,
+  "probes": [
+    {
+      "tokenCount": 16,
+      "inputHash": "sha256:217a9dbec2401b44565862bff16f1c5812f23c6225e0320c55802d2c2b04b3be",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 65,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 128,
+      "inputHash": "sha256:bddf7e95cd36cf18bb689e3e17a5cc53088e0d3eee0983dd4b3b6a003b299659",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 137,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 512,
+      "inputHash": "sha256:2dc7e8664a0cfd5c5f2357318c2497935eb0373a84a31aad13e09251a21fc283",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 628,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 700,
+      "inputHash": "sha256:6989c347600636fbc131a1d6c8912093d97c84e395c861de9db3659868757562",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 377,
+      "failureClass": null
+    }
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Use this report as the local Apple embedding preflight before response-arm export.",
+    "Run the local-full answer-quality shard export with the same local embedding server still alive.",
+    "Keep raw benchmark inputs and response files outside the repository."
+  ]
+}

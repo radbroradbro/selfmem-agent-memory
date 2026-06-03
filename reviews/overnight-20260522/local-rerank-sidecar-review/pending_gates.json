@@ -1,0 +1,301 @@
+{
+  "schema_version": "1.0",
+  "base_ref": "HEAD",
+  "head_ref": "4166b0bb-dirty",
+  "changed_files": [
+    {
+      "path": "docs/AGENT_LIVE_BUILD_GUIDE.md",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "docs/BENCHMARK_SUMMARY.md",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "docs/MODEL_MATRIX.md",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "docs/USER_MANUAL.md",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "packages/bench/provider-benchmark-live-preflight.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "security",
+        "code",
+        "integration"
+      ]
+    },
+    {
+      "path": "packages/bench/public-benchmark-strategy-compare.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "security",
+        "code"
+      ]
+    },
+    {
+      "path": "packages/bench/recallweave-response-export.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "security",
+        "code"
+      ]
+    },
+    {
+      "path": "packages/brain-ui/fixtures/model-matrix.json",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "packages/brain-ui/interaction-smoke.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "security",
+        "code"
+      ]
+    },
+    {
+      "path": "packages/brain-ui/smoke.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "security",
+        "code"
+      ]
+    },
+    {
+      "path": "tests/bench/benchmark-contract.test.ts",
+      "status": "modified",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/local-apple-reranker-sidecar-gate-evidence.md",
+      "status": "added",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-preflight-blocked.json",
+      "status": "added",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-preflight-blocked.md",
+      "status": "added",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-require-ready-blocked.json",
+      "status": "added",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-require-ready-blocked.md",
+      "status": "added",
+      "matched_gates": [
+        "security"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-gate-local-rerank-fixture.json",
+      "status": "added",
+      "matched_gates": [
+        "security",
+        "integration"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-gate-local-rerank-fixture.md",
+      "status": "added",
+      "matched_gates": [
+        "security",
+        "integration"
+      ]
+    }
+  ],
+  "required_gates": [
+    "security",
+    "code",
+    "integration",
+    "final"
+  ],
+  "reasons": [
+    {
+      "gate": "security",
+      "path": "docs/AGENT_LIVE_BUILD_GUIDE.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "docs/BENCHMARK_SUMMARY.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "docs/MODEL_MATRIX.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "docs/USER_MANUAL.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "code",
+      "path": "packages/bench/provider-benchmark-live-preflight.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "security",
+      "path": "packages/bench/provider-benchmark-live-preflight.mjs",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "integration",
+      "path": "packages/bench/provider-benchmark-live-preflight.mjs",
+      "predicate": "script cli mcp provider or worker rule"
+    },
+    {
+      "gate": "code",
+      "path": "packages/bench/public-benchmark-strategy-compare.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "security",
+      "path": "packages/bench/public-benchmark-strategy-compare.mjs",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "code",
+      "path": "packages/bench/recallweave-response-export.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "security",
+      "path": "packages/bench/recallweave-response-export.mjs",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "packages/brain-ui/fixtures/model-matrix.json",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "code",
+      "path": "packages/brain-ui/interaction-smoke.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "security",
+      "path": "packages/brain-ui/interaction-smoke.mjs",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "code",
+      "path": "packages/brain-ui/smoke.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "security",
+      "path": "packages/brain-ui/smoke.mjs",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "tests/bench/benchmark-contract.test.ts",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/local-apple-reranker-sidecar-gate-evidence.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-preflight-blocked.json",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-preflight-blocked.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-require-ready-blocked.json",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/public-longmemeval-expanded-local-rerank-require-ready-blocked.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-gate-local-rerank-fixture.json",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "integration",
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-gate-local-rerank-fixture.json",
+      "predicate": "script cli mcp provider or worker rule"
+    },
+    {
+      "gate": "security",
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-gate-local-rerank-fixture.md",
+      "predicate": "security-sensitive path or diff-content rule"
+    },
+    {
+      "gate": "integration",
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-gate-local-rerank-fixture.md",
+      "predicate": "script cli mcp provider or worker rule"
+    },
+    {
+      "gate": "integration",
+      "path": "<diff>",
+      "predicate": "cross-surface contract dependency or multi-package rule"
+    },
+    {
+      "gate": "final",
+      "path": "<diff>",
+      "predicate": "diff or gate state exists"
+    }
+  ]
+}

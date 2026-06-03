@@ -33,6 +33,15 @@ _VOYAGE_DIMENSIONS = 1024
 _VOYAGE_EMBED_URL = "https://api.voyageai.com/v1/embeddings"
 _VOYAGE_RERANK_URL = "https://api.voyageai.com/v1/rerank"
 _SUPERMEMORY_SEARCH_URL = "https://api.supermemory.ai/v4/search"
+_SUPERMEMORY_TIMEOUT_SECONDS = 1.2
+_RECALL_LATENCY_BUDGET_MS = 2200
+_ADAPTER_CONTRACT = {
+    "name": "recallweave-selfmem-canary",
+    "version": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": True,
+    "storeLatencyInstrumentation": True,
+}
 _PRIVATE_RE = re.compile(r"<private>[\s\S]*?(?:</private>|$)", re.IGNORECASE)
 _TRIVIAL_RE = re.compile(
     r"^(ok|okay|thanks|thank you|got it|sure|yes|no|yep|nope|k|ty|thx|np)\.?$",
@@ -44,6 +53,10 @@ _MAINTENANCE_RE = re.compile(
 )
 _RECALL_INTENT_RE = re.compile(
     r"\b(remember|recall|retrieve|search memory|find memory|durable|preference|decision|bug|fix|workflow|container|lcm|compress|compression|identity|profile)\b",
+    re.IGNORECASE,
+)
+_REMOTE_HISTORY_INTENT_RE = re.compile(
+    r"\b(supermemory|hosted|remote memory|old memory|legacy memory|history|read[- ]?through|prior agent)\b",
     re.IGNORECASE,
 )
 _KEY_PATTERNS = [
@@ -196,9 +209,14 @@ class SelfmemCanaryProvider(MemoryProvider):
             or os.environ.get("SUPERMEMORY_API_KEY", "")
             or os.environ.get("SUPERMEMORY_CC_API_KEY", "")
         )
+        self._supermemory_search_disabled = (
+            os.environ.get("SELFMEM_SUPERMEMORY_SEARCH_DISABLED", "") == "1"
+            or os.environ.get("RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH", "") == "1"
+        )
         self._supermemory_read_through = bool(
             self._supermemory_key
             and self._source_supermemory_container
+            and not self._supermemory_search_disabled
             and os.environ.get("SELFMEM_SUPERMEMORY_READ_THROUGH", "1") != "0"
         )
         local_mode = "voyage-4-large+rerank-2.5" if self._voyage_keys else "local_lexical"
@@ -214,8 +232,13 @@ class SelfmemCanaryProvider(MemoryProvider):
             "agent_identity": self._agent_identity,
             "source_supermemory_container": self._source_supermemory_container or None,
             "local_container": self._local_container,
+            "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+            "strict_canary_contract": _ADAPTER_CONTRACT["strictCanaryContract"],
             "supermemory_read_through": self._supermemory_read_through,
-            "search_policy": "union_local_and_supermemory_read_through",
+            "supermemory_search_disabled": self._supermemory_search_disabled,
+            "search_policy": "local_first_then_bounded_supermemory_read_through",
+            "recall_latency_budget_ms": _recall_latency_budget_ms(),
+            "supermemory_timeout_seconds": _supermemory_timeout_seconds(),
         })
 
     def system_prompt_block(self) -> str:
@@ -247,7 +270,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             return ""
         start = time.perf_counter()
         results = self._search(query, _DEFAULT_TOP_K)
-        elapsed_ms = round((time.perf_counter() - start) * 1000, 3)
+        elapsed_ms = _elapsed_ms(start)
         if not results:
             self._trace("prefetch", {
                 "query": query[:160],
@@ -462,6 +485,7 @@ class SelfmemCanaryProvider(MemoryProvider):
         return None
 
     def _store(self, content: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
+        start = time.perf_counter()
         assert self._memories_path is not None
         content = _coerce_text(content)
         distilled = _distill_content(content, metadata)
@@ -473,6 +497,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             self._trace("store_deduped", {
                 "id": duplicate.get("id"),
                 "local_container": self._local_container,
+                "elapsed_ms": _elapsed_ms(start),
             })
             return duplicate
         embedding = None
@@ -511,7 +536,10 @@ class SelfmemCanaryProvider(MemoryProvider):
             "has_embedding": bool(embedding),
             "local_container": self._local_container,
             "source_supermemory_container": self._source_supermemory_container or None,
+            "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+            "store_latency_instrumentation": True,
             "usage": self._usage,
+            "elapsed_ms": _elapsed_ms(start),
         })
         return item
 
@@ -520,6 +548,15 @@ class SelfmemCanaryProvider(MemoryProvider):
             "success": True,
             "provider": self.name,
             "provider_mode": self._provider_mode,
+            "native_memory": {
+                "provider_id": self.name,
+                "slot": "memory.provider",
+                "default_active": True,
+                "shadow_only": False,
+                "new_writes": "local" if self._write_enabled else "disabled",
+                "hosted_write_back": False,
+            },
+            "adapter_contract": _ADAPTER_CONTRACT,
             "agent_identity": self._agent_identity,
             "local_container": self._local_container,
             "source_supermemory_container": self._source_supermemory_container or None,
@@ -539,13 +576,17 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "voyage_key_count": len(self._voyage_keys),
                 "supermemory_read_key_present": bool(self._supermemory_key),
                 "supermemory_read_through_ready": bool(self._supermemory_read_through),
+                "supermemory_search_disabled": bool(self._supermemory_search_disabled),
             },
             "recall_policy": {
                 "auto_recall_gate": "every_turn" if os.environ.get("SELFMEM_RECALL_EVERY_TURN") == "1" else "skip_obvious_maintenance",
                 "rerank_candidate_limit": _rerank_candidate_limit(),
                 "rerank_token_budget": _rerank_token_budget(),
+                "recall_latency_budget_ms": _recall_latency_budget_ms(),
+                "supermemory_timeout_seconds": _supermemory_timeout_seconds(),
+                "remote_read_through": "disabled_for_benchmark" if self._supermemory_search_disabled else "explicit_history_intent_or_thin_local_results",
             },
-            "search_policy": "union_local_and_supermemory_read_through",
+            "search_policy": "local_first_then_bounded_supermemory_read_through",
             "tool_aliases": ["supermemory_store", "supermemory_search", "supermemory_forget", "supermemory_profile", "supermemory_status"],
         }
 
@@ -556,11 +597,25 @@ class SelfmemCanaryProvider(MemoryProvider):
             "agent_identity": self._agent_identity,
             "source_supermemory_container": self._source_supermemory_container or None,
             "local_container": self._local_container,
+            "adapter_contract": _ADAPTER_CONTRACT,
+            "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+            "strict_canary_contract": _ADAPTER_CONTRACT["strictCanaryContract"],
             "hermes_home": self._hermes_home,
             "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "mode": "local-write-supermemory-read-through",
+            "native_memory": {
+                "provider_id": self.name,
+                "slot": "memory.provider",
+                "default_active": True,
+                "shadow_only": False,
+                "new_writes": "local" if self._write_enabled else "disabled",
+                "hosted_write_back": False,
+            },
             "supermemory_read_through": self._supermemory_read_through,
+            "supermemory_search_disabled": self._supermemory_search_disabled,
             "rerank_policy": "weighted_rrf_union; voyage rerank for local embedded candidates when VOYAGE_API_KEY is present; hosted Supermemory uses its own rerank flag",
+            "recall_latency_budget_ms": _recall_latency_budget_ms(),
+            "supermemory_timeout_seconds": _supermemory_timeout_seconds(),
             "query_expansion": "off_by_default_for_live_hooks",
         }
         self._container_map_path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
@@ -570,9 +625,15 @@ class SelfmemCanaryProvider(MemoryProvider):
         query = _coerce_text(query)
         remote_results: List[Dict[str, Any]] = []
         remote_error = ""
+        remote_elapsed_ms = 0.0
+        remote_attempted = False
         try:
             results = self._search_local(query, limit)
-            if self._supermemory_read_through:
+            local_elapsed_ms = _elapsed_ms(start)
+            remote_decision = _remote_read_through_decision(query, len(results), local_elapsed_ms)
+            if self._supermemory_read_through and remote_decision["search"]:
+                remote_attempted = True
+                remote_start = time.perf_counter()
                 try:
                     remote_results = self._search_supermemory(query, max(limit * 2, limit))
                 except Exception as exc:
@@ -580,7 +641,17 @@ class SelfmemCanaryProvider(MemoryProvider):
                     self._trace("supermemory_read_through_error", {
                         "message": remote_error,
                         "source_supermemory_container": self._source_supermemory_container or None,
+                        "remote_elapsed_ms": _elapsed_ms(remote_start),
                     })
+                finally:
+                    remote_elapsed_ms = _elapsed_ms(remote_start)
+            elif self._supermemory_read_through:
+                self._trace("supermemory_read_through_skipped", {
+                    "reason": remote_decision["reason"],
+                    "local_result_count": len(results),
+                    "local_elapsed_ms": local_elapsed_ms,
+                    "recall_latency_budget_ms": _recall_latency_budget_ms(),
+                })
             results = _merge_ranked_results([results, remote_results], limit)
             self._trace("search", {
                 "query": query[:160],
@@ -588,9 +659,16 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "result_ids": [item["id"] for item in results],
                 "local_result_count": len([item for item in results if item.get("memory_source") == "local_selfmem"]),
                 "supermemory_result_count": len([item for item in results if item.get("memory_source") == "supermemory_read_through"]),
-                "elapsed_ms": round((time.perf_counter() - start) * 1000, 3),
+                "elapsed_ms": _elapsed_ms(start),
+                "local_elapsed_ms": local_elapsed_ms,
+                "remote_elapsed_ms": remote_elapsed_ms,
+                "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+                "search_latency_instrumentation": True,
                 "provider_mode": self._provider_mode,
                 "supermemory_read_through": self._supermemory_read_through,
+                "supermemory_search_disabled": self._supermemory_search_disabled,
+                "supermemory_attempted": remote_attempted,
+                "supermemory_skip_reason": "" if remote_attempted else ("read_through_disabled" if not self._supermemory_read_through else remote_decision["reason"]),
                 "supermemory_error": remote_error,
                 "usage": self._usage,
             })
@@ -603,7 +681,7 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "query": query[:160],
                 "result_count": len(results),
                 "result_ids": [item["id"] for item in results],
-                "elapsed_ms": round((time.perf_counter() - start) * 1000, 3),
+                "elapsed_ms": _elapsed_ms(start),
                 "provider_mode": "local_lexical_after_voyage_error",
             })
             return results
@@ -689,7 +767,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=10) as response:
+            with urllib.request.urlopen(request, timeout=_supermemory_timeout_seconds()) as response:
                 data = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             body = exc.read().decode("utf-8", errors="replace")
@@ -1187,6 +1265,42 @@ def _rerank_token_budget() -> int:
         return max(0, int(os.environ.get("SELFMEM_RERANK_TOKEN_BUDGET", str(_RERANK_TOKEN_BUDGET))))
     except Exception:
         return _RERANK_TOKEN_BUDGET
+
+
+def _recall_latency_budget_ms() -> int:
+    try:
+        return max(250, min(10000, int(os.environ.get("SELFMEM_RECALL_LATENCY_BUDGET_MS", str(_RECALL_LATENCY_BUDGET_MS)))))
+    except Exception:
+        return _RECALL_LATENCY_BUDGET_MS
+
+
+def _supermemory_timeout_seconds() -> float:
+    try:
+        configured_ms = float(os.environ.get("SELFMEM_SUPERMEMORY_TIMEOUT_MS", str(int(_SUPERMEMORY_TIMEOUT_SECONDS * 1000))))
+        return max(0.2, min(10.0, configured_ms / 1000.0))
+    except Exception:
+        return _SUPERMEMORY_TIMEOUT_SECONDS
+
+
+def _elapsed_ms(start: float) -> float:
+    return max(0.001, round((time.perf_counter() - start) * 1000, 3))
+
+
+def _min_local_results_before_remote() -> int:
+    try:
+        return max(0, min(20, int(os.environ.get("SELFMEM_MIN_LOCAL_RESULTS_BEFORE_REMOTE", "3"))))
+    except Exception:
+        return 3
+
+
+def _remote_read_through_decision(query: str, local_count: int, local_elapsed_ms: float) -> Dict[str, Any]:
+    if local_elapsed_ms >= _recall_latency_budget_ms():
+        return {"search": False, "reason": "local_recall_exceeded_latency_budget"}
+    if _REMOTE_HISTORY_INTENT_RE.search(query or ""):
+        return {"search": True, "reason": "explicit_history_intent"}
+    if local_count < _min_local_results_before_remote():
+        return {"search": True, "reason": "thin_local_results"}
+    return {"search": False, "reason": "local_results_sufficient"}
 
 
 def _estimate_tokens(text: str) -> int:

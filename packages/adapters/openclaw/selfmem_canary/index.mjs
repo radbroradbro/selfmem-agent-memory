@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync, appendFileSync, existsSync } fr
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
+import { performance } from "node:perf_hooks";
 
 const DEFAULT_LIMIT = 5;
 const DEFAULT_RERANK_CANDIDATE_LIMIT = 20;
@@ -12,6 +13,15 @@ const VOYAGE_RERANK_URL = "https://api.voyageai.com/v1/rerank";
 const VOYAGE_EMBED_MODEL = "voyage-4-large";
 const VOYAGE_RERANK_MODEL = "rerank-2.5";
 const VOYAGE_DIMENSIONS = 1024;
+const DEFAULT_SUPERMEMORY_TIMEOUT_MS = 1200;
+const DEFAULT_RECALL_LATENCY_BUDGET_MS = 2200;
+const ADAPTER_CONTRACT = Object.freeze({
+  name: "recallweave-selfmem-canary",
+  version: "2026.05.23.store-latency-v1",
+  strictCanaryContract: "v1",
+  searchLatencyInstrumentation: true,
+  storeLatencyInstrumentation: true,
+});
 const COMPRESSION_EVENT_NAMES = [
   "pre_compress",
   "before_compress",
@@ -30,6 +40,7 @@ const KEY_PATTERNS = [
 ];
 const MAINTENANCE_RE = /\b(heartbeat|cron|watchdog|diagnostic|doctor|reliability|status|healthcheck|health check|memory monitor|silent run|update check|ping|no-op|noop)\b/i;
 const RECALL_INTENT_RE = /\b(remember|recall|retrieve|search memory|find memory|durable|preference|decision|bug|fix|workflow|container|lcm|compress|compression|identity|profile)\b/i;
+const REMOTE_HISTORY_INTENT_RE = /\b(supermemory|hosted|remote memory|old memory|legacy memory|history|read[- ]?through|prior agent)\b/i;
 
 export function createSelfmemOpenClawCanary(options = {}) {
   const home = resolveOpenClawHome(options);
@@ -50,21 +61,43 @@ export function createSelfmemOpenClawCanary(options = {}) {
     raw: join(storeDir, "raw_events.jsonl"),
     containerMap: join(storeDir, "container-map.json"),
   };
+  const supermemorySearchDisabled = process.env.SELFMEM_SUPERMEMORY_SEARCH_DISABLED === "1" || process.env.RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH === "1";
   writeFileSync(paths.containerMap, JSON.stringify({
     host: "openclaw",
     agent_identity: agentIdentity,
     source_supermemory_container: sourceSupermemoryContainer || null,
     local_container: localContainer,
+    adapter_contract: ADAPTER_CONTRACT,
+    adapter_contract_version: ADAPTER_CONTRACT.version,
+    strict_canary_contract: ADAPTER_CONTRACT.strictCanaryContract,
     store_dir: storeDir,
     mode: "local-write-supermemory-read-through",
-    search_policy: "union_local_and_supermemory_read_through",
+    native_memory: {
+      provider_id: "selfmem_canary",
+      slot: "plugins.slots.memory",
+      default_active: true,
+      shadow_only: false,
+      new_writes: "local",
+      hosted_write_back: false,
+    },
+    search_policy: "local_first_then_bounded_supermemory_read_through",
+    supermemory_search_disabled: supermemorySearchDisabled,
+    recall_latency_budget_ms: recallLatencyBudgetMs(),
+    supermemory_timeout_ms: supermemoryTimeoutMs(),
     identity_resolved: identityResolved,
     read_only: readOnly,
   }, null, 2));
 
   const state = { home, agentIdentity, identityResolved, readOnly, sourceSupermemoryContainer, localContainer, storeDir, paths };
+  state.adapterContract = ADAPTER_CONTRACT;
   state.supermemoryKey = options.supermemoryKey || process.env.SELFMEM_SUPERMEMORY_READ_KEY || process.env.SUPERMEMORY_READ_API_KEY || process.env.SUPERMEMORY_API_KEY || process.env.SUPERMEMORY_CC_API_KEY || "";
-  state.supermemoryReadThrough = Boolean(state.supermemoryKey && sourceSupermemoryContainer && process.env.SELFMEM_SUPERMEMORY_READ_THROUGH !== "0");
+  state.supermemorySearchDisabled = supermemorySearchDisabled;
+  state.supermemoryReadThrough = Boolean(
+    state.supermemoryKey &&
+    sourceSupermemoryContainer &&
+    !state.supermemorySearchDisabled &&
+    process.env.SELFMEM_SUPERMEMORY_READ_THROUGH !== "0",
+  );
   state.voyageKeys = options.voyageKeys || voyageKeysFromEnv();
   state.voyageKeyIndex = 0;
   state.usage = {
@@ -84,7 +117,12 @@ export function createSelfmemOpenClawCanary(options = {}) {
     id: "selfmem_canary",
     tools: makeTools(state),
     session_start(session = {}) {
-      trace(state, "session_start", { session_id: session.id || session.session_id || "", local_container: localContainer });
+      trace(state, "session_start", {
+        session_id: session.id || session.session_id || "",
+        local_container: localContainer,
+        adapter_contract_version: ADAPTER_CONTRACT.version,
+        strict_canary_contract: ADAPTER_CONTRACT.strictCanaryContract,
+      });
       return status(state);
     },
     async before_prompt_build(input = {}) {
@@ -153,6 +191,7 @@ function toolStore(state, args) {
 }
 
 function store(state, content, metadata = {}) {
+  const startedAt = performance.now();
   if (state.readOnly) throw new Error("Read-only mode: identity is unresolved, so writes are suppressed.");
   const redacted = redact(content);
   if (redacted.fullyPrivate) throw new Error("Cannot store fully private memory.");
@@ -160,7 +199,13 @@ function store(state, content, metadata = {}) {
   const existing = findDuplicate(state, distilled);
   if (existing) {
     state.usage.dedupe_suppressed += 1;
-    trace(state, "store_deduped", { id: existing.id, local_container: state.localContainer });
+    trace(state, "store_deduped", {
+      id: existing.id,
+      local_container: state.localContainer,
+      elapsed_ms: elapsedMs(startedAt),
+      adapter_contract_version: ADAPTER_CONTRACT.version,
+      store_latency_instrumentation: true,
+    });
     return existing;
   }
   const item = {
@@ -178,7 +223,13 @@ function store(state, content, metadata = {}) {
     },
   };
   appendFileSync(state.paths.memories, `${JSON.stringify(item)}\n`);
-  trace(state, "store", { id: item.id, local_container: state.localContainer });
+  trace(state, "store", {
+    id: item.id,
+    local_container: state.localContainer,
+    elapsed_ms: elapsedMs(startedAt),
+    adapter_contract_version: ADAPTER_CONTRACT.version,
+    store_latency_instrumentation: true,
+  });
   return item;
 }
 
@@ -202,10 +253,17 @@ function compressionCheckpoint(state, event = {}) {
 }
 
 async function search(state, query, limit) {
+  const startedAt = performance.now();
   const local = await searchLocal(state, query, limit);
+  const localElapsedMs = elapsedMs(startedAt);
   let remote = [];
   let remoteError = "";
-  if (state.supermemoryReadThrough) {
+  let remoteElapsedMs = 0;
+  let remoteAttempted = false;
+  const remoteDecision = remoteReadThroughDecision(query, local.length, localElapsedMs);
+  if (state.supermemoryReadThrough && remoteDecision.search) {
+    remoteAttempted = true;
+    const remoteStartedAt = performance.now();
     try {
       remote = await searchSupermemory(state, query, Math.max(limit * 2, limit));
     } catch (error) {
@@ -213,8 +271,18 @@ async function search(state, query, limit) {
       trace(state, "supermemory_read_through_error", {
         message: remoteError,
         source_supermemory_container: state.sourceSupermemoryContainer || null,
+        remote_elapsed_ms: elapsedMs(remoteStartedAt),
       });
+    } finally {
+      remoteElapsedMs = elapsedMs(remoteStartedAt);
     }
+  } else if (state.supermemoryReadThrough) {
+    trace(state, "supermemory_read_through_skipped", {
+      reason: remoteDecision.reason,
+      local_result_count: local.length,
+      local_elapsed_ms: localElapsedMs,
+      recall_latency_budget_ms: recallLatencyBudgetMs(),
+    });
   }
   const results = mergeRanked([local, remote], limit);
   trace(state, "search", {
@@ -222,7 +290,15 @@ async function search(state, query, limit) {
     result_count: results.length,
     local_result_count: results.filter((item) => item.memory_source === "local_selfmem").length,
     supermemory_result_count: results.filter((item) => item.memory_source === "supermemory_read_through").length,
+    elapsed_ms: elapsedMs(startedAt),
+    local_elapsed_ms: localElapsedMs,
+    remote_elapsed_ms: remoteElapsedMs,
+    adapter_contract_version: ADAPTER_CONTRACT.version,
+    search_latency_instrumentation: true,
     supermemory_read_through: state.supermemoryReadThrough,
+    supermemory_search_disabled: state.supermemorySearchDisabled,
+    supermemory_attempted: remoteAttempted,
+    supermemory_skip_reason: remoteAttempted ? "" : (state.supermemoryReadThrough ? remoteDecision.reason : "read_through_disabled"),
     supermemory_error: remoteError,
     provider_mode: state.providerMode,
     usage: state.usage,
@@ -295,45 +371,52 @@ async function searchLocalVoyage(state, query, limit) {
 
 async function searchSupermemory(state, query, limit) {
   if (!state.supermemoryKey || !state.sourceSupermemoryContainer) return [];
-  const response = await fetch(SUPERMEMORY_SEARCH_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${state.supermemoryKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      q: query,
-      containerTag: state.sourceSupermemoryContainer,
-      limit: Math.max(1, Math.min(20, limit)),
-      threshold: 0,
-      rerank: true,
-      rewriteQuery: false,
-      searchMode: "memories",
-    }),
-  });
-  const text = await response.text();
-  if (!response.ok) {
-    throw new Error(`Supermemory read-through HTTP ${response.status}: ${sanitizeError(text)}`);
-  }
-  const data = JSON.parse(text);
-  return (data.results || []).flatMap((item, index) => {
-    const redacted = redact(String(item.memory || item.chunk || item.content || "").trim());
-    if (redacted.fullyPrivate || !redacted.text.trim()) return [];
-    const remoteId = String(item.id || `rank-${index}`);
-    return [{
-      id: `supermemory:${remoteId}`,
-      created_at: "",
-      content: redacted.text,
-      score: Number(item.similarity || item.score || 0),
-      provider_mode: "supermemory_read_through",
-      memory_source: "supermemory_read_through",
-      metadata: {
-        supermemory_id: remoteId,
-        source_supermemory_container: state.sourceSupermemoryContainer,
-        redacted: redacted.redacted,
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), supermemoryTimeoutMs());
+  try {
+    const response = await fetch(SUPERMEMORY_SEARCH_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${state.supermemoryKey}`,
+        "Content-Type": "application/json",
       },
-    }];
-  });
+      body: JSON.stringify({
+        q: query,
+        containerTag: state.sourceSupermemoryContainer,
+        limit: Math.max(1, Math.min(20, limit)),
+        threshold: 0,
+        rerank: true,
+        rewriteQuery: false,
+        searchMode: "memories",
+      }),
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    if (!response.ok) {
+      throw new Error(`Supermemory read-through HTTP ${response.status}: ${sanitizeError(text)}`);
+    }
+    const data = JSON.parse(text);
+    return (data.results || []).flatMap((item, index) => {
+      const redacted = redact(String(item.memory || item.chunk || item.content || "").trim());
+      if (redacted.fullyPrivate || !redacted.text.trim()) return [];
+      const remoteId = String(item.id || `rank-${index}`);
+      return [{
+        id: `supermemory:${remoteId}`,
+        created_at: "",
+        content: redacted.text,
+        score: Number(item.similarity || item.score || 0),
+        provider_mode: "supermemory_read_through",
+        memory_source: "supermemory_read_through",
+        metadata: {
+          supermemory_id: remoteId,
+          source_supermemory_container: state.sourceSupermemoryContainer,
+          redacted: redacted.redacted,
+        },
+      }];
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function voyageEmbed(state, texts, inputType) {
@@ -491,26 +574,40 @@ function status(state) {
     success: true,
     provider: "selfmem_canary",
     host: "openclaw",
+    adapter_contract: state.adapterContract,
     agent_identity: state.agentIdentity,
     identity_resolved: state.identityResolved,
     read_only: state.readOnly,
     source_supermemory_container: state.sourceSupermemoryContainer || null,
     local_container: state.localContainer,
     supermemory_read_through: state.supermemoryReadThrough,
-    search_policy: "union_local_and_supermemory_read_through",
+    supermemory_search_disabled: state.supermemorySearchDisabled,
+    search_policy: "local_first_then_bounded_supermemory_read_through",
     provider_mode: state.providerMode,
+    native_memory: {
+      provider_id: "selfmem_canary",
+      slot: "plugins.slots.memory",
+      default_active: true,
+      shadow_only: false,
+      new_writes: state.readOnly ? "disabled" : "local",
+      hosted_write_back: false,
+    },
     voyage_enabled: state.voyageKeys.length > 0,
     recall_policy: {
       auto_recall_gate: process.env.SELFMEM_RECALL_EVERY_TURN === "1" ? "every_turn" : "skip_obvious_maintenance",
       rerank_candidate_limit: rerankCandidateLimit(),
       rerank_token_budget: rerankTokenBudget(),
       embedding_backfill_limit: Math.max(1, Math.min(64, Number(process.env.SELFMEM_EMBED_BACKFILL_LIMIT || 64))),
+      recall_latency_budget_ms: recallLatencyBudgetMs(),
+      supermemory_timeout_ms: supermemoryTimeoutMs(),
+      remote_read_through: state.supermemorySearchDisabled ? "disabled_for_benchmark" : "explicit_history_intent_or_thin_local_results",
     },
     live_credentials: {
       semantic_provider: state.voyageKeys.length > 0 ? "voyage" : "missing",
       voyage_key_count: state.voyageKeys.length,
       supermemory_read_key_present: Boolean(state.supermemoryKey),
       supermemory_read_through_ready: Boolean(state.supermemoryReadThrough),
+      supermemory_search_disabled: Boolean(state.supermemorySearchDisabled),
     },
     usage: state.usage,
     memory_count: readAll(state).length,
@@ -618,6 +715,35 @@ function rerankTokenBudget() {
   const configured = Number(process.env.SELFMEM_RERANK_TOKEN_BUDGET || DEFAULT_RERANK_TOKEN_BUDGET);
   if (!Number.isFinite(configured)) return DEFAULT_RERANK_TOKEN_BUDGET;
   return Math.max(0, Math.floor(configured));
+}
+
+function recallLatencyBudgetMs() {
+  const configured = Number(process.env.SELFMEM_RECALL_LATENCY_BUDGET_MS || DEFAULT_RECALL_LATENCY_BUDGET_MS);
+  if (!Number.isFinite(configured)) return DEFAULT_RECALL_LATENCY_BUDGET_MS;
+  return Math.max(250, Math.min(10000, Math.floor(configured)));
+}
+
+function supermemoryTimeoutMs() {
+  const configured = Number(process.env.SELFMEM_SUPERMEMORY_TIMEOUT_MS || DEFAULT_SUPERMEMORY_TIMEOUT_MS);
+  if (!Number.isFinite(configured)) return DEFAULT_SUPERMEMORY_TIMEOUT_MS;
+  return Math.max(200, Math.min(10000, Math.floor(configured)));
+}
+
+function minLocalResultsBeforeRemote() {
+  const configured = Number(process.env.SELFMEM_MIN_LOCAL_RESULTS_BEFORE_REMOTE || 3);
+  if (!Number.isFinite(configured)) return 3;
+  return Math.max(0, Math.min(20, Math.floor(configured)));
+}
+
+function elapsedMs(startedAt) {
+  return Math.max(0.001, Number((performance.now() - startedAt).toFixed(3)));
+}
+
+function remoteReadThroughDecision(query, localCount, localElapsedMs) {
+  if (localElapsedMs >= recallLatencyBudgetMs()) return { search: false, reason: "local_recall_exceeded_latency_budget" };
+  if (REMOTE_HISTORY_INTENT_RE.test(String(query || ""))) return { search: true, reason: "explicit_history_intent" };
+  if (localCount < minLocalResultsBeforeRemote()) return { search: true, reason: "thin_local_results" };
+  return { search: false, reason: "local_results_sufficient" };
 }
 
 function canRerank(state, query, documents) {

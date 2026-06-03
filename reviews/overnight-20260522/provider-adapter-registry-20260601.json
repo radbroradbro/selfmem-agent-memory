@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "provider-adapter-registry-check",
+  "status": "READY_PROVIDER_ADAPTER_REGISTRY",
+  "generatedAt": "2026-06-01T20:45:43.501Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "storesCredentials": false,
+  "input": {
+    "path": "configs/provider-adapter-registry.json",
+    "hash": "sha256:b89829827d6b0377f6eb850ccba4cceb363243aa21cdee9b563eaec6a6c4805d"
+  },
+  "personalProductionDefaultArm": "cloud-voyage4-lite-voyage-lite",
+  "methodologyDefault": {
+    "memoryMethod": "contextual-source-chunk-v1",
+    "firstStage": "bm25-lite",
+    "vectorMerge": "optional",
+    "defaultVectorArm": "cloud-voyage4-lite-voyage-lite",
+    "defaultReranker": "rerank-2.5-lite",
+    "queryExpansionDefaultEnabled": false,
+    "answerTopK": "8-12",
+    "promotionRule": "Promote only after paired answer-quality deltas clear the configured bootstrap gate on the same raw query selection."
+  },
+  "benchmarkRules": {
+    "sameMaterializerAcrossProviderArms": true,
+    "defaultMaterializerForProviderCanaries": "contextual-source-chunk-v1",
+    "keepBm25ControlInEveryProviderRun": true,
+    "crossProviderFallbackEnabled": false,
+    "failedProviderArmStaysFailedForRun": true,
+    "rerunFailedProviderAsSeparateArmOnly": true,
+    "queryExpansionDefaultEnabled": false,
+    "sourceRehydrationRequiredForAtomicRecords": true,
+    "failureTaxonomyRequiredBeforePromotion": true,
+    "latencyCostQuotaLedgerRequiredBeforePromotion": true
+  },
+  "requiredFamilies": [
+    "voyage",
+    "gemini",
+    "nvidia",
+    "local-apple",
+    "openrouter",
+    "deepseek",
+    "jina",
+    "alibaba",
+    "zeroentropy"
+  ],
+  "presentFamilies": [
+    "voyage",
+    "gemini",
+    "nvidia",
+    "local-apple",
+    "openrouter",
+    "deepseek",
+    "jina",
+    "alibaba",
+    "zeroentropy"
+  ],
+  "missingFamilies": [],
+  "adapters": [
+    {
+      "family": "voyage",
+      "status": "implemented",
+      "capabilities": [
+        "embed",
+        "rerank"
+      ],
+      "benchmarkArms": [
+        "cloud-voyage4-voyage",
+        "cloud-voyage4-voyage-lite-rerank",
+        "cloud-voyage4-lite-voyage-lite"
+      ],
+      "role": "personal cloud default and low-cost provider benchmark lane"
+    },
+    {
+      "family": "gemini",
+      "status": "implemented",
+      "capabilities": [
+        "embed"
+      ],
+      "benchmarkArms": [
+        "cloud-gemini2-embed-rerank-proxy",
+        "cloud-gemini2-voyage-rerank"
+      ],
+      "role": "multimodal/document challenger and text embedding ablation"
+    },
+    {
+      "family": "nvidia",
+      "status": "implemented",
+      "capabilities": [
+        "embed",
+        "rerank",
+        "expand"
+      ],
+      "benchmarkArms": [
+        "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "cloud-nvidia-nemotron-1b",
+        "cloud-nvidia-nemotron-vl-1b"
+      ],
+      "role": "free-tier/provider benchmark challenger and query-expansion sweep lane"
+    },
+    {
+      "family": "local-apple",
+      "status": "implemented",
+      "capabilities": [
+        "embed",
+        "rerank"
+      ],
+      "benchmarkArms": [
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank",
+        "local-apple-qwen3-4b-local-rerank"
+      ],
+      "role": "zero-spend local regression and methodology lane"
+    },
+    {
+      "family": "openrouter",
+      "status": "partial",
+      "capabilities": [
+        "expand",
+        "embed-planned"
+      ],
+      "benchmarkArms": [],
+      "role": "free-model query-expansion fallback and planned embedding comparator"
+    },
+    {
+      "family": "deepseek",
+      "status": "partial",
+      "capabilities": [
+        "expand",
+        "review"
+      ],
+      "benchmarkArms": [],
+      "role": "cheap direct LLM lane for review, query expansion, and benchmark orchestration"
+    },
+    {
+      "family": "jina",
+      "status": "planned",
+      "capabilities": [
+        "embed",
+        "rerank"
+      ],
+      "benchmarkArms": [
+        "planned-jina-embedding-rerank"
+      ],
+      "role": "free-tier comparator after adapter implementation"
+    },
+    {
+      "family": "alibaba",
+      "status": "planned",
+      "capabilities": [
+        "embed",
+        "rerank",
+        "expand"
+      ],
+      "benchmarkArms": [
+        "planned-alibaba-qwen3-embedding-rerank"
+      ],
+      "role": "Qwen cloud comparator after adapter implementation"
+    },
+    {
+      "family": "zeroentropy",
+      "status": "planned",
+      "capabilities": [
+        "rerank"
+      ],
+      "benchmarkArms": [
+        "planned-zeroentropy-zerank-2"
+      ],
+      "role": "quality-challenger rerank lane after adapter implementation"
+    }
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Use the registry to keep provider canaries on the same materializer.",
+    "Implement planned Jina, Alibaba, and ZeroEntropy adapters only after the current contextual BM25 lane is stable.",
+    "Do not enable query expansion by default until it wins a paired answer-quality lane."
+  ]
+}

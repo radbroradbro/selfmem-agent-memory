@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "full-shard-control-export-probe",
+  "status": "READY_FULL_SHARD_CONTROL_EXPORT_PROBE",
+  "generatedAt": "2026-05-26T03:21:03.565Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "writesPrivateResponseFiles": true,
+  "privateResponseFileCommitted": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "queryCount": 500,
+    "shardId": "shard-001",
+    "startIndex": 0,
+    "endIndexExclusive": 25,
+    "responseCount": 25,
+    "answerModel": "gpt-4o",
+    "judgeModel": "gpt-4o"
+  },
+  "privateInputs": {
+    "directoryLabel": "external-private-input-dir",
+    "outputDirectoryLabel": "external-private-output-dir",
+    "querysetHash": "sha256:9cd221a53f8692f2035a87fc6d5f46495505c5c2571679fdfbdb2fe3f751d89b",
+    "memoriesHash": "sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a",
+    "valuesPrinted": false
+  },
+  "limits": {
+    "contextTokenBudget": 800,
+    "limit": 5,
+    "maxMemoryBytes": 300000000
+  },
+  "controls": {
+    "deterministicOnly": true,
+    "providerStrategiesExcluded": true,
+    "queryExpansionMode": "deterministic-proxy",
+    "localModelEvidence": false,
+    "answerQualityEvidence": false
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "exported": true,
+      "pathLabel": "external-private-response-file",
+      "name": "bm25-lite-responses.private.json",
+      "privateResponseFileHash": "sha256:2a82121f05e44ac4c6249c66c41a754ef85de940b63c5cb40c9d5e5ff6ea057a",
+      "privateResponseFileSizeBytes": 19346,
+      "privateResponseFileOutsideRepo": true,
+      "privateResponseFileMode": "0600",
+      "privateResponseFileMode0600": true,
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "queryShard": {
+        "startIndex": 0,
+        "endIndexExclusive": 25,
+        "totalQueryCount": 500,
+        "responseCount": 25,
+        "requestedLimit": 25,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+      },
+      "responseCount": 25,
+      "inputStats": {
+        "maxMemoryBytes": 300000000,
+        "featureProfile": {
+          "metadata": false,
+          "tokens": true,
+          "tokenSet": true,
+          "bigramSet": false,
+          "semanticVector": false,
+          "topicTermSet": false,
+          "roleCoverage": false,
+          "dateMs": false
+        },
+        "linesRead": 19195,
+        "parsed": 19195,
+        "candidates": 19195,
+        "skippedInvalid": 0,
+        "skippedFullyPrivate": 0,
+        "redactionCount": 0,
+        "keyRedactionCount": 0
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 25,
+        "queriesClipped": 25,
+        "clippedResultCount": 25,
+        "skippedByBudgetCount": 100,
+        "fullCandidateTokensAvg": 16999,
+        "exportedContextTokensAvg": 800
+      },
+      "featureProfile": {
+        "metadata": false,
+        "tokens": true,
+        "tokenSet": true,
+        "bigramSet": false,
+        "semanticVector": false,
+        "topicTermSet": false,
+        "roleCoverage": false,
+        "dateMs": false
+      },
+      "providerStrategy": false,
+      "providerCallsMade": 0,
+      "providerMockCalls": 0,
+      "queryExpansionCalls": 0,
+      "queryExpansionFallbacks": 0,
+      "timingMs": {
+        "min": 1006,
+        "p50": 1061,
+        "max": 1144,
+        "average": 1064,
+        "observedWallSeconds": 35
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "exported": true,
+      "pathLabel": "external-private-response-file",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "privateResponseFileHash": "sha256:41f15b7460e746694024b1206376444c3736ab5b18d8f25b0b2ba2d935913de6",
+      "privateResponseFileSizeBytes": 19374,
+      "privateResponseFileOutsideRepo": true,
+      "privateResponseFileMode": "0600",
+      "privateResponseFileMode0600": true,
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "queryShard": {
+        "startIndex": 0,
+        "endIndexExclusive": 25,
+        "totalQueryCount": 500,
+        "responseCount": 25,
+        "requestedLimit": 25,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+      },
+      "responseCount": 25,
+      "inputStats": {
+        "maxMemoryBytes": 300000000,
+        "featureProfile": {
+          "metadata": true,
+          "tokens": true,
+          "tokenSet": true,
+          "bigramSet": true,
+          "semanticVector": true,
+          "topicTermSet": true,
+          "roleCoverage": true,
+          "dateMs": true
+        },
+        "linesRead": 19195,
+        "parsed": 19195,
+        "candidates": 19195,
+        "skippedInvalid": 0,
+        "skippedFullyPrivate": 0,
+        "redactionCount": 0,
+        "keyRedactionCount": 0
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 25,
+        "queriesClipped": 25,
+        "clippedResultCount": 25,
+        "skippedByBudgetCount": 100,
+        "fullCandidateTokensAvg": 17507,
+        "exportedContextTokensAvg": 800
+      },
+      "featureProfile": {
+        "metadata": true,
+        "tokens": true,
+        "tokenSet": true,
+        "bigramSet": true,
+        "semanticVector": true,
+        "topicTermSet": true,
+        "roleCoverage": true,
+        "dateMs": true
+      },
+      "providerStrategy": false,
+      "providerCallsMade": 0,
+      "providerMockCalls": 0,
+      "queryExpansionCalls": 0,
+      "queryExpansionFallbacks": 0,
+      "timingMs": {
+        "min": 2874,
+        "p50": 3124,
+        "max": 3994,
+        "average": 3143,
+        "observedWallSeconds": 226
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "exported": true,
+      "pathLabel": "external-private-response-file",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "privateResponseFileHash": "sha256:27d513c2b3dedca72c34e43585e1222969551f3b0ff039b4eda70c3f2a5e3798",
+      "privateResponseFileSizeBytes": 19462,
+      "privateResponseFileOutsideRepo": true,
+      "privateResponseFileMode": "0600",
+      "privateResponseFileMode0600": true,
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "queryShard": {
+        "startIndex": 0,
+        "endIndexExclusive": 25,
+        "totalQueryCount": 500,
+        "responseCount": 25,
+        "requestedLimit": 25,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+      },
+      "responseCount": 25,
+      "inputStats": {
+        "maxMemoryBytes": 300000000,
+        "featureProfile": {
+          "metadata": true,
+          "tokens": true,
+          "tokenSet": true,
+          "bigramSet": true,
+          "semanticVector": true,
+          "topicTermSet": true,
+          "roleCoverage": true,
+          "dateMs": true
+        },
+        "linesRead": 19195,
+        "parsed": 19195,
+        "candidates": 19195,
+        "skippedInvalid": 0,
+        "skippedFullyPrivate": 0,
+        "redactionCount": 0,
+        "keyRedactionCount": 0
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 25,
+        "queriesClipped": 25,
+        "clippedResultCount": 25,
+        "skippedByBudgetCount": 100,
+        "fullCandidateTokensAvg": 17336,
+        "exportedContextTokensAvg": 800
+      },
+      "featureProfile": {
+        "metadata": true,
+        "tokens": true,
+        "tokenSet": true,
+        "bigramSet": true,
+        "semanticVector": true,
+        "topicTermSet": true,
+        "roleCoverage": true,
+        "dateMs": true
+      },
+      "providerStrategy": false,
+      "providerCallsMade": 0,
+      "providerMockCalls": 0,
+      "queryExpansionCalls": 0,
+      "queryExpansionFallbacks": 25,
+      "timingMs": {
+        "min": 2889,
+        "p50": 3139,
+        "max": 3410,
+        "average": 3134,
+        "observedWallSeconds": 227
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    }
+  ],
+  "aggregate": {
+    "allResponseCountsMatch": true,
+    "allProviderCallsZero": true,
+    "allPrivateFilesOutsideRepo": true,
+    "allPrivateFilesMode0600": true,
+    "allPrivacyClean": true
+  },
+  "safety": {
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPromptIncluded": false,
+    "rawAnswerIncluded": false
+  },
+  "nextActions": [
+    "Run the provider and live local-model shard arms after endpoints and explicit public-data consent are configured.",
+    "Run answer-quality preflight only after every required private response arm exists for the selected shard.",
+    "Keep this control probe separate from SOTA evidence; it proves runnable same-shard controls, not answer-quality superiority."
+  ]
+}

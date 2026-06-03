@@ -1,0 +1,221 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "required files exist",
+      "ok": true
+    },
+    {
+      "name": "required scripts exist",
+      "ok": true
+    },
+    {
+      "name": "stale RecallWeave temp cleanup guard passes",
+      "ok": true
+    },
+    {
+      "name": "selfmem_update command is mapped",
+      "ok": true
+    },
+    {
+      "name": "query expansion response parser accepts local model rewrites",
+      "ok": true
+    },
+    {
+      "name": "fresh Codex lifecycle audit fixture passes",
+      "ok": true
+    },
+    {
+      "name": "fresh wiki amplification fixture keeps BM25 control honest",
+      "ok": true
+    },
+    {
+      "name": "fresh local wiki shard plan is ready without SOTA overclaim",
+      "ok": true
+    },
+    {
+      "name": "fresh local wiki method report preserves benchmark boundaries",
+      "ok": true
+    },
+    {
+      "name": "dom evidence is sane",
+      "ok": true
+    },
+    {
+      "name": "release state is conservative",
+      "ok": true
+    },
+    {
+      "name": "post-baseline public evidence guard is honored",
+      "ok": true
+    },
+    {
+      "name": "release docs mention current preview surfaces",
+      "ok": true
+    },
+    {
+      "name": "release handoff documents blocked launch path",
+      "ok": true
+    },
+    {
+      "name": "model matrix and autoresearch gate stay conservative",
+      "ok": true
+    },
+    {
+      "name": "fresh public MemoryBench source lock passes",
+      "ok": true
+    },
+    {
+      "name": "fresh public LongMemEval slice manifest passes",
+      "ok": true
+    },
+    {
+      "name": "fresh public benchmark target check passes",
+      "ok": true
+    },
+    {
+      "name": "fresh local session compaction audit passes",
+      "ok": true
+    },
+    {
+      "name": "fresh local session batch compaction audit passes",
+      "ok": true
+    },
+    {
+      "name": "fresh static brain UI evidence passes",
+      "ok": true
+    },
+    {
+      "name": "fresh brain UI smoke passes",
+      "ok": true
+    },
+    {
+      "name": "fresh brain UI interaction smoke passes",
+      "ok": true
+    },
+    {
+      "name": "fresh local container audit smoke passes",
+      "ok": true
+    },
+    {
+      "name": "fresh clean consumer smoke passes",
+      "ok": true
+    },
+    {
+      "name": "fresh adapter store latency instrumentation passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary report generator passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary evidence intake passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary remediation passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary drill passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary operator packet passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary evidence packet passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary evidence packet review passes",
+      "ok": true
+    },
+    {
+      "name": "fresh returned canary packet intake passes",
+      "ok": true
+    },
+    {
+      "name": "fresh returned canary workspace generator passes",
+      "ok": true
+    },
+    {
+      "name": "fresh returned canary inbox scanner passes",
+      "ok": true
+    },
+    {
+      "name": "fresh returned canary inbox watcher passes",
+      "ok": true
+    },
+    {
+      "name": "fresh returned downloads scanner passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary diagnostic batch audit passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary next-agent plan passes",
+      "ok": true
+    },
+    {
+      "name": "fresh canary next-agent handoff packet passes",
+      "ok": true
+    },
+    {
+      "name": "current canary handoff packet identity is consistent",
+      "ok": true
+    },
+    {
+      "name": "fresh canary window reviewer evidence is explicit",
+      "ok": true
+    },
+    {
+      "name": "fresh release blocker doctor passes",
+      "ok": true
+    },
+    {
+      "name": "fresh hosted baseline preflight passes",
+      "ok": true
+    },
+    {
+      "name": "fresh GitHub handoff packet passes",
+      "ok": true
+    },
+    {
+      "name": "fresh GitHub live sync passes",
+      "ok": true
+    },
+    {
+      "name": "fresh goal completion audit passes",
+      "ok": true
+    },
+    {
+      "name": "git diff check passes",
+      "ok": true
+    },
+    {
+      "name": "remote url has no token",
+      "ok": true
+    },
+    {
+      "name": "core package dry-run pack passes",
+      "ok": true
+    },
+    {
+      "name": "forbidden runtime files are absent",
+      "ok": true
+    },
+    {
+      "name": "secret scan has zero hits",
+      "ok": true
+    },
+    {
+      "name": "public docs and evidence private path scan has zero hits",
+      "ok": true
+    }
+  ]
+}

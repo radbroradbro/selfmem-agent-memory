@@ -1,5 +1,11 @@
-defaultCloudArm: cloud-voyage4-voyage
-defaultLocalArm: local-qwen3-gte
+defaultCloudArm: cloud-voyage4-lite-voyage-lite
+defaultLocalArm: local-apple-qwen3-0_6b
+
+usagePolicy:
+  personalAgentDefaultArm: cloud-voyage4-lite-voyage-lite
+  methodologyRefinementDefaultArm: local-apple-qwen3-0_6b
+  rationale: "Use the Voyage lite embedding plus lite rerank cloud arm for actual Codex/personal memory by default. Use local arms for high-volume methodology refinement, plugin benchmark loops, private/offline sweeps, and no-spend question-set experimentation."
+  localPromotionRule: "Do not promote a local arm to the personal default unless it wins a same-data answer-quality benchmark against the cloud default or the owner explicitly changes the policy."
 
 fallbackPolicy:
   enabled: false
@@ -9,15 +15,18 @@ queryExpansion:
   defaultEnabled: false
   exposeRewriteQueryOption: true
   searchParameter: rewriteQuery
-  defaultProvider: nvidia
-  defaultModel: nvidia/nemotron-mini-4b-instruct
-  selectionPolicy: "Sweep NVIDIA hosted LLM models for latency and rewrite quality before changing the default."
+  defaultProvider: none
+  defaultModel: none
+  preferredSweepProvider: nvidia
+  selectionPolicy: "Sweep NVIDIA hosted LLMs, Gemini free-tier candidates, and small local OpenAI-compatible models for latency, exact-identifier preservation, and rewrite quality before enabling any default."
   sweepConfig: configs/nvidia-nim-query-expansion.yaml
   challengerModels:
     - qwen/qwen3-next-80b-a3b-instruct
     - meta/llama-3.2-3b-instruct
     - nvidia/llama-3.1-nemotron-nano-8b-v1
     - mistralai/mistral-nemotron
+    - gemini-2.5-flash
+    - local:qwen3-0.6b-instruct
   maxRewrites: 3
   onlySend: user_query
   neverSend:
@@ -35,6 +44,22 @@ arms:
     reranker: cohere
     rerankModel: cohere.rerank-v4.0-pro
     purpose: multimodal and document-heavy challenger arm
+
+  cloud-gemini2-embed-rerank-proxy:
+    embedder: gemini
+    embedModel: gemini-embedding-2
+    dimensions: 1536
+    reranker: deterministic-proxy
+    rerankModel: recallweave-deterministic-rerank-proxy
+    purpose: first-class Gemini Embedding 2 text/multimodal challenger without adding a second paid reranker
+
+  cloud-gemini2-voyage-rerank:
+    embedder: gemini
+    embedModel: gemini-embedding-2
+    dimensions: 1536
+    reranker: voyage
+    rerankModel: rerank-2.5
+    purpose: Gemini Embedding 2 challenger with Voyage rerank held constant against Voyage and NVIDIA arms
 
   cloud-gemini2-cohere4pro-3072:
     embedder: gemini
@@ -60,7 +85,27 @@ arms:
     rerankModel: rerank-2.5
     keyRotationEnv: VOYAGE_API_KEYS
     singleKeyEnv: VOYAGE_API_KEY
-    purpose: default text/code memory arm with same-provider embedding and rerank
+    purpose: quality challenger text/code memory arm with same-provider embedding and rerank
+
+  cloud-voyage4-voyage-lite-rerank:
+    embedder: voyage
+    embedModel: voyage-4-large
+    dimensions: 1024
+    reranker: voyage
+    rerankModel: rerank-2.5-lite
+    keyRotationEnv: VOYAGE_API_KEYS
+    singleKeyEnv: VOYAGE_API_KEY
+    purpose: quality embedding with low-cost same-provider rerank challenger
+
+  cloud-voyage4-lite-voyage-lite:
+    embedder: voyage
+    embedModel: voyage-4-lite
+    dimensions: 1024
+    reranker: voyage
+    rerankModel: rerank-2.5-lite
+    keyRotationEnv: VOYAGE_API_KEYS
+    singleKeyEnv: VOYAGE_API_KEY
+    purpose: default low-cost personal cloud memory arm with same-provider embedding and rerank
 
   cloud-gemini2-pinecone:
     embedder: gemini
@@ -70,19 +115,89 @@ arms:
     rerankModel: pinecone-rerank-v0
     purpose: BEIR-style rerank check
 
-  local-qwen3-gte:
+  cloud-nvidia-retriever-500m:
+    embedder: nvidia
+    embedModel: nvidia/llama-nemotron-embed-1b-v2
+    dimensions: provider-default
+    reranker: nvidia
+    rerankModel: nvidia/llama-3.2-nemoretriever-500m-rerank-v2
+    apiKeyEnv: NVIDIA_API_KEY
+    apiKeysEnv: NVIDIA_API_KEYS
+    purpose: latency-oriented NVIDIA hosted retrieval challenger
+
+  cloud-nvidia-nemotron-1b:
+    embedder: nvidia
+    embedModel: nvidia/llama-nemotron-embed-1b-v2
+    dimensions: provider-default
+    reranker: nvidia
+    rerankModel: nvidia/llama-nemotron-rerank-1b-v2
+    apiKeyEnv: NVIDIA_API_KEY
+    apiKeysEnv: NVIDIA_API_KEYS
+    purpose: current NVIDIA 1B text retrieval challenger
+
+  cloud-nvidia-nemotron-vl-1b:
+    embedder: nvidia
+    embedModel: nvidia/llama-nemotron-embed-vl-1b-v2
+    dimensions: provider-default
+    reranker: nvidia
+    rerankModel: nvidia/llama-nemotron-rerank-vl-1b-v2
+    apiKeyEnv: NVIDIA_API_KEY
+    apiKeysEnv: NVIDIA_API_KEYS
+    purpose: multimodal NVIDIA retrieval challenger
+
+  cloud-nvidia-e5-mistral:
+    embedder: nvidia
+    embedModel: nvidia/nv-embedqa-e5-v5
+    dimensions: 1024
+    reranker: nvidia
+    rerankModel: nvidia/nv-rerankqa-mistral-4b-v3
+    apiKeyEnv: NVIDIA_API_KEY
+    apiKeysEnv: NVIDIA_API_KEYS
+    purpose: NVIDIA hosted quality challenger for QA-style retrieval
+
+  local-apple-qwen3-0_6b:
+    embedder: qwen3
+    runtime: llama.cpp
+    runtimeProfile: apple-metal
+    artifactPolicy: source-locked-huggingface-or-official
+    staleProcessPolicy: stop-recallweave-owned-only
+    quantizationPolicy: default-q8-or-source-card-recommended-only
+    embedModel: Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0
+    dimensions: 1024
+    reranker: deterministic-proxy
+    rerankModel: recallweave-deterministic-rerank-proxy
+    plannedReranker: Qwen/Qwen3-Reranker-0.6B
+    plannedRerankRuntime: sentence-transformers-or-llama.cpp-gguf
+    baseUrlEnv: SELFMEM_LOCAL_EMBED_BASE_URL
+    rerankBaseUrlEnv: SELFMEM_LOCAL_RERANK_BASE_URL
+    purpose: default zero-spend Apple Silicon embedding arm for 24GB-class Macs; local reranker remains a challenger until live-tested
+
+  local-apple-qwen3-4b:
+    embedder: qwen3
+    runtime: llama.cpp
+    runtimeProfile: apple-metal
+    artifactPolicy: source-locked-huggingface-or-official
+    staleProcessPolicy: stop-recallweave-owned-only
+    quantizationPolicy: benchmark-arm-only
+    embedModel: Qwen/Qwen3-Embedding-4B
+    dimensions: 2560
+    reranker: qwen3
+    rerankModel: Qwen/Qwen3-Reranker-4B
+    purpose: optional local quality arm when latency and memory fit
+
+  local-qwen3-8b-gte:
     embedder: qwen3
     embedModel: qwen3-embedding-8b
     reranker: gte
     rerankModel: gte-reranker-modernbert-base
-    purpose: practical zero-spend local default
+    purpose: legacy quality arm; not default for 24GB Apple Silicon
 
-  local-qwen3-qwen3rerank:
+  local-qwen3-8b-qwen3rerank:
     embedder: qwen3
     embedModel: qwen3-embedding-8b
     reranker: qwen3
     rerankModel: qwen3-reranker-4b-or-8b-based-on-local-fit
-    purpose: quality-first local arm
+    purpose: quality-first local arm for larger machines or slow offline runs
 
   local-jina5-gte:
     embedder: jina

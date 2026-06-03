@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-embedding-launch-diagnostic",
+  "status": "BLOCKED_LOCAL_EMBEDDING_LAUNCH",
+  "generatedAt": "2026-05-26T16:24:37.428Z",
+  "fixtureOnly": false,
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawLogIncluded": false,
+  "rawConfigIncluded": false,
+  "rawBenchmarkInputIncluded": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "privatePathPrinted": false,
+  "endpointPrinted": false,
+  "modelPathPrinted": false,
+  "serverBinPrinted": false,
+  "printsEnvValues": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForShard002Resume": false,
+  "launchRecovered": false,
+  "launchBlocked": true,
+  "attemptCount": 2,
+  "attempts": [
+    {
+      "label": "first",
+      "fileNameHash": "sha256:5caf318a57db400093c4b76a76bd0a446d76565f0c7f4046441b59085588c295",
+      "logPresent": true,
+      "logHash": "sha256:12c287644da2cce34be9f0ab7999af6b4a59782743900ee9ec4c23e070d1070b",
+      "lineCount": 150,
+      "byteCount": 10277,
+      "tailHash": "sha256:966b6aa151455f28cecdaa4a44857a17673174c8a1127aa4135ac256e60b816e",
+      "phases": {
+        "metalInitialized": true,
+        "httpServerStarted": true,
+        "modelLoadStarted": true,
+        "modelMetadataLoaded": true,
+        "tensorLoadStarted": true,
+        "endpointReady": false
+      },
+      "lastReachedPhase": "tensor-load-started",
+      "endpointReadyEvidence": false,
+      "processExitedBeforeEndpointReady": true,
+      "failureClass": "local-embedding-launch-exited-during-model-load",
+      "rawLogPrinted": false,
+      "privatePathPrinted": false
+    },
+    {
+      "label": "cpu",
+      "fileNameHash": "sha256:c0b60a7d11049a4e19f4dcf06ca9945d78042a9f5482f2c6743defc64c602f87",
+      "logPresent": true,
+      "logHash": "sha256:4c674d60dffb7aff3192d83e58f7cddfdfcb7130741add06456fa2a0e53e06be",
+      "lineCount": 61,
+      "byteCount": 5537,
+      "tailHash": "sha256:2fd6b4decdec535786cba7c48a4fb4561cba81f3d58b188c96ae597a8b616dcb",
+      "phases": {
+        "metalInitialized": true,
+        "httpServerStarted": true,
+        "modelLoadStarted": true,
+        "modelMetadataLoaded": true,
+        "tensorLoadStarted": false,
+        "endpointReady": false
+      },
+      "lastReachedPhase": "model-metadata-loaded",
+      "endpointReadyEvidence": false,
+      "processExitedBeforeEndpointReady": true,
+      "failureClass": "local-embedding-launch-exited-during-model-load",
+      "rawLogPrinted": false,
+      "privatePathPrinted": false
+    }
+  ],
+  "blockers": [
+    "local-embedding-launch-exited-before-endpoint-ready"
+  ],
+  "nextActions": [
+    "Free local memory pressure or stop stale model/browser processes before relaunching the embedding endpoint.",
+    "Relaunch the dedicated Qwen3 Embedding 0.6B GGUF endpoint and wait for /v1/models readiness.",
+    "Rerun the runtime doctor and durability smoke before shard-002 missing-arm export."
+  ]
+}

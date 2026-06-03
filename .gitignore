@@ -21,6 +21,13 @@ trace.jsonl
 *.sqlite3
 *.zip
 .goal-loop-review/
+.automation-worktrees/
+reviews/**/logs/
+reviews/**/checks.ndjson
+reviews/**/architecture-verification-rerun.json
+reviews/**/goal-objective-rerun.json
+reviews/**/goal-objective-rerun.prompt.md
+reviews/**/automation-rerun-*.md
 *.tsbuildinfo
 __pycache__/
 *.pyc

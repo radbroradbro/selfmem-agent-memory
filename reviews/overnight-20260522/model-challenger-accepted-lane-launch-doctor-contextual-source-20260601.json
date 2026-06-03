@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "full-shard-accepted-lane-launch-doctor",
+  "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
+  "claimScope": "model-challenger",
+  "generatedAt": "2026-06-01T20:48:51.055Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-model-challenger-contextual-source-shard-plan-20260601.json",
+    "hash": "sha256:d7539c238106515556bbfc886df9517400b7c78b82c3494595f8f4d3144edc0d",
+    "claimScope": "model-challenger",
+    "queryCount": 500,
+    "shardCount": 20,
+    "shardSize": 25,
+    "acceptedLaneIds": [
+      "model-challenger-accepted-shards"
+    ],
+    "diagnosticLaneIds": [
+      "deterministic-control-proxy",
+      "local-apple-no-spend",
+      "local-apple-scaled-challenger",
+      "voyage-minimum-challenger",
+      "gemini2-minimum-challenger",
+      "nvidia-minimum-challenger"
+    ]
+  },
+  "launchGate": {
+    "readyForFirstAcceptedShardRun": false,
+    "readyForAcceptedShardIntake": false,
+    "readyForPublicSotaClaim": false,
+    "readyForLocalFullBenchmarkResult": false,
+    "readyForModelChallengerBenchmarkResult": false,
+    "privateInputsReady": true,
+    "acceptedLaneReadyForResponseArmExport": true,
+    "acceptedLaneReadyForAnswerQualityScoring": false,
+    "localRuntimeReadyForResponseArmExport": true,
+    "shardResultsReturned": false,
+    "fullMemorySotaScoreProven": false,
+    "publicSotaClaimAllowed": false
+  },
+  "privateInput": {
+    "source": "checked-in-private-input-doctor",
+    "status": "READY_FULL_SHARD_PRIVATE_INPUTS",
+    "readyForAnswerQualityShardRun": true,
+    "rawSourcesRetainedPrivate": true,
+    "privateDirectoryPresent": true,
+    "privateDirectoryInsideRepository": false,
+    "privatePathPrinted": false,
+    "filesPresent": 6,
+    "filesHashMatched": 6,
+    "filesMode0600": 6,
+    "blockerCount": 0,
+    "blockers": []
+  },
+  "acceptedLane": {
+    "laneId": "model-challenger-accepted-shards",
+    "label": "Full model-challenger shard-intake lane",
+    "acceptedByFullShardIntake": true,
+    "canReachFullSotaGateAfterShardIntake": false,
+    "diagnosticOnly": false,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "cloud-gemini2-embed-rerank-proxy",
+      "cloud-voyage4-lite-voyage-lite",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank"
+    ],
+    "providerRequirements": [
+      "gemini",
+      "nvidia",
+      "voyage"
+    ],
+    "readyForResponseArmExport": true,
+    "readyForAnswerQualityScoring": false,
+    "readyForAcceptedShardIntakeCandidate": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "publicBenchmarkClaimsAllowed": false,
+    "responseArmExport": {
+      "laneId": "model-challenger-accepted-shards",
+      "ready": true,
+      "liveExportEnabled": true,
+      "noRawTextConfirmed": true,
+      "providerCallsRequired": true,
+      "providerCallsEnabled": true,
+      "providerPublicDataConfirmed": true,
+      "queryExpansionStrategyPresent": false,
+      "printsEnvValues": false,
+      "blockers": []
+    },
+    "answerQuality": {
+      "ready": false,
+      "answerQualityCallsEnabled": true,
+      "publicDataConfirmed": true,
+      "noRawTextOutputConfirmed": true,
+      "answerModelPresent": false,
+      "judgeModelPresent": false,
+      "targetAnswerModel": "gpt-4o",
+      "targetJudgeModel": "gpt-4o",
+      "answerModelMatchesTarget": false,
+      "judgeModelMatchesTarget": false,
+      "modelMatchPolicy": "challenger-model-allowed",
+      "exactTargetModelsRequired": false,
+      "localDiagnosticModelAllowed": false,
+      "localDiagnosticEndpointSatisfied": false,
+      "scoringModelPolicySatisfied": false,
+      "baseUrlPresent": false,
+      "endpointIsLocal": false,
+      "cloudEndpointRequiresApiKey": false,
+      "apiKeyPresent": false,
+      "printsEnvValues": false,
+      "blockers": [
+        "answer-model-missing",
+        "judge-model-missing",
+        "openai-compatible-base-url-missing"
+      ]
+    },
+    "queryExpansion": {
+      "required": false,
+      "evidenceRequirement": "not-required",
+      "ready": true,
+      "readyForResponseArmExport": true,
+      "readyForAnswerQualityScoring": true,
+      "readyForAcceptedShardIntake": true,
+      "diagnosticFallbackAllowed": false,
+      "deterministicFallbackOnly": false,
+      "countsAsQueryExpansionEvidence": false,
+      "countsAsFullSotaQueryExpansionEvidence": false,
+      "localEndpointPresent": false,
+      "localModelPresent": false,
+      "localReady": false,
+      "cloudCallsEnabled": false,
+      "publicDataConfirmed": false,
+      "cloudProviderReady": false,
+      "readyProviderKinds": [],
+      "printsEnvValues": false,
+      "blockers": []
+    },
+    "providerReadiness": {
+      "gemini": {
+        "ready": true,
+        "keyCount": 6,
+        "valueEnvNames": [
+          "GEMINI_API_KEY",
+          "GEMINI_API_KEYS",
+          "GOOGLE_API_KEY",
+          "GOOGLE_API_KEYS",
+          "AI_STUDIO_API_KEY",
+          "AI_STUDIO_API_KEYS"
+        ],
+        "keyFileEnvNames": [
+          "GEMINI_API_KEY_FILE",
+          "GEMINI_API_KEYS_FILE",
+          "GOOGLE_API_KEY_FILE",
+          "GOOGLE_API_KEYS_FILE",
+          "AI_STUDIO_API_KEY_FILE",
+          "AI_STUDIO_API_KEYS_FILE"
+        ],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [
+          "GEMINI_API_KEYS_FILE",
+          "GOOGLE_API_KEYS_FILE",
+          "AI_STUDIO_API_KEYS_FILE"
+        ],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      },
+      "nvidia": {
+        "ready": true,
+        "keyCount": 1,
+        "valueEnvNames": [
+          "NVIDIA_API_KEY",
+          "NVIDIA_API_KEYS",
+          "NVAPI_KEY",
+          "NVAPI_KEYS"
+        ],
+        "keyFileEnvNames": [
+          "NVIDIA_API_KEY_FILE",
+          "NVIDIA_API_KEYS_FILE",
+          "NVAPI_KEY_FILE",
+          "NVAPI_KEYS_FILE"
+        ],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [
+          "NVIDIA_API_KEYS_FILE",
+          "NVAPI_KEYS_FILE"
+        ],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      },
+      "voyage": {
+        "ready": true,
+        "keyCount": 8,
+        "valueEnvNames": [
+          "VOYAGE_API_KEY",
+          "VOYAGE_API_KEYS"
+        ],
+        "keyFileEnvNames": [
+          "VOYAGE_API_KEY_FILE",
+          "VOYAGE_API_KEYS_FILE"
+        ],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [
+          "VOYAGE_API_KEYS_FILE"
+        ],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      }
+    },
+    "localRuntimeHealth": {
+      "timeoutMs": 1500,
+      "endpointValuesPrinted": false,
+      "readyForResponseArmExport": true,
+      "endpoints": {
+        "local-apple": {
+          "provider": "local-apple",
+          "required": false,
+          "configured": false,
+          "localOnly": false,
+          "checked": false,
+          "reachable": true,
+          "ready": true,
+          "httpStatus": null,
+          "status": "not-required",
+          "envNames": [],
+          "endpointValuePrinted": false,
+          "blockers": []
+        },
+        "local-rerank": {
+          "provider": "local-rerank",
+          "required": false,
+          "configured": false,
+          "localOnly": false,
+          "checked": false,
+          "reachable": true,
+          "ready": true,
+          "httpStatus": null,
+          "status": "not-required",
+          "envNames": [],
+          "endpointValuePrinted": false,
+          "blockers": []
+        }
+      },
+      "blockers": []
+    },
+    "blockerCount": 3,
+    "blockers": [
+      "answer-model-missing",
+      "judge-model-missing",
+      "openai-compatible-base-url-missing"
+    ]
+  },
+  "shardProgress": {
+    "progressSource": "no-progress-inputs",
+    "progressIntakePath": null,
+    "progressInputCount": 0,
+    "progressInputFiles": [],
+    "acceptedShardCount": 0,
+    "pendingShardCount": 20,
+    "rejectedResultCount": 0,
+    "duplicateResultCount": 0,
+    "workorderCount": 1,
+    "firstPendingShardId": "shard-001",
+    "firstPendingShardRange": "0-25"
+  },
+  "operatorInputsNeeded": [
+    {
+      "id": "answer-quality-scoring",
+      "envNames": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT",
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL"
+      ],
+      "note": "OpenAI-compatible answer and judge endpoint matching the target models",
+      "valuePrinted": false
+    }
+  ],
+  "nextCommands": {
+    "shardMaterialize": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --memory-method contextual-source-chunk-v1 --context-token-budget 800 --limit 5 --query-offset 0 --max-queries 25 --private-output-dir <private-output-dir>/shards/shard-001/materialized --output <public-review-dir>/public-longmemeval-model-challenger-materialize-shard-001.json --markdown-output <public-review-dir>/public-longmemeval-model-challenger-materialize-shard-001.md",
+    "responseArmExport": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/shard-001/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/shard-001/materialized/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/shards/shard-001/arms --strategies bm25-lite,full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-lite-voyage-lite,cloud-nvidia-nv-embed-v1-mistral-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset 0 --max-queries 25",
+    "answerQuality": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=challenger-model-allowed RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<challenger-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<challenger-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope model-challenger --model-match-policy challenger-model-allowed --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/shard-001/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/shard-001/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/shard-001/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries 25 --arm bm25-lite=<private-output-dir>/shards/shard-001/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/shard-001/arms/full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/shard-001/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-lite-voyage-lite=<private-output-dir>/shards/shard-001/arms/cloud-voyage4-lite-voyage-lite-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/shard-001/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --output <public-review-dir>/answer-quality-model-challenger-shard-001.json --markdown-output <public-review-dir>/answer-quality-model-challenger-shard-001.md",
+    "workorderRefresh": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",
+    "shardIntakeAfterAllShards": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake --input <public-review-dir>/answer-quality-model-challenger-shard-001.json,<public-review-dir>/answer-quality-model-challenger-shard-002.json,<public-review-dir>/answer-quality-model-challenger-shard-003.json,<public-review-dir>/answer-quality-model-challenger-shard-004.json,<public-review-dir>/answer-quality-model-challenger-shard-005.json,<public-review-dir>/answer-quality-model-challenger-shard-006.json,<public-review-dir>/answer-quality-model-challenger-shard-007.json,<public-review-dir>/answer-quality-model-challenger-shard-008.json,<public-review-dir>/answer-quality-model-challenger-shard-009.json,<public-review-dir>/answer-quality-model-challenger-shard-010.json,<public-review-dir>/answer-quality-model-challenger-shard-011.json,<public-review-dir>/answer-quality-model-challenger-shard-012.json,<public-review-dir>/answer-quality-model-challenger-shard-013.json,<public-review-dir>/answer-quality-model-challenger-shard-014.json,<public-review-dir>/answer-quality-model-challenger-shard-015.json,<public-review-dir>/answer-quality-model-challenger-shard-016.json,<public-review-dir>/answer-quality-model-challenger-shard-017.json,<public-review-dir>/answer-quality-model-challenger-shard-018.json,<public-review-dir>/answer-quality-model-challenger-shard-019.json,<public-review-dir>/answer-quality-model-challenger-shard-020.json --output <public-review-dir>/answer-quality-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-full-shard-intake.md --require-ready"
+  },
+  "blockers": [
+    "answer-model-missing",
+    "judge-model-missing",
+    "openai-compatible-base-url-missing",
+    "accepted-lane-answer-quality-scoring-not-ready",
+    "model-challenger-answer-quality-shard-results-not-returned"
+  ],
+  "nextActions": [
+    "Satisfy the private-input doctor, cloud provider credentials, and challenger answer-quality endpoint requirements.",
+    "Keep query expansion as a labeled ablation unless the accepted lane explicitly includes it.",
+    "Do not claim public SOTA from this lane; exact-target full-SOTA evidence remains a separate gate."
+  ]
+}

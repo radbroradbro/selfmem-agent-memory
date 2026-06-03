@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "status": "COMBINED_WITH_ARM_FAILURES",
+  "mode": "public-benchmark-strategy-shard-combine",
+  "benchmark": "longmemeval",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-06-01T18:54:01.603Z",
+  "input": {
+    "reportCount": 1,
+    "reports": [
+      {
+        "path": "reviews/overnight-20260522/provider-runs/whole-harness-live-5q-contextual-20260601.json",
+        "hash": "sha256:977d22ac73b6eeb184be5b13a14479c683fedd4133dddc25e4b5925ef0926c17",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "queryOffset": 0,
+        "maxQueries": 5,
+        "selectedQueryCount": 5
+      }
+    ],
+    "querySetHash": "sha256:15b1f211048f47a7bbcfccf0274aa09b36aa130129c469145788e14ff26746d6",
+    "queryCount": 500,
+    "expectedResultRefCount": 101,
+    "requireComplete": false,
+    "requiredStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "cloud-gemini2-embed-rerank-proxy",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank"
+    ]
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "reportCount": 1,
+      "providerArms": [
+        "none"
+      ],
+      "rankingStrategies": [
+        "bm25-lite"
+      ],
+      "combinedResponsesHash": "sha256:4f38ed91b746fee1a941cac9923e9a5798a0cfa9d3d86dfc38cab0d7096cf8b5",
+      "combinedResultHash": "sha256:e0006edbd565019d2a31cca7db71fd10c7fe4f882b91c44ec28d517e4a5be80b",
+      "metrics": {
+        "quality": 0.3656,
+        "pAt1": 0.8,
+        "recallAt5": 0.1409,
+        "recallAt10": 0.1409,
+        "ndcgAt10": 0.3804,
+        "latencyP50Ms": 17,
+        "latencyP95Ms": 23
+      },
+      "coverage": {
+        "complete": false,
+        "coveredQueryCount": 5,
+        "totalQueryCount": 500,
+        "coveragePercent": 1,
+        "firstCoveredIndex": 0,
+        "lastCoveredIndex": 4,
+        "missingQueryCount": 495,
+        "duplicateFingerprintCount": 0
+      },
+      "fingerprintCount": 5
+    },
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "reportCount": 1,
+      "providerArms": [
+        "cloud-gemini2-embed-rerank-proxy"
+      ],
+      "rankingStrategies": [
+        "cloud-gemini2-embed-rerank-proxy"
+      ],
+      "combinedResponsesHash": "sha256:a4f7267b942d944519ca0992ca714f269c084e780137b5487e61a1d870d65985",
+      "combinedResultHash": "sha256:7b02b42847e5111cce4205e508a2ae5a7f60a93006773505c31d15857bc953e5",
+      "metrics": {
+        "quality": 0.3145,
+        "pAt1": 0.8,
+        "recallAt5": 0.0907,
+        "recallAt10": 0.0907,
+        "ndcgAt10": 0.2764,
+        "latencyP50Ms": 1245,
+        "latencyP95Ms": 1625
+      },
+      "coverage": {
+        "complete": false,
+        "coveredQueryCount": 5,
+        "totalQueryCount": 500,
+        "coveragePercent": 1,
+        "firstCoveredIndex": 0,
+        "lastCoveredIndex": 4,
+        "missingQueryCount": 495,
+        "duplicateFingerprintCount": 0
+      },
+      "fingerprintCount": 5
+    },
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "reportCount": 1,
+      "providerArms": [
+        "cloud-nvidia-nv-embed-v1-mistral-rerank"
+      ],
+      "rankingStrategies": [
+        "cloud-nvidia-nv-embed-v1-mistral-rerank"
+      ],
+      "combinedResponsesHash": "sha256:b01238bb2f8bac34601dea1e825d67aa1d81cf1b37ba00699ab3b820cf2c4099",
+      "combinedResultHash": "sha256:a07ec4abc85e7116b6e280c58a9256d4810abe3afeaab09bb3573d3042cecd5e",
+      "metrics": {
+        "quality": 0.4289,
+        "pAt1": 1,
+        "recallAt5": 0.1471,
+        "recallAt10": 0.1471,
+        "ndcgAt10": 0.4213,
+        "latencyP50Ms": 12076,
+        "latencyP95Ms": 14233
+      },
+      "coverage": {
+        "complete": false,
+        "coveredQueryCount": 5,
+        "totalQueryCount": 500,
+        "coveragePercent": 1,
+        "firstCoveredIndex": 0,
+        "lastCoveredIndex": 4,
+        "missingQueryCount": 495,
+        "duplicateFingerprintCount": 0
+      },
+      "fingerprintCount": 5
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "reportCount": 1,
+      "providerArms": [
+        "none"
+      ],
+      "rankingStrategies": [
+        "full-hybrid-rerank"
+      ],
+      "combinedResponsesHash": "sha256:1ac037c7adf70fcdc3956cf0bb754bfc6534fd718cd06efa0ddd8a6b22b0e329",
+      "combinedResultHash": "sha256:9c4866fb219675b83f4228e207a92f8295cb29e5f887a282553ba0638fb86b2a",
+      "metrics": {
+        "quality": 0.3265,
+        "pAt1": 0.8,
+        "recallAt5": 0.1012,
+        "recallAt10": 0.1012,
+        "ndcgAt10": 0.3034,
+        "latencyP50Ms": 37,
+        "latencyP95Ms": 49
+      },
+      "coverage": {
+        "complete": false,
+        "coveredQueryCount": 5,
+        "totalQueryCount": 500,
+        "coveragePercent": 1,
+        "firstCoveredIndex": 0,
+        "lastCoveredIndex": 4,
+        "missingQueryCount": 495,
+        "duplicateFingerprintCount": 0
+      },
+      "fingerprintCount": 5
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "reportCount": 1,
+      "providerArms": [
+        "none"
+      ],
+      "rankingStrategies": [
+        "query-expanded-full-hybrid-rerank"
+      ],
+      "combinedResponsesHash": "sha256:d5654e340e0417b85fb97af143d9f7fb81b06fc49321a9b7f233cc74c7ae8637",
+      "combinedResultHash": "sha256:47cbeddb628259860f694551d5c0a0c1b3e53898e418e9a61105c708d47136db",
+      "metrics": {
+        "quality": 0.3265,
+        "pAt1": 0.8,
+        "recallAt5": 0.1012,
+        "recallAt10": 0.1012,
+        "ndcgAt10": 0.3034,
+        "latencyP50Ms": 1609,
+        "latencyP95Ms": 1645
+      },
+      "coverage": {
+        "complete": false,
+        "coveredQueryCount": 5,
+        "totalQueryCount": 500,
+        "coveragePercent": 1,
+        "firstCoveredIndex": 0,
+        "lastCoveredIndex": 4,
+        "missingQueryCount": 495,
+        "duplicateFingerprintCount": 0
+      },
+      "fingerprintCount": 5
+    }
+  ],
+  "failedStrategies": [
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "failureHash": "sha256:483b7a363a8e4e09aeaafb4655e8edfc87f860384f5c960cc987cc1cdec241fa",
+      "failureSummary": "node packages/bench/recallweave-response-export.mjs --live --queryset <private-path> --memories <private-path> --preserve-ids --strategy cloud-voyage4-voyage-lite-rerank --context-token-budget 1400 --limit 5 --max-memory-bytes 2000000000 --",
+      "retryableProviderLimit": true,
+      "queryOffset": 0,
+      "maxQueries": 5
+    }
+  ],
+  "winner": {
+    "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "quality": 0.4289,
+    "pAt1": 1,
+    "recallAt5": 0.1471,
+    "recallAt10": 0.1471,
+    "ndcgAt10": 0.4213,
+    "latencyP50Ms": 12076,
+    "coveragePercent": 1
+  },
+  "coverage": {
+    "queryCount": 500,
+    "completeStrategyCount": 0,
+    "incompleteStrategyCount": 5,
+    "bestCoveragePercent": 1
+  },
+  "blockers": [],
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Use this combined report as retrieval-proxy system evidence only; it is not answer-quality or SOTA evidence.",
+    "Shard provider waves when a full single-process arm is too slow, then combine only same-target reports with matching query-set hashes.",
+    "Run answer-quality scoring after retrieval arms cover the selected target and private response files pass intake."
+  ]
+}

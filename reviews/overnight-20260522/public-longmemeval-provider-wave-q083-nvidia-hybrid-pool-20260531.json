@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "partialResultsAllowed": true,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "partialResultsAllowed": true,
+  "generatedAt": "2026-05-31T02:59:25.758Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "collectorCompatibleQuerySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:039fe599c3cedf355d6a2cb9271931c5d30fce43045f9dc778157d43e32e6cc9",
+    "queryCount": 500,
+    "expectedResultRefCount": 1896,
+    "haystackSessionCount": 19195,
+    "requestedQuerySelection": {
+      "queryOffset": 83,
+      "maxQueries": 1,
+      "completeDataset": false
+    },
+    "selectedQueryCount": 1,
+    "armTimeoutMs": 0,
+    "providerArmTimeoutMs": 150000,
+    "providerTimeoutMs": 45000,
+    "providerRetryAttempts": 2,
+    "parallelArms": 1,
+    "isolateArms": true,
+    "controlReuse": {
+      "enabled": true,
+      "requestedReportCount": 1,
+      "reusedStrategyCount": 2,
+      "reusedStrategies": [
+        "bm25-lite",
+        "full-hybrid-rerank"
+      ]
+    }
+  },
+  "reusedControls": [
+    {
+      "strategy": "bm25-lite",
+      "sourceReportHash": "sha256:7436ed29744e3700c0feacf4ba3f2c189aee5ba262ee5b7eaf71c5202dfe079e",
+      "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+      "sourceGeneratedAt": "2026-05-31T01:43:51.389Z",
+      "queryShard": {
+        "startIndex": 83,
+        "endIndexExclusive": 84,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": 1,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:49dae5d64aada36ef04dca85c4aedbfba9d0674a25e967d89dd044071032a41b"
+      }
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "sourceReportHash": "sha256:7436ed29744e3700c0feacf4ba3f2c189aee5ba262ee5b7eaf71c5202dfe079e",
+      "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+      "sourceGeneratedAt": "2026-05-31T01:43:51.389Z",
+      "queryShard": {
+        "startIndex": 83,
+        "endIndexExclusive": 84,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": 1,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:49dae5d64aada36ef04dca85c4aedbfba9d0674a25e967d89dd044071032a41b"
+      }
+    }
+  ],
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:7db870140838e57c5cf46ad55f0e93289b5beff1235eb5d48a671d7602dd6946",
+      "resultHash": "sha256:220933ddb5bd5c3edb063dff0b95bbafb920119568eec32042c7c78b7c0094b6",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "e71d2a995bc04572",
+        "containerTagHash": "a687dcb077b46e06",
+        "localEmbeddingCachePathHash": "sha256:2968cb0fcce8079c79aeaad9deb04d7b060e636d51b8f8dd5d44d7ddbae6c3b0"
+      },
+      "queryShard": {
+        "startIndex": 83,
+        "endIndexExclusive": 84,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": 1,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:49dae5d64aada36ef04dca85c4aedbfba9d0674a25e967d89dd044071032a41b"
+      },
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 1243,
+        "latencyP95Ms": 1243,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 1,
+        "queriesClipped": 1,
+        "clippedResultCount": 1,
+        "skippedByBudgetCount": 4,
+        "fullCandidateTokensAvg": 16347,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "6f67a04474cf7226",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ],
+      "reusedControl": true,
+      "reuse": {
+        "sourceReportHash": "sha256:7436ed29744e3700c0feacf4ba3f2c189aee5ba262ee5b7eaf71c5202dfe079e",
+        "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+        "sourceGeneratedAt": "2026-05-31T01:43:51.389Z"
+      }
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:9389f3f1fde90444745f4613e0f9c4d317146fda05e0d156d01e9c8d3ddf7533",
+      "resultHash": "sha256:610e11fa2b266d93ec799363eb7621df995f3cc622aedc406c9d25acc7389f94",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "b9938c3cb43354d4",
+        "containerTagHash": "a0d293bad99f38bf",
+        "localEmbeddingCachePathHash": "sha256:90e98289ccc99f4395696de00e8a273ef718e088f7559ba59f30d370bb1aa3c2"
+      },
+      "queryShard": {
+        "startIndex": 83,
+        "endIndexExclusive": 84,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": 1,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:49dae5d64aada36ef04dca85c4aedbfba9d0674a25e967d89dd044071032a41b"
+      },
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 4799,
+        "latencyP95Ms": 4799,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 1,
+        "queriesClipped": 1,
+        "clippedResultCount": 1,
+        "skippedByBudgetCount": 4,
+        "fullCandidateTokensAvg": 19263,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "6f67a04474cf7226",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ],
+      "reusedControl": true,
+      "reuse": {
+        "sourceReportHash": "sha256:7436ed29744e3700c0feacf4ba3f2c189aee5ba262ee5b7eaf71c5202dfe079e",
+        "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+        "sourceGeneratedAt": "2026-05-31T01:43:51.389Z"
+      }
+    }
+  ],
+  "failedStrategies": [
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "quality": 0,
+    "pAt1": 0,
+    "recallAt5": 0,
+    "recallAt10": 0,
+    "ndcgAt10": 0,
+    "latencyP50Ms": 1243
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0,
+    "pAt1": 0,
+    "recallAt5": 0,
+    "recallAt10": 0,
+    "ndcgAt10": 0,
+    "latencyP50Ms": 1243
+  },
+  "promotion": {
+    "kind": "provider",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Missing bm25-lite control, full-hybrid-rerank control, or provider-backed arm."
+  },
+  "hybridPromotion": {
+    "kind": "provider",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Missing bm25-lite control, full-hybrid-rerank control, or provider-backed arm."
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

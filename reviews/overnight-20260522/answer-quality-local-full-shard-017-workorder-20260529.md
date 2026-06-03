@@ -1,0 +1,61 @@
+# Full Answer-Quality Shard Workorder
+
+- Status: PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS
+- Ready for shard intake: false
+- Ready for shard combine: false
+- Counts as full memory SOTA evidence: false
+- Accepted shards: 16
+- Pending shards: 4
+- Rejected results: 0
+- Workorders emitted: 1
+- Runtime blocker reports: 0
+- Runtime resume plans: 0
+
+## Workorders
+- shard-017: 400-425
+
+## Runtime Resume Plans
+- none
+
+## Execution Lanes
+- deterministic-control-proxy: ready=true; intake-compatible=false; providers=none
+- local-apple-no-spend: ready=true; intake-compatible=false; providers=local-apple, local-rerank
+- voyage-minimum-challenger: ready=false; intake-compatible=false; providers=voyage
+- nvidia-minimum-challenger: ready=false; intake-compatible=false; providers=nvidia
+- local-full-accepted-shards: ready=true; intake-compatible=true; providers=local-apple, local-rerank
+
+## Execution Lane Readiness
+- deterministic-control-proxy: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
+  - query-expansion=deterministic-fallback-only; model-backed=false; fallback-allowed=true
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing
+- local-apple-no-spend: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
+  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
+- voyage-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, openai-compatible-base-url-missing, voyage-credentials-missing
+- nvidia-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, nvidia-credentials-missing, openai-compatible-base-url-missing
+- local-full-accepted-shards: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
+  - query-expansion=local-or-cloud-model-required; model-backed=false; fallback-allowed=false
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing
+
+## Blockers
+- answer-quality-shard-runs-pending
+
+## Gated Commands
+- Intake: npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --output <public-review-dir>/answer-quality-local-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-local-full-shard-intake.md --require-ready
+- Combine after intake passes: npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-local-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-local-full-combined.md
+- Result gate after combine: npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --claim-scope local-full --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-local-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-local-full.json --require-ready
+- Reviewer intake after combine: npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-local-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-local-full.json
+
+## Next Actions
+- Run the listed response-arm export and answer-quality commands for the pending shards.
+- Re-run this workorder with the returned public shard-result JSONs to track progress.
+- Do not run combine until benchmark:answer-quality:shard-intake passes with complete coverage.

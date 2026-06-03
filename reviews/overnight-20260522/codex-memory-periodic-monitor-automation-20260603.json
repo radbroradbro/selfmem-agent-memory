@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "mode": "codex-memory-periodic-monitor-automation",
+  "generatedAt": "2026-06-03T15:20:00Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "automationId": "recallweave-memory-dogfood-monitor-2",
+  "status": "ACTIVE",
+  "scheduleLabel": "hourly",
+  "workspace": "selfmem-agent-memory-recover",
+  "checks": [
+    "codex-memory-dogfood-monitor rewired strict health",
+    "release-blocker-doctor blocker drift",
+    "goal-completion-audit completion guard"
+  ],
+  "watchSignals": {
+    "severeNoise": true,
+    "quietPromptContextLeak": true,
+    "directLookupUsefulness": true,
+    "randomBenchmarkOrCanaryInjection": true,
+    "forcedOrPeriodicRecallAnchoring": true,
+    "explicitWriteFailures": true,
+    "blockerDrift": true,
+    "checkedInSecretOrPrivatePathLeak": true
+  },
+  "notAConcern": [
+    "local memory containing private operational facts",
+    "local memory containing secrets the operator intentionally wants recalled"
+  ],
+  "boundaries": {
+    "publicLaunchAllowed": false,
+    "countsAsBenchmarkEvidence": false,
+    "productionDefaultAllowed": false,
+    "openRouterDefaultAllowed": false,
+    "goalCompletionAllowedByThisAutomation": false
+  },
+  "notifyPolicy": {
+    "notifyOnRegression": true,
+    "notifyOnBlockerChange": true,
+    "stayQuietWhenCleanAndUnchanged": true
+  }
+}

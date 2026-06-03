@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "fixtureOnly": true,
+  "evidenceType": "fixture-recallweave-baseline-result",
+  "provider": "recallweave",
+  "metricsOnly": true,
+  "runId": "fixture-recallweave-baseline",
+  "runAt": "fixture-current-window",
+  "sourceCommit": "fixture-source-commit",
+  "datasetSlice": "fixture-memory-canary-slice",
+  "querySetHash": "sha256:fixturequeryset000000000000000000000000000000000000000000000000",
+  "scoringCodeHash": "sha256:fixturescoring000000000000000000000000000000000000000000000000",
+  "judgeModel": "fixture-judge",
+  "answerModel": "fixture-answer",
+  "sameHarness": true,
+  "sameDataset": true,
+  "sameJudge": true,
+  "sameAnswerModel": true,
+  "querySetEvidence": {
+    "queryCount": 3,
+    "labeledQueryCount": 3,
+    "unlabeledQueryCount": 0,
+    "expectedResultRefCount": 3,
+    "minExpectedRefsPerQuery": 1,
+    "usesExpectedIds": true,
+    "usesExpectedHashes": false,
+    "publicBenchmarkReady": true
+  },
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawAnswerIncluded": false,
+  "metrics": {
+    "quality": 0.81,
+    "pAt1": 0.72,
+    "recallAt5": 0.88,
+    "recallAt10": 0.93,
+    "ndcgAt10": 0.83,
+    "latencyP50Ms": 540,
+    "latencyP95Ms": 980,
+    "contextTokensAvg": 1180
+  },
+  "cost": {
+    "ingestUsd": 0.008,
+    "queryUsd": 0.014
+  },
+  "matchedHostedRunPresent": true
+}

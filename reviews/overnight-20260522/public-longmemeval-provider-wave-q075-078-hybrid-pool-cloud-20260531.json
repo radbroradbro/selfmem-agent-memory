@@ -1,0 +1,619 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "partialResultsAllowed": true,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "partialResultsAllowed": true,
+  "generatedAt": "2026-05-31T03:19:32.661Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "collectorCompatibleQuerySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:806f34242a2f120f933b7ae0033b112ee8e5e4eab946fba36087220717b26ce7",
+    "queryCount": 500,
+    "expectedResultRefCount": 1896,
+    "haystackSessionCount": 19195,
+    "requestedQuerySelection": {
+      "queryOffset": 75,
+      "maxQueries": 3,
+      "completeDataset": false
+    },
+    "selectedQueryCount": 3,
+    "armTimeoutMs": 0,
+    "providerArmTimeoutMs": 300000,
+    "providerTimeoutMs": 90000,
+    "providerRetryAttempts": 2,
+    "parallelArms": 1,
+    "isolateArms": true,
+    "controlReuse": {
+      "enabled": true,
+      "requestedReportCount": 1,
+      "reusedStrategyCount": 2,
+      "reusedStrategies": [
+        "bm25-lite",
+        "full-hybrid-rerank"
+      ]
+    }
+  },
+  "reusedControls": [
+    {
+      "strategy": "bm25-lite",
+      "sourceReportHash": "sha256:3535d89b7d1c4df78ea6717d22967ef36135984c81909cb2c70e769b8cefa86e",
+      "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+      "sourceGeneratedAt": "2026-05-30T23:44:51.878Z",
+      "queryShard": {
+        "startIndex": 75,
+        "endIndexExclusive": 78,
+        "totalQueryCount": 500,
+        "responseCount": 3,
+        "requestedLimit": 3,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:fe64eaf138028be16e22f9e13a6577fedd5965b00492ce3c5ed9b109c5368dff"
+      }
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "sourceReportHash": "sha256:3535d89b7d1c4df78ea6717d22967ef36135984c81909cb2c70e769b8cefa86e",
+      "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+      "sourceGeneratedAt": "2026-05-30T23:44:51.878Z",
+      "queryShard": {
+        "startIndex": 75,
+        "endIndexExclusive": 78,
+        "totalQueryCount": 500,
+        "responseCount": 3,
+        "requestedLimit": 3,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:fe64eaf138028be16e22f9e13a6577fedd5965b00492ce3c5ed9b109c5368dff"
+      }
+    }
+  ],
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:bde29e1f2b2d7bfa4bdde8f817b4a5d7be10947730039173b2e9efa240f0cbba",
+      "resultHash": "sha256:c433635b6ba3ae500113de6034d33126c82dafe20de9695fdfba1b3cf94ca9c0",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "e71d2a995bc04572",
+        "containerTagHash": "edacc0f0aeb8ed88",
+        "localEmbeddingCachePathHash": "sha256:b7939752f02231d0ac3c89ee2a21423fa6af2d290368b727e52fa1608e64653e"
+      },
+      "queryShard": {
+        "startIndex": 75,
+        "endIndexExclusive": 78,
+        "totalQueryCount": 500,
+        "responseCount": 3,
+        "requestedLimit": 3,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:fe64eaf138028be16e22f9e13a6577fedd5965b00492ce3c5ed9b109c5368dff"
+      },
+      "metrics": {
+        "quality": 0.1575,
+        "pAt1": 0.3333,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1301,
+        "latencyP50Ms": 1018,
+        "latencyP95Ms": 1107,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 3,
+        "clippedResultCount": 3,
+        "skippedByBudgetCount": 27,
+        "fullCandidateTokensAvg": 36759,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "678991ac680fb84d",
+          "topResultIdHash": "4dc4870edd97bf47",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3b87fd982793b610",
+          "topResultIdHash": "8d81e5b344a1a246",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "2d26ff48af59ac7c",
+          "topResultIdHash": "cecfa2bc6e8c55ce",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ],
+      "reusedControl": true,
+      "reuse": {
+        "sourceReportHash": "sha256:3535d89b7d1c4df78ea6717d22967ef36135984c81909cb2c70e769b8cefa86e",
+        "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+        "sourceGeneratedAt": "2026-05-30T23:44:51.878Z"
+      }
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:9c839edc5124d6a7ecc0f62b23a275d7ee6dfefcb7b178e7fef1f7df5e23c6dd",
+      "resultHash": "sha256:470b2e19e45375c6e3133f15d5b78a2cc9887982eaf6d9a47100831d2dcf45a8",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "b9938c3cb43354d4",
+        "containerTagHash": "7bd24bba6886a349",
+        "localEmbeddingCachePathHash": "sha256:37943ba48df5cbde48e529c72b70203943d779ab66d6cab3be0b01001ba42126"
+      },
+      "queryShard": {
+        "startIndex": 75,
+        "endIndexExclusive": 78,
+        "totalQueryCount": 500,
+        "responseCount": 3,
+        "requestedLimit": 3,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:fe64eaf138028be16e22f9e13a6577fedd5965b00492ce3c5ed9b109c5368dff"
+      },
+      "metrics": {
+        "quality": 0.1575,
+        "pAt1": 0.3333,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1301,
+        "latencyP50Ms": 3741,
+        "latencyP95Ms": 4350,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 3,
+        "clippedResultCount": 3,
+        "skippedByBudgetCount": 27,
+        "fullCandidateTokensAvg": 40441,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "678991ac680fb84d",
+          "topResultIdHash": "4dc4870edd97bf47",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3b87fd982793b610",
+          "topResultIdHash": "8d81e5b344a1a246",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "2d26ff48af59ac7c",
+          "topResultIdHash": "cecfa2bc6e8c55ce",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ],
+      "reusedControl": true,
+      "reuse": {
+        "sourceReportHash": "sha256:3535d89b7d1c4df78ea6717d22967ef36135984c81909cb2c70e769b8cefa86e",
+        "sourceReportPath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+        "sourceGeneratedAt": "2026-05-30T23:44:51.878Z"
+      }
+    },
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:b31ead07af89a56fa73429e0eef010c2ed4adfbdfde2842d4f6b630ae26473aa",
+      "resultHash": "sha256:e8a7069764f187e3cc392a98f43cc4f9ce431111bd556cb5a753114d53ef5be3",
+      "rankingStrategy": "cloud-gemini2-embed-rerank-proxy",
+      "provider": {
+        "strategy": "cloud-gemini2-embed-rerank-proxy",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 6,
+        "providerMockCalls": 0,
+        "embeddingCalls": 6,
+        "rerankCalls": 0,
+        "documentCountSent": 12,
+        "queryCountSent": 3,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": "cloud-gemini2-embed-rerank-proxy",
+        "providers": [
+          "gemini"
+        ],
+        "embedModel": "gemini-embedding-2",
+        "embedDimensions": 1536,
+        "rerankModel": "local-deterministic-rerank-proxy",
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {
+          "gemini": 6
+        },
+        "keyCountAvailable": 6
+      },
+      "armIsolation": {
+        "isolated": true,
+        "supermemorySearchDisabled": true,
+        "effectiveArmTimeoutMs": 300000,
+        "armIdHash": "c9bc6fc299bed360",
+        "containerTagHash": "6914fbcd89915cbb",
+        "localEmbeddingCachePathHash": "sha256:3c6d808b7b867ad3832a30cebdbf9f96e4d7329b51aacf3b264dfcc38a76f589"
+      },
+      "queryShard": {
+        "startIndex": 75,
+        "endIndexExclusive": 78,
+        "totalQueryCount": 500,
+        "responseCount": 3,
+        "requestedLimit": 3,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:fe64eaf138028be16e22f9e13a6577fedd5965b00492ce3c5ed9b109c5368dff"
+      },
+      "metrics": {
+        "quality": 0.1575,
+        "pAt1": 0.3333,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1301,
+        "latencyP50Ms": 11092,
+        "latencyP95Ms": 11706,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 3,
+        "clippedResultCount": 3,
+        "skippedByBudgetCount": 27,
+        "fullCandidateTokensAvg": 37677,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "678991ac680fb84d",
+          "topResultIdHash": "4dc4870edd97bf47",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3b87fd982793b610",
+          "topResultIdHash": "8d81e5b344a1a246",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "2d26ff48af59ac7c",
+          "topResultIdHash": "cecfa2bc6e8c55ce",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:11ed8787ca3aec14ff7fc863e8f8597705c662bcf50af8ed45f3564f4499f802",
+      "resultHash": "sha256:832b05b611e644db732194e38f39cee6c7b3d2bc13bfa4ddb26c96f3d11229c5",
+      "rankingStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "provider": {
+        "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 9,
+        "providerMockCalls": 0,
+        "embeddingCalls": 6,
+        "rerankCalls": 3,
+        "documentCountSent": 24,
+        "queryCountSent": 3,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "providers": [
+          "nvidia"
+        ],
+        "embedModel": "nvidia/nv-embed-v1",
+        "embedDimensions": null,
+        "rerankModel": "nv-rerank-qa-mistral-4b:1",
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {
+          "nvidia": 1
+        },
+        "keyCountAvailable": 1
+      },
+      "armIsolation": {
+        "isolated": true,
+        "supermemorySearchDisabled": true,
+        "effectiveArmTimeoutMs": 300000,
+        "armIdHash": "d98295921246a478",
+        "containerTagHash": "16bfe57ea55b66d9",
+        "localEmbeddingCachePathHash": "sha256:0040aeefb85a316aefdcd81d05680d83c7d95dff6cd09c75471735038aa406a1"
+      },
+      "queryShard": {
+        "startIndex": 75,
+        "endIndexExclusive": 78,
+        "totalQueryCount": 500,
+        "responseCount": 3,
+        "requestedLimit": 3,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:fe64eaf138028be16e22f9e13a6577fedd5965b00492ce3c5ed9b109c5368dff"
+      },
+      "metrics": {
+        "quality": 0.1575,
+        "pAt1": 0.3333,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1301,
+        "latencyP50Ms": 14566,
+        "latencyP95Ms": 18084,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 3,
+        "clippedResultCount": 3,
+        "skippedByBudgetCount": 27,
+        "fullCandidateTokensAvg": 38189,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "678991ac680fb84d",
+          "topResultIdHash": "0c4bf67b574f36db",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3b87fd982793b610",
+          "topResultIdHash": "86e9db1ed125fa12",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "2d26ff48af59ac7c",
+          "topResultIdHash": "5dd315256266589e",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    }
+  ],
+  "failedStrategies": [
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "quality": 0.1575,
+    "pAt1": 0.3333,
+    "recallAt5": 0.0833,
+    "recallAt10": 0.0833,
+    "ndcgAt10": 0.1301,
+    "latencyP50Ms": 1018
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0.1575,
+    "pAt1": 0.3333,
+    "recallAt5": 0.0833,
+    "recallAt10": 0.0833,
+    "ndcgAt10": 0.1301,
+    "latencyP50Ms": 1018
+  },
+  "promotion": {
+    "kind": "provider",
+    "bestProviderStrategy": "cloud-gemini2-embed-rerank-proxy",
+    "bestHybridStrategy": "cloud-gemini2-embed-rerank-proxy",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "qualityDeltaVsFullHybrid": 0,
+    "latencyDeltaVsBm25": 10074,
+    "latencyDeltaVsFullHybrid": 7351
+  },
+  "hybridPromotion": {
+    "kind": "provider",
+    "bestProviderStrategy": "cloud-gemini2-embed-rerank-proxy",
+    "bestHybridStrategy": "cloud-gemini2-embed-rerank-proxy",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "qualityDeltaVsFullHybrid": 0,
+    "latencyDeltaVsBm25": 10074,
+    "latencyDeltaVsFullHybrid": 7351
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

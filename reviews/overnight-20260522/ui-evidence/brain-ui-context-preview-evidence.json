@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "mode": "fixture-brain-ui-context-preview",
+  "writesRealFiles": false,
+  "head": "3d13665be917bedb33a4797d6ee5d6f3aaa9c460",
+  "url": "http://127.0.0.1:4177/",
+  "evidence": {
+    "hasContextPreviewHeading": true,
+    "mode": "fixture-prompt-context-preview",
+    "writesRealFiles": false,
+    "query": "native memory optimization",
+    "tokenBudget": 900,
+    "totalTokens": 642,
+    "budgetRemaining": 258,
+    "selectedMemoryCount": 3,
+    "sectionCount": 3,
+    "omittedCount": 2,
+    "privacyLeakCount": 0,
+    "hostedReadThrough": "read-only",
+    "writeMode": "local-only",
+    "hasCompiledContext": true,
+    "hasLocalOnlyWriteMode": true,
+    "hasReadOnlyHostedMode": true,
+    "hasZeroLeaks": true,
+    "hasGuardrailsSection": true,
+    "hasOmittedNoiseCandidate": true,
+    "hasPrivateOrKeyText": false,
+    "summaryText": "642/900Tokens258Remaining3Selected0Leaks"
+  },
+  "consoleErrorCount": 0,
+  "consoleMessages": []
+}

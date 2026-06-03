@@ -62,3 +62,16 @@ sync report that shows:
 Share operational evidence, not memory content. Useful diagnostics include event
 counts, provider mode, lifecycle coverage, redaction counts, error classes,
 version info, and sanitized stack traces.
+
+## Local Container Audit
+
+Real local-container browsing must start with a read-only audit. The audit
+requires an explicit directory, inspects only known runtime filenames, redacts
+the root path, returns counts and health reasons, and never returns raw memory
+or event text. It is a preflight for future Brain UI local mode, not permission
+to display live memories.
+
+The Brain UI selected audit route is disabled unless
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires
+read-only confirmation, clears the typed path after submit, and displays only a
+redacted `.../container` label.

@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "mode": "release-readiness-console",
+  "generatedAt": "2026-05-31T07:12:17.768Z",
+  "publicLaunchVerdict": "FAIL",
+  "productionReady": false,
+  "repository": "example/recallweave",
+  "pullRequest": {
+    "number": 5,
+    "branch": "feat/nucleus-wiki-native-contract",
+    "base": "main",
+    "state": "open",
+    "mergeable": true
+  },
+  "latestVerifiedCodeBaseline": {
+    "headSha": "0ce738855846add4e0e1aa3de9e050349361593b",
+    "ciRunId": null,
+    "ciConclusion": "local",
+    "localReleaseCheck": "passed",
+    "secretScan": "zero_hits"
+  },
+  "latestDocumentationBaseline": {
+    "headSha": "27c902cb0c4a5e1b72a7f5e9d1e5b1f6a57d8f43",
+    "ciRunId": 26301295098,
+    "ciConclusion": "success"
+  },
+  "safetyBoundary": {
+    "usesFixtureUiEvidence": true,
+    "commitsRawMemories": false,
+    "commitsRawTranscripts": false,
+    "commitsCredentials": false,
+    "enablesHostedWriteBack": false
+  },
+  "providerBudgetContract": {
+    "status": "NEEDS_RERUN_UNDER_CONTRACT",
+    "mode": "no-spend-free-tier",
+    "maxPaidUsd": 0,
+    "reports": 17,
+    "reportsWithBudgetContract": 0,
+    "reportsMissingBudgetContract": 17,
+    "crossProviderFallbackEnabled": false,
+    "defaultPromotionBlockedUntilRerun": true
+  },
+  "provenPreviewSurfaces": [
+    "nucleus-index",
+    "wiki-vault-compile",
+    "wiki-vault-sync-dry-run",
+    "brain-ui-container-health",
+    "brain-ui-selected-local-container-browse",
+    "brain-ui-selected-vault-sync-apply",
+    "brain-ui-lifecycle-policy-apply",
+    "brain-ui-memory-review-queue-apply",
+    "brain-ui-selected-local-memory-edit",
+    "brain-ui-selected-local-memory-materialize",
+    "brain-ui-dynamic-graph-layout",
+    "brain-ui-graph-navigation-controls",
+    "brain-ui-session-compaction-audit",
+    "brain-ui-prompt-context-preview",
+    "brain-ui-research-source-lock",
+    "selfmem-update",
+    "local-full-500-query-diagnostic-score",
+    "provider-wave-intake-dashboard",
+    "provider-budget-contract-dashboard",
+    "answer-quality-method-ladder-workorder",
+    "atomic-memory-v1-answer-quality-smoke"
+  ],
+  "remainingBlockers": [
+    "full-memory-sota-benchmark-gate",
+    "atomic-memory-v1-full-answer-quality-wave-missing",
+    "same-data-voyage-answer-quality-missing",
+    "provider-waves-need-budget-contract-rerun-before-default-promotion",
+    "two-independent-memory-score-reviewers-missing",
+    "docs-release-notes-and-ui-evidence-refresh-after-full-result",
+    "human-public-launch-approval-required",
+    "real-container-production-rollout-required"
+  ],
+  "manualActions": [
+    "Run the full answer-quality provider lane with the accepted strategy set.",
+    "Rerun provider-wave repair slices under the no-spend provider budget contract before default promotion.",
+    "Collect two independent memory-score reviewer approvals.",
+    "Refresh release notes and UI evidence after the full result is accepted.",
+    "Approve public visibility only after the full SOTA gate stays green.",
+    "Run a real-container production canary before wider rollout."
+  ]
+}

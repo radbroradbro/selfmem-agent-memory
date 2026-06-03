@@ -1,0 +1,1563 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-method-ladder-result-gate",
+  "status": "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER",
+  "generatedAt": "2026-06-03T13:18:15.144Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsMethodLadderEvidence": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "reason": "Same-shard answer-quality method ladder shows a non-session challenger beating the session baseline under failure-accounted scoring; full memory/SOTA claims still require the remaining gates.",
+  "thresholds": {
+    "baselineMethod": "session-v1",
+    "minDelta": 1,
+    "maxWinnerArmFailures": 0,
+    "maxTotalFailureRate": 0.01,
+    "requirePairedBootstrap": false,
+    "minPairedMeanDelta": 1,
+    "minPairedBootstrapLowerBound": 0,
+    "pairedBootstrapSamples": 1000,
+    "promotionMinQueryCount": 75,
+    "promotionMaxWinnerArmFailures": 0,
+    "promotionMaxTotalFailureRate": 0.01
+  },
+  "result": {
+    "source": "result-file",
+    "hash": "sha256:3232820fbe9cd8361cc844c0d405b3f1172dd84df3a65de9fe20100536750104",
+    "fixtureOnly": false,
+    "mode": "answer-quality-memory-method-ladder",
+    "benchmark": "longmemeval",
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "queryShard": {
+      "startIndex": 75,
+      "endIndexExclusive": 100,
+      "requestedLimit": 25,
+      "sameRawQuerySelectionAcrossMethods": true,
+      "selectedQuestionIdsHash": "sha256:19d1f2a86c4f26c5fa05a95fc39f769c6e40affa09cb8680cf88635a9af8697a"
+    },
+    "continueOnCallError": true,
+    "methodCount": 2,
+    "totalCalls": 200,
+    "totalFailures": 0,
+    "totalFailureRate": 0
+  },
+  "baseline": {
+    "method": "session-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 24,
+    "judgeCorrectRate": 0.24,
+    "callsMade": 100,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 24,
+        "judgeCorrectRate": 0.24,
+        "answerLatencyP50Ms": 2074,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "678991ac680fb84d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "3b87fd982793b610",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2d26ff48af59ac7c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "a256467afcd101e2",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39b198ddb1103c67",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "203aaf01d255bb21",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2766acc8fb3b0752",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "5e35a88f4cf41f0e",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "7dd79b4061adabf3",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "368df56fb78a503c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "8263e050ff577f2b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "753a55ed0ed7f10e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "71fbb5c64b0d0c87",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c724e31c371ea413",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "397619c518cf5d68",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "54b636ae03cf07cc",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c6ea56c7a833782b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "f42d13aeb19ca914",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "0697bc7a8785a0a7",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "c4da948a5699b1ac",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "4819d041e8fd119b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39bfa1843917ef7d",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "12fa1ce7c4e37428",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "06ef1e8351e0c819",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "978a887fb9e55956",
+            "score": 0,
+            "correct": false
+          }
+        ]
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 2154,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "678991ac680fb84d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "3b87fd982793b610",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2d26ff48af59ac7c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "a256467afcd101e2",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39b198ddb1103c67",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "203aaf01d255bb21",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2766acc8fb3b0752",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "5e35a88f4cf41f0e",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "7dd79b4061adabf3",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "368df56fb78a503c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "8263e050ff577f2b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "753a55ed0ed7f10e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "71fbb5c64b0d0c87",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c724e31c371ea413",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "397619c518cf5d68",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "54b636ae03cf07cc",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c6ea56c7a833782b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "f42d13aeb19ca914",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "0697bc7a8785a0a7",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "c4da948a5699b1ac",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "4819d041e8fd119b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39bfa1843917ef7d",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "12fa1ce7c4e37428",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "06ef1e8351e0c819",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "978a887fb9e55956",
+            "score": 0,
+            "correct": false
+          }
+        ]
+      }
+    ]
+  },
+  "bestChallenger": {
+    "method": "contextual-source-chunk-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 36,
+    "judgeCorrectRate": 0.36,
+    "callsMade": 100,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 36,
+        "judgeCorrectRate": 0.36,
+        "answerLatencyP50Ms": 2104,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "678991ac680fb84d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "3b87fd982793b610",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2d26ff48af59ac7c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "a256467afcd101e2",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39b198ddb1103c67",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "203aaf01d255bb21",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2766acc8fb3b0752",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "5e35a88f4cf41f0e",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "7dd79b4061adabf3",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "368df56fb78a503c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "8263e050ff577f2b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "753a55ed0ed7f10e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "71fbb5c64b0d0c87",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c724e31c371ea413",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "397619c518cf5d68",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "54b636ae03cf07cc",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c6ea56c7a833782b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "f42d13aeb19ca914",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "0697bc7a8785a0a7",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "c4da948a5699b1ac",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "4819d041e8fd119b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39bfa1843917ef7d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "12fa1ce7c4e37428",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "06ef1e8351e0c819",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "978a887fb9e55956",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 32,
+        "judgeCorrectRate": 0.32,
+        "answerLatencyP50Ms": 2204,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "678991ac680fb84d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "3b87fd982793b610",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2d26ff48af59ac7c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "a256467afcd101e2",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39b198ddb1103c67",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "203aaf01d255bb21",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2766acc8fb3b0752",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "5e35a88f4cf41f0e",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "7dd79b4061adabf3",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "368df56fb78a503c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "8263e050ff577f2b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "753a55ed0ed7f10e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "71fbb5c64b0d0c87",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c724e31c371ea413",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "397619c518cf5d68",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "54b636ae03cf07cc",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c6ea56c7a833782b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "f42d13aeb19ca914",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "0697bc7a8785a0a7",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "c4da948a5699b1ac",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "4819d041e8fd119b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39bfa1843917ef7d",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "12fa1ce7c4e37428",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "06ef1e8351e0c819",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "978a887fb9e55956",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "bestOverall": {
+    "method": "contextual-source-chunk-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 36,
+    "judgeCorrectRate": 0.36,
+    "callsMade": 100,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 36,
+        "judgeCorrectRate": 0.36,
+        "answerLatencyP50Ms": 2104,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "678991ac680fb84d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "3b87fd982793b610",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2d26ff48af59ac7c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "a256467afcd101e2",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39b198ddb1103c67",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "203aaf01d255bb21",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2766acc8fb3b0752",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "5e35a88f4cf41f0e",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "7dd79b4061adabf3",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "368df56fb78a503c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "8263e050ff577f2b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "753a55ed0ed7f10e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "71fbb5c64b0d0c87",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c724e31c371ea413",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "397619c518cf5d68",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "54b636ae03cf07cc",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c6ea56c7a833782b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "f42d13aeb19ca914",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "0697bc7a8785a0a7",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "c4da948a5699b1ac",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "4819d041e8fd119b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39bfa1843917ef7d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "12fa1ce7c4e37428",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "06ef1e8351e0c819",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "978a887fb9e55956",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 32,
+        "judgeCorrectRate": 0.32,
+        "answerLatencyP50Ms": 2204,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "678991ac680fb84d",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "3b87fd982793b610",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2d26ff48af59ac7c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "a256467afcd101e2",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39b198ddb1103c67",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "203aaf01d255bb21",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "2766acc8fb3b0752",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "5e35a88f4cf41f0e",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "7dd79b4061adabf3",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "368df56fb78a503c",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "8263e050ff577f2b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "753a55ed0ed7f10e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "71fbb5c64b0d0c87",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c724e31c371ea413",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "397619c518cf5d68",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "54b636ae03cf07cc",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "c6ea56c7a833782b",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "f42d13aeb19ca914",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "0697bc7a8785a0a7",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "c4da948a5699b1ac",
+            "score": 100,
+            "correct": true
+          },
+          {
+            "queryIdHash": "4819d041e8fd119b",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "39bfa1843917ef7d",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "12fa1ce7c4e37428",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "06ef1e8351e0c819",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "978a887fb9e55956",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "deltaVsBaseline": 12,
+    "winnerArmFailures": 0,
+    "winningArm": {
+      "strategy": "bm25-lite",
+      "answerQuality": 36,
+      "judgeCorrectRate": 0.36,
+      "answerFailures": 0,
+      "judgeFailures": 0
+    },
+    "pairedBootstrap": {
+      "required": false,
+      "available": true,
+      "baselineFingerprintCount": 25,
+      "challengerFingerprintCount": 25,
+      "commonQueryCount": 25,
+      "meanDelta": 12,
+      "lowerBound95": -4,
+      "upperBound95": 28,
+      "minMeanDelta": 1,
+      "minLowerBound": 0
+    }
+  },
+  "promotion": {
+    "scope": "next-larger-slice-challenger-only",
+    "status": "BLOCKED_NEXT_LARGER_SLICE_CHALLENGER",
+    "readyForNextLargerSlice": false,
+    "productionDefaultAllowed": false,
+    "publicSotaClaimAllowed": false,
+    "challenger": "contextual-source-chunk-v1:bm25-lite",
+    "checks": {
+      "methodEvidenceReady": true,
+      "queryCountMinimum": false,
+      "pairedBootstrapAvailable": true,
+      "pairedBootstrapMeanDelta": true,
+      "pairedBootstrapLowerBound": false,
+      "failureAccountedWinnerArm": true,
+      "failureAccountedTotalRate": true,
+      "sameShardAndPrivacyReady": true
+    },
+    "blockers": [
+      "promotion-query-count-below-minimum",
+      "promotion-paired-bootstrap-lower-bound-below-threshold"
+    ],
+    "warnings": [
+      "does-not-promote-production-default",
+      "does-not-count-as-full-memory-sota-evidence"
+    ],
+    "failureAccounting": {
+      "winnerArmFailures": 0,
+      "totalFailureRate": 0,
+      "maxWinnerArmFailures": 0,
+      "maxTotalFailureRate": 0.01
+    },
+    "pairedBootstrap": {
+      "requiredForPromotion": true,
+      "available": true,
+      "commonQueryCount": 25,
+      "meanDelta": 12,
+      "lowerBound95": -4,
+      "upperBound95": 28,
+      "minMeanDelta": 1,
+      "minLowerBound": 0
+    }
+  },
+  "rows": [
+    {
+      "method": "session-v1",
+      "winnerStrategy": "bm25-lite",
+      "answerQuality": 24,
+      "judgeCorrectRate": 0.24,
+      "callsMade": 100,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 24,
+          "judgeCorrectRate": 0.24,
+          "answerLatencyP50Ms": 2074,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "678991ac680fb84d",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "3b87fd982793b610",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2d26ff48af59ac7c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "a256467afcd101e2",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39b198ddb1103c67",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "203aaf01d255bb21",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2766acc8fb3b0752",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "5e35a88f4cf41f0e",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "7dd79b4061adabf3",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "368df56fb78a503c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "8263e050ff577f2b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "753a55ed0ed7f10e",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "71fbb5c64b0d0c87",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c724e31c371ea413",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "397619c518cf5d68",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "54b636ae03cf07cc",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c6ea56c7a833782b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "f42d13aeb19ca914",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "0697bc7a8785a0a7",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "c4da948a5699b1ac",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "4819d041e8fd119b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39bfa1843917ef7d",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "12fa1ce7c4e37428",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "06ef1e8351e0c819",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "978a887fb9e55956",
+              "score": 0,
+              "correct": false
+            }
+          ]
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 20,
+          "judgeCorrectRate": 0.2,
+          "answerLatencyP50Ms": 2154,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "678991ac680fb84d",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "3b87fd982793b610",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2d26ff48af59ac7c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "a256467afcd101e2",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39b198ddb1103c67",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "203aaf01d255bb21",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2766acc8fb3b0752",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "5e35a88f4cf41f0e",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "7dd79b4061adabf3",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "368df56fb78a503c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "8263e050ff577f2b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "753a55ed0ed7f10e",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "71fbb5c64b0d0c87",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c724e31c371ea413",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "397619c518cf5d68",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "54b636ae03cf07cc",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c6ea56c7a833782b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "f42d13aeb19ca914",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "0697bc7a8785a0a7",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "c4da948a5699b1ac",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "4819d041e8fd119b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39bfa1843917ef7d",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "12fa1ce7c4e37428",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "06ef1e8351e0c819",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "978a887fb9e55956",
+              "score": 0,
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "winnerStrategy": "bm25-lite",
+      "answerQuality": 36,
+      "judgeCorrectRate": 0.36,
+      "callsMade": 100,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 36,
+          "judgeCorrectRate": 0.36,
+          "answerLatencyP50Ms": 2104,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "678991ac680fb84d",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "3b87fd982793b610",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2d26ff48af59ac7c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "a256467afcd101e2",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39b198ddb1103c67",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "203aaf01d255bb21",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2766acc8fb3b0752",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "5e35a88f4cf41f0e",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "7dd79b4061adabf3",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "368df56fb78a503c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "8263e050ff577f2b",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "753a55ed0ed7f10e",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "71fbb5c64b0d0c87",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c724e31c371ea413",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "397619c518cf5d68",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "54b636ae03cf07cc",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c6ea56c7a833782b",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "f42d13aeb19ca914",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "0697bc7a8785a0a7",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "c4da948a5699b1ac",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "4819d041e8fd119b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39bfa1843917ef7d",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "12fa1ce7c4e37428",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "06ef1e8351e0c819",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "978a887fb9e55956",
+              "score": 100,
+              "correct": true
+            }
+          ]
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 32,
+          "judgeCorrectRate": 0.32,
+          "answerLatencyP50Ms": 2204,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "678991ac680fb84d",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "3b87fd982793b610",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2d26ff48af59ac7c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "a256467afcd101e2",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39b198ddb1103c67",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "203aaf01d255bb21",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "2766acc8fb3b0752",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "5e35a88f4cf41f0e",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "7dd79b4061adabf3",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "368df56fb78a503c",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "8263e050ff577f2b",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "753a55ed0ed7f10e",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "71fbb5c64b0d0c87",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c724e31c371ea413",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "397619c518cf5d68",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "54b636ae03cf07cc",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "c6ea56c7a833782b",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "f42d13aeb19ca914",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "0697bc7a8785a0a7",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "c4da948a5699b1ac",
+              "score": 100,
+              "correct": true
+            },
+            {
+              "queryIdHash": "4819d041e8fd119b",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "39bfa1843917ef7d",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "12fa1ce7c4e37428",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "06ef1e8351e0c819",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "978a887fb9e55956",
+              "score": 100,
+              "correct": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "resultExists": true,
+    "modeRecognized": true,
+    "metricsOnly": true,
+    "publicSafe": true,
+    "fixtureOnlyFalse": true,
+    "executeRequested": true,
+    "answerQualityMode": true,
+    "publicClaimsDisabled": true,
+    "rawQuestionsExcluded": true,
+    "rawAnswersExcluded": true,
+    "rawMemoryExcluded": true,
+    "rawTranscriptExcluded": true,
+    "sameRawQuerySelection": true,
+    "querySelectionHashPresent": true,
+    "baselinePresent": true,
+    "challengerPresent": true,
+    "challengerBeatsBaseline": true,
+    "bestOverallIsChallenger": true,
+    "winnerArmFailureLimit": true,
+    "totalFailureRateLimit": true,
+    "privacyLeakCountersClear": true,
+    "pairedBootstrapAvailable": true,
+    "pairedBootstrapMeanDelta": true,
+    "pairedBootstrapLowerBound": true
+  },
+  "blockers": [],
+  "nextActions": [
+    "Use contextual-source-chunk-v1 with bm25-lite as the next larger-slice challenger.",
+    "Carry session-v1, BM25, and full-hybrid controls forward so the next slice can confirm or reject this lift.",
+    "Attach this gate report to the SOTA ladder packet as method-selection evidence only."
+  ]
+}

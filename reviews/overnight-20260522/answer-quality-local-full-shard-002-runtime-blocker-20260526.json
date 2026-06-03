@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "mode": "answer-quality-local-full-shard-runtime-blocker",
+  "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+  "generatedAt": "2026-05-26T10:53:21Z",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "claimScope": "local-full",
+  "acceptedShard": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "queryShard": {
+    "shardId": "shard-002",
+    "queryOffset": 25,
+    "maxQueries": 25,
+    "startIndex": 25,
+    "endIndexExclusive": 50,
+    "totalQueryCount": 500,
+    "selectedQueryIdHash": "sha256:aae07a15bbe52d3a9b469ed4986284850a40ed1a50cbf9889d08a5f8237fe470"
+  },
+  "attemptedStrategies": [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank"
+  ],
+  "completedPrivateArmEvidence": [
+    {
+      "strategy": "bm25-lite",
+      "name": "bm25-lite-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:3eb7b6d8f8fdaa401c8fbb052b21cdd48cb6ae52e924876d0a33ce962cde3956",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:22a4656f077df1304177dd2c04c964668f423b1d1826799e0d681d69ec26ac31",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:cd3011dc8d751695d9461e66c013ffbb60d7a35c1ad632775293ace4970b6977",
+      "responseCount": 25,
+      "providerCallsMade": 25,
+      "queryExpansionCalls": 25,
+      "queryExpansionRewritesReturned": 44,
+      "queryExpansionMode": "pure-local",
+      "queryExpansionModel": "qwen36-a3b-main-q8kv-8192"
+    }
+  ],
+  "failedArm": {
+    "strategy": "local-apple-qwen3-0_6b",
+    "failureClass": "local-embedding-server-socket-close",
+    "observedNodeError": "TypeError: fetch failed; SocketError: other side closed",
+    "embeddingServiceLastExitStatus": 5,
+    "completedPublicShardResultWritten": false
+  },
+  "publicSyntheticReproduction": {
+    "reproduced": true,
+    "rawTextIncluded": false,
+    "inputDescription": "public synthetic repeated-token embedding smoke",
+    "observedNodeError": "TypeError: fetch failed",
+    "embeddingServiceLastExitStatus": 5
+  },
+  "localRuntime": {
+    "hardwareClass": "Apple Silicon M5",
+    "embeddingModel": "Qwen3-Embedding-0.6B-Q8_0 GGUF",
+    "rerankModel": "Qwen3-Reranker-0.6B-Q8_0 GGUF",
+    "chatAndQueryExpansionModel": "qwen36-a3b-main-q8kv-8192",
+    "launchMechanism": "launchctl short-lived local services",
+    "rawModelPathsIncluded": false,
+    "rawEndpointUrlsIncluded": false,
+    "testedEmbeddingSettings": [
+      {
+        "contextSize": 8192,
+        "batchSize": 2048,
+        "microBatchSize": 512,
+        "maxEmbeddingTokens": 900,
+        "result": "server-restarted-before-arm-completion"
+      },
+      {
+        "contextSize": 2048,
+        "batchSize": 512,
+        "microBatchSize": 512,
+        "maxEmbeddingTokens": 512,
+        "result": "server-restarted-before-arm-completion"
+      }
+    ]
+  },
+  "partialAttempt": {
+    "completedArmCount": 3,
+    "missingArmCount": 2,
+    "completedStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank"
+    ],
+    "missingStrategies": [
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "readyForAnswerQualityPreflight": false,
+    "readyForShardIntake": false,
+    "acceptedShardCountAfterAttempt": 1,
+    "missingShardCountAfterAttempt": 19
+  },
+  "blockers": [
+    "local-apple-embedding-server-socket-close",
+    "local-full-shard-002-incomplete",
+    "local-full-shard-coverage-incomplete"
+  ],
+  "nextActions": [
+    "Do not report shard 002 as accepted local-full evidence.",
+    "Add a bounded local embedding durability smoke before each local-full shard run.",
+    "Retry shard 002 only after the local embedding server survives the public synthetic long-input smoke and the local Apple arm can export all 25 responses.",
+    "If the 0.6B GGUF embedding server remains unstable, test a cloud embedding/query-expansion canary or a different local embedding runtime as a separate benchmark arm, with the configuration documented."
+  ]
+}

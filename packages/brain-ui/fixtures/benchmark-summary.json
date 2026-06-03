@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "mode": "local-compaction-benchmark-summary",
+  "generatedAt": "2026-05-22T17:30:00.000Z",
+  "source": "packages/bench/session-compaction-benchmark.mjs",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "memoryBenchmark": {
+    "generatedAt": "2026-05-31T07:12:17.768Z",
+    "claimScope": "local-full",
+    "status": "READY_LOCAL_FULL_MEMORY_SCORE",
+    "benchmark": "LongMemEval-S full 500",
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
+    "localFull": {
+      "scoredQueries": 500,
+      "totalQueries": 500,
+      "acceptedShards": 20,
+      "totalShards": 20,
+      "bestStrategy": "local-apple-qwen3-0_6b-local-rerank",
+      "bestAnswerQuality": 24.9,
+      "bm25AnswerQuality": 22.162,
+      "deltaVsBm25": 2.738,
+      "p50LatencyMs": 9316.8,
+      "publicBenchmarkClaimsAllowed": false,
+      "countsAsFullMemorySotaEvidence": false
+    },
+    "strategies": [
+      {
+        "id": "local-apple-qwen3-0_6b-local-rerank",
+        "answerQuality": 24.9,
+        "correctRate": 0.242,
+        "p50LatencyMs": 9316.8
+      },
+      {
+        "id": "bm25-lite",
+        "answerQuality": 22.162,
+        "correctRate": 0.216,
+        "p50LatencyMs": 8618.9
+      },
+      {
+        "id": "local-apple-qwen3-0_6b",
+        "answerQuality": 20.67,
+        "correctRate": 0.198,
+        "p50LatencyMs": 10334.25
+      },
+      {
+        "id": "full-hybrid-rerank",
+        "answerQuality": 18.532,
+        "correctRate": 0.18,
+        "p50LatencyMs": 10167.75
+      },
+      {
+        "id": "query-expanded-full-hybrid-rerank",
+        "answerQuality": 18.292,
+        "correctRate": 0.176,
+        "p50LatencyMs": 9386.85
+      }
+    ],
+    "providerWaves": {
+      "status": "READY_PROVIDER_WAVE_INTAKE",
+      "reports": 17,
+      "completedReports": 7,
+      "partialReports": 10,
+      "bestZeroDollarLane": "nvidia",
+      "budgetContract": {
+        "contractRequiredForNewProviderWaves": true,
+        "reportsWithBudgetContract": 0,
+        "reportsMissingBudgetContract": 17,
+        "allBudgetedReportsNoSpend": false,
+        "allBudgetedReportsWithinAllowedProviders": true,
+        "anyPaidProviderRequestedInNoSpendMode": false,
+        "maxPaidUsdMax": 0,
+        "defaultPromotionBlockedUntilRerun": true
+      },
+      "blockers": [
+        "retryable-provider-limit-or-timeout-observed"
+      ]
+    },
+    "atomicMethodSmoke": {
+      "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
+      "claimScope": "model-challenger",
+      "method": "atomic-memory-v1",
+      "answerModel": "deepseek-v4-flash",
+      "judgeModel": "deepseek-v4-flash",
+      "scoredQueries": 3,
+      "totalQueries": 500,
+      "answerQuality": 66.6667,
+      "correctRate": 0.6667,
+      "bestStrategy": "bm25-lite",
+      "gateStatus": "BLOCKED_END_TO_END_MEMORY_SCORE",
+      "blockers": [
+        "missing-dense-or-vector-control",
+        "missing-query-expansion-arm",
+        "missing-local-apple-arm",
+        "missing-local-rerank-arm",
+        "missing-full-or-officially-comparable-memory-benchmark-run"
+      ]
+    },
+    "sotaGate": {
+      "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
+      "primaryReportedTarget": "supermemory-production-research-gemini-3-pro",
+      "primaryReportedScore": 85.2,
+      "scoreDelta": -60.3,
+      "blockers": [
+        "full-answer-quality-shard-results-not-returned",
+        "missing-voyage-answer-quality-same-data-result",
+        "reported-target-judge-model-does-not-match-result",
+        "two-independent-reviewer-approvals-missing"
+      ]
+    }
+  },
+  "suite": {
+    "scenarioCount": 5,
+    "description": "Public-safe deterministic suite for local-only RecallWeave session compaction quality checks."
+  },
+  "aggregate": {
+    "passedScenarios": 5,
+    "failedScenarios": 0,
+    "privacyLeakCount": 0,
+    "exactIdentifierAccuracy": 1,
+    "averageKindCoverage": 1,
+    "averageRequiredTermCoverage": 1,
+    "averageNoiseReductionRatio": 0.307,
+    "totalOutputCandidates": 10
+  },
+  "thresholds": {
+    "failedScenarios": 0,
+    "privacyLeakCount": 0,
+    "exactIdentifierAccuracy": 1,
+    "minimumAverageNoiseReductionRatio": 0.2
+  },
+  "scenarios": [
+    {
+      "id": "release-readiness-overnight",
+      "label": "Release readiness",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.2,
+      "outputCandidates": 4,
+      "failures": []
+    },
+    {
+      "id": "exact-identifier-preservation",
+      "label": "Exact identifiers",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.333,
+      "outputCandidates": 2,
+      "failures": []
+    },
+    {
+      "id": "stale-and-private-suppression",
+      "label": "Stale/private suppression",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.333,
+      "outputCandidates": 2,
+      "failures": []
+    },
+    {
+      "id": "dedupe-repeated-decisions",
+      "label": "Dedupe decisions",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.667,
+      "outputCandidates": 1,
+      "failures": []
+    },
+    {
+      "id": "standalone-ticket-fact",
+      "label": "Standalone ticket fact",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0,
+      "outputCandidates": 1,
+      "failures": []
+    }
+  ],
+  "caveats": [
+    "Fixture benchmark only.",
+    "Hosted Supermemory comparison requires a fresh metrics-only baseline.",
+    "No raw session text or candidate memory text is included."
+  ]
+}

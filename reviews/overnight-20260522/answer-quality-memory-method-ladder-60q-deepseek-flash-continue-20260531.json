@@ -1,0 +1,377 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-memory-method-ladder",
+  "generatedAt": "2026-06-01T04:46:08.911Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "benchmark": "longmemeval",
+  "fixtureOnly": false,
+  "executeRequested": true,
+  "readyForExecution": true,
+  "readiness": {
+    "ready": true,
+    "blockers": [],
+    "callsAllowed": true,
+    "publicDataConfirmed": true,
+    "noRawOutputGuard": true,
+    "baseUrlPresent": true,
+    "endpointLabel": "https://api.deepseek.com",
+    "endpointIsLocal": false,
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "cloudApiKeyPresent": true
+  },
+  "claimBoundary": "same-shard answer-quality method diagnostic; not production or SOTA evidence without the normal gates",
+  "claimScope": "model-challenger",
+  "modelMatchPolicy": "challenger-model-allowed",
+  "queryShard": {
+    "startIndex": 0,
+    "endIndexExclusive": 60,
+    "requestedLimit": 60,
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:004d5635cc3002151186cbc7e21b7a19ae7b8c85f32f847d430275c6f7f7a206"
+  },
+  "contextTokenBudget": 800,
+  "limit": 5,
+  "continueOnCallError": true,
+  "methods": [
+    "session-v1",
+    "contextual-source-chunk-v1",
+    "atomic-memory-v1"
+  ],
+  "strategies": [
+    "bm25-lite",
+    "full-hybrid-rerank"
+  ],
+  "materializations": [
+    {
+      "method": "session-v1",
+      "selectedQuestionIdsHash": "sha256:004d5635cc3002151186cbc7e21b7a19ae7b8c85f32f847d430275c6f7f7a206",
+      "queryCount": 60,
+      "haystackSessionCount": 2757,
+      "memoryRecordCount": 2757,
+      "contextualSourceChunkCount": 0,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 0,
+      "expectedResultRefCount": 204,
+      "querySetHash": "sha256:766040c2cf4a0a008ad67d12dd6660cb1ca7eff69879e1b026c68782cf8debf2",
+      "collectorCompatibleQuerySetHash": "sha256:4c15ff40e8411e09255f0bcf894347619f393bbf593b85bc14e3e13ba90b15d1",
+      "memoriesFileHash": "sha256:147dc11b627c5d91392fe1683076a2fe7fc2827b631c134f1ce512b475f53297",
+      "answerLabelsFileHash": "sha256:542de55710c8256bcadd304efafc54dc197566f4d91d73e3ac3856537eac5fe5"
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "selectedQuestionIdsHash": "sha256:004d5635cc3002151186cbc7e21b7a19ae7b8c85f32f847d430275c6f7f7a206",
+      "queryCount": 60,
+      "haystackSessionCount": 2757,
+      "memoryRecordCount": 20477,
+      "contextualSourceChunkCount": 20477,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 0,
+      "expectedResultRefCount": 1046,
+      "querySetHash": "sha256:8740e866307866e8a205b6b75d759c708961a8be46130a4cbfeff4238a2d5d51",
+      "collectorCompatibleQuerySetHash": "sha256:6ead7800ca355366e062f132d7432c9d23096ab5dfebd6dfbe583e98cebaa7b2",
+      "memoriesFileHash": "sha256:776b045ada27854d605d8c73af66d430cb123093c2e0629840c8d8881f568491",
+      "answerLabelsFileHash": "sha256:542de55710c8256bcadd304efafc54dc197566f4d91d73e3ac3856537eac5fe5"
+    },
+    {
+      "method": "atomic-memory-v1",
+      "selectedQuestionIdsHash": "sha256:004d5635cc3002151186cbc7e21b7a19ae7b8c85f32f847d430275c6f7f7a206",
+      "queryCount": 60,
+      "haystackSessionCount": 2757,
+      "memoryRecordCount": 48738,
+      "contextualSourceChunkCount": 20477,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 28261,
+      "expectedResultRefCount": 1046,
+      "querySetHash": "sha256:a42433f2224b354f761c200211420ed7b4a94e21f9d8cc37d372cba5f6dba551",
+      "collectorCompatibleQuerySetHash": "sha256:6ead7800ca355366e062f132d7432c9d23096ab5dfebd6dfbe583e98cebaa7b2",
+      "memoriesFileHash": "sha256:ff872f3be33d003b2e45f50979f67ba213aa2318d0537cf41d2967d5d8605dda",
+      "answerLabelsFileHash": "sha256:542de55710c8256bcadd304efafc54dc197566f4d91d73e3ac3856537eac5fe5"
+    }
+  ],
+  "responseArms": [
+    {
+      "method": "session-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 60,
+      "querySetHash": "sha256:4c15ff40e8411e09255f0bcf894347619f393bbf593b85bc14e3e13ba90b15d1",
+      "responsesHash": "sha256:ab4ddff6bb5358e6328aff34fbabe7fa733d92893a08be256d98310fa60b7b21",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "session-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 60,
+      "querySetHash": "sha256:4c15ff40e8411e09255f0bcf894347619f393bbf593b85bc14e3e13ba90b15d1",
+      "responsesHash": "sha256:07b390e14244a1313251b8924c778b357a8c7d626389601c313d8beb397ba3cc",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 60,
+      "querySetHash": "sha256:6ead7800ca355366e062f132d7432c9d23096ab5dfebd6dfbe583e98cebaa7b2",
+      "responsesHash": "sha256:f21bcb4a5c8f6a6f906caa8a20b5f68c295981f3f833f76b0ba89d5b3eb4776a",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 60,
+      "querySetHash": "sha256:6ead7800ca355366e062f132d7432c9d23096ab5dfebd6dfbe583e98cebaa7b2",
+      "responsesHash": "sha256:256a0d0baf9e151c7cd83425b21c841c724f75a5fb130fbc775ccc51a5823de6",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "atomic-memory-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 60,
+      "querySetHash": "sha256:6ead7800ca355366e062f132d7432c9d23096ab5dfebd6dfbe583e98cebaa7b2",
+      "responsesHash": "sha256:d3e1f18934b06c414f93f6515f5f757390355d1cf01eabca85d948efe12a7e55",
+      "skippedSourceOnly": 20477,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "atomic-memory-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 60,
+      "querySetHash": "sha256:6ead7800ca355366e062f132d7432c9d23096ab5dfebd6dfbe583e98cebaa7b2",
+      "responsesHash": "sha256:3d8d3b2a21ca69abddd735a538802f89155d0c341915c0182beaa93cd01ef580",
+      "skippedSourceOnly": 20477,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    }
+  ],
+  "answerQualityReports": [
+    {
+      "method": "session-v1",
+      "reportHash": "sha256:311903479695bfb6a52f8bf81926367944cf05081c93fcc27b4071ae9f7b500e",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 240,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 22.1667,
+        "judgeCorrectRate": 0.2167,
+        "answerLatencyP50Ms": 1866
+      },
+      "metrics": {
+        "answerQuality": 22.1667,
+        "memoryScore": 22.1667,
+        "longmemevalScore": 22.1667,
+        "quality": 0.2217,
+        "judgeCorrectRate": 0.2167,
+        "answerLatencyP50Ms": 1866,
+        "answerLatencyP95Ms": 2144,
+        "contextTokensAvg": 800
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 22.1667,
+          "judgeCorrectRate": 0.2167,
+          "answerLatencyP50Ms": 1886,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 22.1667,
+          "judgeCorrectRate": 0.2167,
+          "answerLatencyP50Ms": 1866,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        }
+      ]
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "reportHash": "sha256:c5edede467936efd5ddec06597f63f804f5af8d4ed1a8c2cfc0e4013107fcbe3",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 240,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "bm25-lite",
+        "answerQuality": 37.5,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 1917
+      },
+      "metrics": {
+        "answerQuality": 37.5,
+        "memoryScore": 37.5,
+        "longmemevalScore": 37.5,
+        "quality": 0.375,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 1917,
+        "answerLatencyP95Ms": 2415,
+        "contextTokensAvg": 791
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 37.5,
+          "judgeCorrectRate": 0.3667,
+          "answerLatencyP50Ms": 1917,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 31,
+          "judgeCorrectRate": 0.3,
+          "answerLatencyP50Ms": 1843,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        }
+      ]
+    },
+    {
+      "method": "atomic-memory-v1",
+      "reportHash": "sha256:37e2df69f65670c95fa1c9d7f5fc88f22188e47c29aadc7a19f9d5e9378b47da",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 240,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "bm25-lite",
+        "answerQuality": 35,
+        "judgeCorrectRate": 0.3333,
+        "answerLatencyP50Ms": 1951
+      },
+      "metrics": {
+        "answerQuality": 35,
+        "memoryScore": 35,
+        "longmemevalScore": 35,
+        "quality": 0.35,
+        "judgeCorrectRate": 0.3333,
+        "answerLatencyP50Ms": 1951,
+        "answerLatencyP95Ms": 2238,
+        "contextTokensAvg": 756
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 35,
+          "judgeCorrectRate": 0.3333,
+          "answerLatencyP50Ms": 1951,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 28,
+          "judgeCorrectRate": 0.2667,
+          "answerLatencyP50Ms": 1945,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "method": "contextual-source-chunk-v1",
+    "reportHash": "sha256:c5edede467936efd5ddec06597f63f804f5af8d4ed1a8c2cfc0e4013107fcbe3",
+    "readyForEndToEndMemoryScoreGate": true,
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsModelChallengerBenchmarkEvidence": true,
+    "callsMade": 240,
+    "endpointLabel": "https://api.deepseek.com",
+    "winner": {
+      "strategy": "bm25-lite",
+      "answerQuality": 37.5,
+      "judgeCorrectRate": 0.3667,
+      "answerLatencyP50Ms": 1917
+    },
+    "metrics": {
+      "answerQuality": 37.5,
+      "memoryScore": 37.5,
+      "longmemevalScore": 37.5,
+      "quality": 0.375,
+      "judgeCorrectRate": 0.3667,
+      "answerLatencyP50Ms": 1917,
+      "answerLatencyP95Ms": 2415,
+      "contextTokensAvg": 791
+    },
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 37.5,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 1917,
+        "answerFailures": 0,
+        "judgeFailures": 0
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 31,
+        "judgeCorrectRate": 0.3,
+        "answerLatencyP50Ms": 1843,
+        "answerFailures": 0,
+        "judgeFailures": 0
+      }
+    ]
+  },
+  "nextActions": [
+    "Treat contextual-source-chunk-v1 with bm25-lite as the next larger-slice challenger, not as a production default yet.",
+    "Promote only methods that beat session-v1 on the same raw query selection and retain their edge under failure-accounted answer-quality scoring.",
+    "Run the standard result gate and reviewer intake before any public benchmark claim."
+  ]
+}

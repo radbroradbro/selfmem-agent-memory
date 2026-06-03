@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "mode": "benchmark-target-lock",
+  "createdAt": "2026-06-01",
+  "sourceEvidenceCheckedAt": "2026-05-26",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "primaryReportedMemoryTargetId": "supermemory-production-research-gemini-3-pro",
+  "primaryReportedMemoryTarget": {
+    "systemName": "Supermemory",
+    "sourceName": "Supermemory Research",
+    "sourceUrl": "https://supermemory.ai/research/",
+    "retrievedAt": "2026-05-26",
+    "benchmark": "LongMemEval-S",
+    "benchmarkFamily": "longmemeval",
+    "metricName": "overall",
+    "score": 85.2,
+    "scoreUnit": "percent",
+    "judgeModel": "gemini-3-pro",
+    "answerModelReported": false,
+    "targetUse": "primary-reported-memory-system-target",
+    "evidenceType": "provider-reported-public-research-page",
+    "caveat": "Highest source-locked production/research target in reported-memory-targets-20260525.json. RecallWeave must meet or beat it under matching benchmark semantics before SOTA wording."
+  },
+  "comparisonContract": {
+    "sameBenchmarkVariantRequired": true,
+    "sameDatasetRevisionRequired": true,
+    "sameScoringScriptOrReviewedEquivalenceRequired": true,
+    "sameMetricDefinitionRequired": true,
+    "sameJudgeModelRequiredForSotaClaim": true,
+    "sameAnswerModelOrDocumentedAnswerModelCaveatRequired": true,
+    "failureAccountedScoreRequired": true,
+    "fullRunRequiredForPublicClaim": true,
+    "hostedSupermemoryParityOptionalWhenQuotaBlocked": true,
+    "reportedTargetsAreSourceLocksNotProofOfWin": true
+  },
+  "currentRecallWeaveClaimBoundary": {
+    "mayClaim": [
+      "75Q same-shard method-ladder evidence supports contextual-source-chunk-v1 plus bm25-lite as the next larger-slice challenger",
+      "current local-full and provider lanes remain diagnostic until the full target and reviewer gates pass"
+    ],
+    "mayNotClaim": [
+      "RecallWeave beats Supermemory",
+      "RecallWeave is SOTA on LongMemEval-S",
+      "provider component benchmark scores substitute for full memory-system evidence"
+    ]
+  },
+  "nextEvidenceRequired": [
+    "100Q or larger paired answer-quality confirmation for the selected materializer",
+    "500Q full-run answer-quality result for the selected low-cost stack",
+    "strict target-matched reviewer intake for any public comparison claim",
+    "bounded real-agent canary with lifecycle write, read, supersede, tombstone, delete, and recall-miss review"
+  ]
+}

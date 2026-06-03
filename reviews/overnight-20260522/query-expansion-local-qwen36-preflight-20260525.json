@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-query-expansion-preflight",
+  "status": "PURE_LOCAL_QUERY_EXPANSION_READY",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-25T19:14:51.251Z",
+  "configContract": {
+    "providerMatrixDefaultEnabledFalse": true,
+    "defaultLocalEnabledFalse": true,
+    "defaultCloudEnabledFalse": true,
+    "rewriteQueryDefaultFalse": true,
+    "onlySendUserQuery": true,
+    "fallbackDisabled": true,
+    "providerMatrixHash": "sha256:e59b4ec0a03c35421e56c2dfd8664c1b45b3c95bd0a3b948291ff7dd2c78fc4a",
+    "defaultLocalHash": "sha256:166ae6f957b5bc5196fd5129e222edac880f2ec431a785ba9841a3c967fe94d8",
+    "defaultCloudHash": "sha256:d460e2497b3939889effa8bdc598f91e4d632ab54752f024232ca108bb57e948",
+    "benchBudgetHash": "sha256:3e505b93b6130b88339e14a614d5a0aa43b8a598a9e467c02acfaf155f241231"
+  },
+  "implementationContract": {
+    "responseExporterHash": "sha256:760f42c0f048638095ce718063134293ffa3027dcf42a3df1e4e3fb3319dfc46",
+    "liveRequestBuilderImported": true,
+    "liveQueryExpansionPlanPresent": true,
+    "openAiCompatibleQueryExpansionPresent": true,
+    "geminiQueryExpansionPresent": true,
+    "deterministicFallbackPresent": true,
+    "metricsOnlyStatsPresent": true,
+    "liveLlmExpansionWiringPresent": true
+  },
+  "consent": {
+    "providerCalls": true,
+    "publicData": true
+  },
+  "localEnv": {
+    "baseUrl": {
+      "present": true,
+      "envName": "SELFMEM_QUERY_EXPANSION_BASE_URL",
+      "valuePrinted": false
+    },
+    "model": {
+      "present": true,
+      "envName": "SELFMEM_QUERY_EXPANSION_MODEL",
+      "valuePrinted": false
+    },
+    "apiKey": {
+      "present": false,
+      "envName": "SELFMEM_QUERY_EXPANSION_API_KEY",
+      "valuePrinted": false
+    }
+  },
+  "cloudEnv": {
+    "nvidia": {
+      "present": false,
+      "keyCount": 0,
+      "envNames": [
+        "NVIDIA_API_KEY",
+        "NVIDIA_API_KEYS",
+        "NVAPI_KEY",
+        "NVAPI_KEYS",
+        "NVIDIA_API_KEY_FILE",
+        "NVIDIA_API_KEYS_FILE",
+        "NVAPI_KEY_FILE",
+        "NVAPI_KEYS_FILE"
+      ],
+      "presentEnvNames": [],
+      "valuesPrinted": false
+    },
+    "gemini": {
+      "present": false,
+      "keyCount": 0,
+      "envNames": [
+        "GEMINI_API_KEY",
+        "GEMINI_API_KEYS",
+        "GOOGLE_API_KEY",
+        "GOOGLE_API_KEYS",
+        "AI_STUDIO_API_KEY",
+        "AI_STUDIO_API_KEYS",
+        "GEMINI_API_KEY_FILE",
+        "GEMINI_API_KEYS_FILE"
+      ],
+      "presentEnvNames": [],
+      "valuesPrinted": false
+    },
+    "openrouter": {
+      "present": false,
+      "keyCount": 0,
+      "envNames": [
+        "OPENROUTER_API_KEY",
+        "OPENROUTER_API_KEYS",
+        "OPENROUTER_API_KEY_FILE",
+        "OPENROUTER_API_KEYS_FILE"
+      ],
+      "presentEnvNames": [],
+      "valuesPrinted": false
+    }
+  },
+  "readiness": {
+    "pureLocalReady": true,
+    "mixedCloudReady": false,
+    "selectedMode": "PURE_LOCAL_QUERY_EXPANSION_READY",
+    "queryExpansionCanBeBenchmarked": true,
+    "liveLlmExpansionWiringPresent": true,
+    "countsAsPureLocal": true,
+    "countsAsMixedLocalCloud": false
+  },
+  "candidatePolicy": {
+    "currentAsOf": "2026-05-25",
+    "defaultState": "off",
+    "pureLocalCandidates": [
+      {
+        "family": "Qwen 3.6",
+        "role": "bounded query rewrite and exact-identifier preserving expansion",
+        "sourceUse": "current-model-radar-needs-local-measurement",
+        "env": [
+          "SELFMEM_QUERY_EXPANSION_BASE_URL",
+          "SELFMEM_QUERY_EXPANSION_MODEL"
+        ]
+      },
+      {
+        "family": "Gemma 4",
+        "role": "small local instruction-model challenger for query rewrites",
+        "sourceUse": "current-model-radar-needs-local-measurement",
+        "env": [
+          "SELFMEM_QUERY_EXPANSION_BASE_URL",
+          "SELFMEM_QUERY_EXPANSION_MODEL"
+        ]
+      },
+      {
+        "family": "local:qwen3-0.6b-instruct",
+        "role": "repo-configured small local baseline",
+        "sourceUse": "provider-matrix-configured",
+        "env": [
+          "SELFMEM_QUERY_EXPANSION_BASE_URL",
+          "SELFMEM_QUERY_EXPANSION_MODEL"
+        ]
+      }
+    ],
+    "mixedCloudCandidates": [
+      {
+        "family": "NVIDIA hosted LLM",
+        "role": "cloud query expansion when local 24GB-class hardware is the limiting factor",
+        "sourceUse": "nvidia-nim-sweep-configured",
+        "env": [
+          "RECALLWEAVE_QUERY_EXPANSION_CALLS",
+          "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA",
+          "NVIDIA_API_KEY or NVIDIA_API_KEYS_FILE"
+        ]
+      },
+      {
+        "family": "Gemini challenger",
+        "role": "cloud query expansion challenger if NVIDIA is unavailable",
+        "sourceUse": "default-cloud-configured",
+        "env": [
+          "RECALLWEAVE_QUERY_EXPANSION_CALLS",
+          "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA",
+          "GEMINI_API_KEY or GEMINI_API_KEY_FILE"
+        ]
+      }
+    ],
+    "labelRule": "A run with cloud query expansion must be reported as mixed local-plus-cloud, never as pure local.",
+    "payloadRule": "Only the current user query may be sent to a query expansion provider; stored memories, raw transcripts, provider keys, and private-tagged content stay out of provider payloads."
+  },
+  "blockers": [],
+  "nextActions": [
+    "Run query-expanded-full-hybrid-rerank as a pure local query-expansion arm on the same source-locked target.",
+    "Report query expansion latency separately from embedding and rerank latency.",
+    "Compare against bm25-lite, dense/vector-only, full-hybrid-rerank, and provider arms before promotion."
+  ]
+}

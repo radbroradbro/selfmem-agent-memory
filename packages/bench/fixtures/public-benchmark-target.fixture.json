@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "fixtureOnly": true,
+  "targetId": "fixture-longmemeval-canary-target-v1",
+  "benchmarkType": "memory",
+  "claimTier": "fixture",
+  "benchmark": {
+    "name": "LongMemEval",
+    "family": "longmemeval",
+    "sourceUrl": "https://openreview.net/pdf?id=pZiyCaVuti",
+    "checkedAt": "2026-05-23",
+    "datasetRevision": "source-lock-revision-2026-05-23-test",
+    "split": "longmemeval-s-canary-slice-test",
+    "judgeModel": "benchmark-judge-test",
+    "answerModel": "benchmark-answer-test",
+    "questionIds": [
+      "fixture-lme-001",
+      "fixture-lme-002",
+      "fixture-lme-003"
+    ],
+    "answerLabelsRef": "longmemeval-s-labels-test",
+    "answerLabelsHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "judgeRule": "Use the source-locked benchmark judge rule for this dataset revision.",
+    "scoringScriptRef": "MemoryBench or official scorer at the source-locked revision.",
+    "scoringCodeHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "metrics": [
+      "quality",
+      "pAt1",
+      "recallAt5",
+      "recallAt10",
+      "ndcgAt10",
+      "latencyP50Ms",
+      "latencyP95Ms",
+      "contextTokensAvg"
+    ]
+  },
+  "reportedTarget": {
+    "sourceName": "reported-provider-fixture",
+    "sourceUrl": "https://github.com/supermemoryai/memorybench",
+    "checkedAt": "2026-05-23",
+    "metricName": "quality",
+    "score": 0.816,
+    "judgeModel": "benchmark-judge-test",
+    "answerModel": "benchmark-answer-test",
+    "tokenBudgetReported": false,
+    "caveat": "Parser target only. Replace with a source-locked reported row before claiming a benchmark result."
+  },
+  "comparability": {
+    "metricDefinitionsMatch": true,
+    "sameDatasetSource": true,
+    "sameDatasetRevision": true,
+    "sameSplit": true,
+    "sameLabels": true,
+    "sameJudgeRule": true,
+    "sameScoringCode": true
+  },
+  "componentEvidence": [
+    {
+      "benchmark": "MTEB",
+      "modelArm": "fixture-embedding-arm",
+      "claimUse": "model-selection-only",
+      "sourceUrl": "https://huggingface.co/mteb"
+    },
+    {
+      "benchmark": "BEIR",
+      "modelArm": "fixture-reranker-arm",
+      "claimUse": "component-evidence-only",
+      "sourceUrl": "https://arxiv.org/abs/2210.07316"
+    }
+  ],
+  "fullComparableBenchmarkCount": 0
+}

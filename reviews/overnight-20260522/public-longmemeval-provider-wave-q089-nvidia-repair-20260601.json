@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "status": "COMPLETED",
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "partialResultsAllowed": true,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "providerBudget": {
+    "schemaVersion": 1,
+    "kind": "provider-budget-contract",
+    "benchmarkKind": "public-benchmark-provider-gate",
+    "fixtureOnly": false,
+    "mode": "no-spend-free-tier",
+    "noSpendMode": true,
+    "maxPaidUsd": 0,
+    "maxPaidUsdSource": "environment",
+    "providerCallsEnabled": true,
+    "publicDataConfirmed": true,
+    "allowedProviders": [
+      "alibaba",
+      "deepseek",
+      "gemini",
+      "jina",
+      "local-apple",
+      "local-rerank",
+      "nvidia",
+      "openrouter",
+      "voyage"
+    ],
+    "disallowedIfPaid": [
+      "cohere",
+      "openai",
+      "pinecone",
+      "zeroentropy"
+    ],
+    "requiredProviders": [
+      "nvidia"
+    ],
+    "requiredProvidersWithinAllowed": true,
+    "unknownProviderFamiliesRequested": [],
+    "paidProviderRequestedInNoSpendMode": false,
+    "paidProviderFamiliesRequested": [],
+    "keyRotation": {
+      "allowed": true,
+      "purpose": "cost isolation, reliability, and free-credit usage",
+      "sameProviderOnly": true,
+      "neverSwitchModelsWithinArm": true,
+      "doNotBypassProviderTermsOrPublishedLimits": true,
+      "stopOnRateLimitInsteadOfSwitchingArms": true
+    },
+    "cachePolicy": {
+      "cacheEmbeddings": true,
+      "cacheRerankScores": true,
+      "reuseCachedProviderOutputsBeforeFullWave": true,
+      "cacheKeyMustIncludeProviderModelDimensionsAndPayloadHash": true,
+      "rawProviderPayloadsMayNotBeWrittenToPublicEvidence": true
+    },
+    "fallbackPolicy": {
+      "crossProviderFallbackEnabled": false,
+      "failedProviderArmStaysFailedForThatRun": true,
+      "rerunAsSeparateArmOnly": true
+    },
+    "rateLimitPolicy": {
+      "sourceOfTruth": "provider dashboard, provider response headers, or explicit environment throttles",
+      "throttleScope": "key",
+      "keyScopedThrottleEnabled": true,
+      "globalMinIntervalMs": 0,
+      "retryAttempts": 2,
+      "timeoutMs": 45000
+    },
+    "reportRules": {
+      "metricsOnly": true,
+      "publicSafeEvidenceOnly": true,
+      "providerValuesPrinted": false,
+      "rawQuestionsIncluded": false,
+      "rawAnswersIncluded": false,
+      "rawMemoryIncluded": false,
+      "rawTranscriptIncluded": false
+    },
+    "configHashes": {
+      "benchBudget": "sha256:2c38fa9e74119c599dcf85930420dafa55d88a09702e62740bab1ac847970813",
+      "providerMatrix": "sha256:45b195182407993e1f0efae856483e222371ac26bda83305a9d6ca94170da497",
+      "defaultCloud": "sha256:d460e2497b3939889effa8bdc598f91e4d632ab54752f024232ca108bb57e948",
+      "providerAdapterRegistry": "sha256:412f54fca3d8ce0fa4293b43a432933dfd299b9bbecb9f8c3066bf59b077a67c",
+      "benchmarkTargetLock": "sha256:7676a040930694899c0975ad3ed8d7a2a11517b990703793788b77dabcf261cc"
+    },
+    "blockers": []
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "partialResultsAllowed": true,
+  "generatedAt": "2026-06-01T19:46:43.056Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "querySetHash": "sha256:c740f67a895be6f2e13f6b6406a3740fa0f142c1af18cf21611429a47a5e11fb",
+    "collectorCompatibleQuerySetHash": "sha256:c740f67a895be6f2e13f6b6406a3740fa0f142c1af18cf21611429a47a5e11fb",
+    "materializerHash": "sha256:30c9a3c1fa44169a9d17ba785253c91a37908df751dd4e36cf23e9edb9186eb7",
+    "queryCount": 500,
+    "expectedResultRefCount": 21,
+    "haystackSessionCount": 43,
+    "requestedQuerySelection": {
+      "queryOffset": 89,
+      "maxQueries": 1,
+      "completeDataset": false
+    },
+    "selectedQueryCount": 1,
+    "armTimeoutMs": 180000,
+    "providerArmTimeoutMs": 180000,
+    "providerTimeoutMs": 180000,
+    "providerRetryAttempts": 2,
+    "parallelArms": 1,
+    "isolateArms": true,
+    "controlReuse": {
+      "enabled": false,
+      "requestedReportCount": 0,
+      "reusedStrategyCount": 0,
+      "reusedStrategies": []
+    }
+  },
+  "reusedControls": [],
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:c740f67a895be6f2e13f6b6406a3740fa0f142c1af18cf21611429a47a5e11fb",
+      "responsesHash": "sha256:14256491b8afa6de763fcc28e70504063eab4809c6d43856e370f3d9148aa513",
+      "resultHash": "sha256:8b88eb42236e7b33461758bcba83bb9617d07be4973c846daaf47664e740ff4e",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerThrottle": {
+          "scope": "key",
+          "keyScopedThrottleEnabled": true,
+          "retryAttempts": 2,
+          "timeoutMs": 180000,
+          "globalMinIntervalMs": 0,
+          "providers": {}
+        },
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "supermemorySearchDisabled": true,
+        "effectiveArmTimeoutMs": 180000,
+        "armIdHash": "e71d2a995bc04572",
+        "containerTagHash": "695cfa7b7e44a5cd",
+        "localEmbeddingCachePathHash": "sha256:1d38b60287b278fe2d9eca44e48c494ba0fcea46ff2edc5b793dc32fd2da8f43"
+      },
+      "queryShard": {
+        "startIndex": 89,
+        "endIndexExclusive": 90,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": null,
+        "completeDataset": false,
+        "rangeHash": "sha256:24873cbcfa84b292923f06044cfa56700c2ceac5b35252c521f8c2aaa8e351c1",
+        "selectedQueryIdHash": "sha256:477069dfdf5c934ef2e01c902ba95cf477fb825c3cdf46e647eea517473fb3f3"
+      },
+      "metrics": {
+        "quality": 0.4387,
+        "pAt1": 1,
+        "recallAt5": 0.1429,
+        "recallAt10": 0.1429,
+        "ndcgAt10": 0.469,
+        "latencyP50Ms": 9,
+        "latencyP95Ms": 9,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 1,
+        "queriesClipped": 1,
+        "clippedResultCount": 1,
+        "skippedByBudgetCount": 2,
+        "fullCandidateTokensAvg": 1604,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "397619c518cf5d68",
+          "topResultIdHash": "d4fb70ae399e273f",
+          "pAt1": 1,
+          "recallAt5": 0.1429,
+          "recallAt10": 0.1429,
+          "ndcgAt10": 0.469,
+          "latencyMs": 9
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:c740f67a895be6f2e13f6b6406a3740fa0f142c1af18cf21611429a47a5e11fb",
+      "responsesHash": "sha256:7d58255e45e93f4274e2f0bb42c932810226d8bccf556eae06b916f344d28f70",
+      "resultHash": "sha256:3dc7e31f78ef88cd3619c4142fdebef8134d370ea5725d886f7ca524fd5ded4d",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerThrottle": {
+          "scope": "key",
+          "keyScopedThrottleEnabled": true,
+          "retryAttempts": 2,
+          "timeoutMs": 180000,
+          "globalMinIntervalMs": 0,
+          "providers": {}
+        },
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "supermemorySearchDisabled": true,
+        "effectiveArmTimeoutMs": 180000,
+        "armIdHash": "b9938c3cb43354d4",
+        "containerTagHash": "2bbcb0e90f4e8351",
+        "localEmbeddingCachePathHash": "sha256:3cc5bea822f0f3d76f13ee8ce1bbe6ca9090129cb686c49d907eb451e2093a7e"
+      },
+      "queryShard": {
+        "startIndex": 89,
+        "endIndexExclusive": 90,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": null,
+        "completeDataset": false,
+        "rangeHash": "sha256:24873cbcfa84b292923f06044cfa56700c2ceac5b35252c521f8c2aaa8e351c1",
+        "selectedQueryIdHash": "sha256:477069dfdf5c934ef2e01c902ba95cf477fb825c3cdf46e647eea517473fb3f3"
+      },
+      "metrics": {
+        "quality": 0.3873,
+        "pAt1": 1,
+        "recallAt5": 0.0952,
+        "recallAt10": 0.0952,
+        "ndcgAt10": 0.359,
+        "latencyP50Ms": 18,
+        "latencyP95Ms": 18,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 1,
+        "queriesClipped": 1,
+        "clippedResultCount": 1,
+        "skippedByBudgetCount": 2,
+        "fullCandidateTokensAvg": 1751,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "397619c518cf5d68",
+          "topResultIdHash": "d3c50d6537b5130c",
+          "pAt1": 1,
+          "recallAt5": 0.0952,
+          "recallAt10": 0.0952,
+          "ndcgAt10": 0.359,
+          "latencyMs": 18
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "querySetHash": "sha256:c740f67a895be6f2e13f6b6406a3740fa0f142c1af18cf21611429a47a5e11fb",
+      "responsesHash": "sha256:3f589062e825d27ed597dbc9f667d846ec4a215eade221261173df5b932a9733",
+      "resultHash": "sha256:a4072cd8d6087cc3154c3cac783a2fbfe70cc9a1aa92fd833f302ce1fe081393",
+      "rankingStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "provider": {
+        "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 3,
+        "providerMockCalls": 0,
+        "embeddingCalls": 2,
+        "rerankCalls": 1,
+        "documentCountSent": 45,
+        "queryCountSent": 1,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "providers": [
+          "nvidia"
+        ],
+        "embedModel": "nvidia/nv-embed-v1",
+        "embedDimensions": null,
+        "rerankModel": "nv-rerank-qa-mistral-4b:1",
+        "fixtureProviderMock": false,
+        "providerThrottle": {
+          "scope": "key",
+          "keyScopedThrottleEnabled": true,
+          "retryAttempts": 2,
+          "timeoutMs": 180000,
+          "globalMinIntervalMs": 0,
+          "providers": {
+            "nvidia": {
+              "minIntervalMs": 1750,
+              "keyCount": 1
+            }
+          }
+        },
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {
+          "nvidia": 1
+        },
+        "keyCountAvailable": 1
+      },
+      "armIsolation": {
+        "isolated": true,
+        "supermemorySearchDisabled": true,
+        "effectiveArmTimeoutMs": 180000,
+        "armIdHash": "d98295921246a478",
+        "containerTagHash": "acf3309c50289912",
+        "localEmbeddingCachePathHash": "sha256:af430ef31c4af0af5b210d12fe893347677ec58387c841b31b199c071e90c7c4"
+      },
+      "queryShard": {
+        "startIndex": 89,
+        "endIndexExclusive": 90,
+        "totalQueryCount": 500,
+        "responseCount": 1,
+        "requestedLimit": null,
+        "completeDataset": false,
+        "rangeHash": "sha256:24873cbcfa84b292923f06044cfa56700c2ceac5b35252c521f8c2aaa8e351c1",
+        "selectedQueryIdHash": "sha256:477069dfdf5c934ef2e01c902ba95cf477fb825c3cdf46e647eea517473fb3f3"
+      },
+      "metrics": {
+        "quality": 0.4387,
+        "pAt1": 1,
+        "recallAt5": 0.1429,
+        "recallAt10": 0.1429,
+        "ndcgAt10": 0.469,
+        "latencyP50Ms": 6738,
+        "latencyP95Ms": 6738,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 1,
+        "queriesClipped": 1,
+        "clippedResultCount": 1,
+        "skippedByBudgetCount": 2,
+        "fullCandidateTokensAvg": 1571,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "397619c518cf5d68",
+          "topResultIdHash": "d4fb70ae399e273f",
+          "pAt1": 1,
+          "recallAt5": 0.1429,
+          "recallAt10": 0.1429,
+          "ndcgAt10": 0.469,
+          "latencyMs": 6738
+        }
+      ]
+    }
+  ],
+  "failedStrategies": [],
+  "winner": {
+    "strategy": "bm25-lite",
+    "quality": 0.4387,
+    "pAt1": 1,
+    "recallAt5": 0.1429,
+    "recallAt10": 0.1429,
+    "ndcgAt10": 0.469,
+    "latencyP50Ms": 9
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0.4387,
+    "pAt1": 1,
+    "recallAt5": 0.1429,
+    "recallAt10": 0.1429,
+    "ndcgAt10": 0.469,
+    "latencyP50Ms": 9
+  },
+  "promotion": {
+    "kind": "provider",
+    "bestProviderStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "bestHybridStrategy": "full-hybrid-rerank",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "directionalWin": false,
+    "reason": "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "qualityDeltaVsFullHybrid": 0.0514,
+    "latencyDeltaVsBm25": 6729,
+    "latencyDeltaVsFullHybrid": 6720,
+    "pairedDeltaVsBm25": {
+      "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "controlStrategy": "bm25-lite",
+      "pairedQueryCount": 1,
+      "mean": 0,
+      "ci95": {
+        "lower": 0,
+        "upper": 0,
+        "iterations": 0
+      },
+      "ciExcludesZero": false
+    },
+    "pairedDeltaVsFullHybrid": {
+      "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "controlStrategy": "full-hybrid-rerank",
+      "pairedQueryCount": 1,
+      "mean": 0.0514,
+      "ci95": {
+        "lower": 0.0514,
+        "upper": 0.0514,
+        "iterations": 0
+      },
+      "ciExcludesZero": true
+    },
+    "confidenceGate": {
+      "minPairedQueryCount": 30,
+      "checks": [
+        {
+          "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "controlStrategy": "bm25-lite",
+          "pairedQueryCount": 1,
+          "ci95": {
+            "lower": 0,
+            "upper": 0,
+            "iterations": 0
+          },
+          "ciLowerAboveZero": false
+        },
+        {
+          "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "controlStrategy": "full-hybrid-rerank",
+          "pairedQueryCount": 1,
+          "ci95": {
+            "lower": 0.0514,
+            "upper": 0.0514,
+            "iterations": 0
+          },
+          "ciLowerAboveZero": true
+        }
+      ],
+      "passes": false
+    }
+  },
+  "hybridPromotion": {
+    "kind": "provider",
+    "bestProviderStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "bestHybridStrategy": "full-hybrid-rerank",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "directionalWin": false,
+    "reason": "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "qualityDeltaVsFullHybrid": 0.0514,
+    "latencyDeltaVsBm25": 6729,
+    "latencyDeltaVsFullHybrid": 6720,
+    "pairedDeltaVsBm25": {
+      "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "controlStrategy": "bm25-lite",
+      "pairedQueryCount": 1,
+      "mean": 0,
+      "ci95": {
+        "lower": 0,
+        "upper": 0,
+        "iterations": 0
+      },
+      "ciExcludesZero": false
+    },
+    "pairedDeltaVsFullHybrid": {
+      "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "controlStrategy": "full-hybrid-rerank",
+      "pairedQueryCount": 1,
+      "mean": 0.0514,
+      "ci95": {
+        "lower": 0.0514,
+        "upper": 0.0514,
+        "iterations": 0
+      },
+      "ciExcludesZero": true
+    },
+    "confidenceGate": {
+      "minPairedQueryCount": 30,
+      "checks": [
+        {
+          "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "controlStrategy": "bm25-lite",
+          "pairedQueryCount": 1,
+          "ci95": {
+            "lower": 0,
+            "upper": 0,
+            "iterations": 0
+          },
+          "ciLowerAboveZero": false
+        },
+        {
+          "candidateStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "controlStrategy": "full-hybrid-rerank",
+          "pairedQueryCount": 1,
+          "ci95": {
+            "lower": 0.0514,
+            "upper": 0.0514,
+            "iterations": 0
+          },
+          "ciLowerAboveZero": true
+        }
+      ],
+      "passes": false
+    }
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

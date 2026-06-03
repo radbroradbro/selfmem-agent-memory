@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "mode": "provider-adapter-registry",
+  "createdAt": "2026-06-01",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "storesCredentials": false,
+  "printsCredentials": false,
+  "personalProductionDefaultArm": "cloud-voyage4-lite-voyage-lite",
+  "methodologyDefault": {
+    "memoryMethod": "contextual-source-chunk-v1",
+    "firstStage": "bm25-lite",
+    "vectorMerge": "optional",
+    "defaultVectorArm": "cloud-voyage4-lite-voyage-lite",
+    "defaultReranker": "rerank-2.5-lite",
+    "queryExpansionDefaultEnabled": false,
+    "answerTopK": "8-12",
+    "promotionRule": "Promote only after paired answer-quality deltas clear the configured bootstrap gate on the same raw query selection."
+  },
+  "benchmarkRules": {
+    "sameMaterializerAcrossProviderArms": true,
+    "defaultMaterializerForProviderCanaries": "contextual-source-chunk-v1",
+    "keepBm25ControlInEveryProviderRun": true,
+    "crossProviderFallbackEnabled": false,
+    "failedProviderArmStaysFailedForRun": true,
+    "rerunFailedProviderAsSeparateArmOnly": true,
+    "queryExpansionDefaultEnabled": false,
+    "sourceRehydrationRequiredForAtomicRecords": true,
+    "failureTaxonomyRequiredBeforePromotion": true,
+    "latencyCostQuotaLedgerRequiredBeforePromotion": true
+  },
+  "cacheKeyFields": [
+    "provider_family",
+    "model",
+    "model_revision",
+    "dimensions",
+    "input_type",
+    "normalized_payload_sha256"
+  ],
+  "adapters": [
+    {
+      "family": "voyage",
+      "status": "implemented",
+      "capabilities": ["embed", "rerank"],
+      "benchmarkArms": ["cloud-voyage4-voyage", "cloud-voyage4-voyage-lite-rerank", "cloud-voyage4-lite-voyage-lite"],
+      "embeddingModels": ["voyage-4-large", "voyage-4-lite"],
+      "rerankModels": ["rerank-2.5", "rerank-2.5-lite"],
+      "envKeyNames": ["VOYAGE_API_KEY", "VOYAGE_API_KEYS", "VOYAGE_API_KEYS_FILE"],
+      "role": "personal cloud default and low-cost provider benchmark lane"
+    },
+    {
+      "family": "gemini",
+      "status": "implemented",
+      "capabilities": ["embed"],
+      "benchmarkArms": ["cloud-gemini2-embed-rerank-proxy", "cloud-gemini2-voyage-rerank"],
+      "embeddingModels": ["gemini-embedding-2"],
+      "rerankModels": ["deterministic-proxy", "voyage-rerank-2.5"],
+      "envKeyNames": ["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEYS_FILE", "AI_STUDIO_API_KEYS_FILE"],
+      "role": "multimodal/document challenger and text embedding ablation"
+    },
+    {
+      "family": "nvidia",
+      "status": "implemented",
+      "capabilities": ["embed", "rerank", "expand"],
+      "benchmarkArms": ["cloud-nvidia-nv-embed-v1-mistral-rerank", "cloud-nvidia-nemotron-1b", "cloud-nvidia-nemotron-vl-1b"],
+      "embeddingModels": ["nvidia/nv-embed-v1", "nvidia/llama-nemotron-embed-1b-v2", "nvidia/llama-nemotron-embed-vl-1b-v2"],
+      "rerankModels": ["nvidia/nv-rerankqa-mistral-4b-v3", "nvidia/llama-nemotron-rerank-1b-v2", "nvidia/llama-nemotron-rerank-vl-1b-v2"],
+      "envKeyNames": ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVCF_RUN_KEY", "NVAPI_KEYS_FILE"],
+      "role": "free-tier/provider benchmark challenger and query-expansion sweep lane"
+    },
+    {
+      "family": "local-apple",
+      "status": "implemented",
+      "capabilities": ["embed", "rerank"],
+      "benchmarkArms": ["local-apple-qwen3-0_6b", "local-apple-qwen3-0_6b-local-rerank", "local-apple-qwen3-4b-local-rerank"],
+      "embeddingModels": ["Qwen/Qwen3-Embedding-0.6B-GGUF", "Qwen/Qwen3-Embedding-4B"],
+      "rerankModels": ["Qwen/Qwen3-Reranker-0.6B", "Qwen/Qwen3-Reranker-4B"],
+      "envKeyNames": ["SELFMEM_LOCAL_EMBED_BASE_URL", "SELFMEM_LOCAL_RERANK_BASE_URL"],
+      "role": "zero-spend local regression and methodology lane"
+    },
+    {
+      "family": "openrouter",
+      "status": "partial",
+      "capabilities": ["expand", "embed-planned"],
+      "benchmarkArms": [],
+      "embeddingModels": ["nvidia/llama-nemotron-embed-vl-1b-v2:free"],
+      "rerankModels": [],
+      "envKeyNames": ["OPENROUTER_API_KEY", "OPENROUTER_API_KEYS_FILE"],
+      "role": "free-model query-expansion fallback and planned embedding comparator"
+    },
+    {
+      "family": "deepseek",
+      "status": "partial",
+      "capabilities": ["expand", "review"],
+      "benchmarkArms": [],
+      "embeddingModels": [],
+      "rerankModels": [],
+      "envKeyNames": ["DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS_FILE", "DEEPSEEK_PRO_API_KEY", "DEEPSEEK_FLASH_API_KEY"],
+      "role": "cheap direct LLM lane for review, query expansion, and benchmark orchestration"
+    },
+    {
+      "family": "jina",
+      "status": "planned",
+      "capabilities": ["embed", "rerank"],
+      "benchmarkArms": ["planned-jina-embedding-rerank"],
+      "embeddingModels": ["jina-embeddings-v4", "jina-embeddings-v5"],
+      "rerankModels": ["jina-reranker-v2"],
+      "envKeyNames": ["JINA_API_KEY", "JINA_API_KEYS_FILE"],
+      "role": "free-tier comparator after adapter implementation"
+    },
+    {
+      "family": "alibaba",
+      "status": "planned",
+      "capabilities": ["embed", "rerank", "expand"],
+      "benchmarkArms": ["planned-alibaba-qwen3-embedding-rerank"],
+      "embeddingModels": ["text-embedding-v4"],
+      "rerankModels": ["qwen3-rerank"],
+      "envKeyNames": ["DASHSCOPE_API_KEY", "DASHSCOPE_API_KEYS_FILE", "ALIBABA_API_KEY", "ALIBABA_API_KEYS_FILE"],
+      "role": "Qwen cloud comparator after adapter implementation"
+    },
+    {
+      "family": "zeroentropy",
+      "status": "planned",
+      "capabilities": ["rerank"],
+      "benchmarkArms": ["planned-zeroentropy-zerank-2"],
+      "embeddingModels": [],
+      "rerankModels": ["zerank-2"],
+      "envKeyNames": ["ZEROENTROPY_API_KEY", "ZEROENTROPY_API_KEYS_FILE"],
+      "role": "quality-challenger rerank lane after adapter implementation"
+    }
+  ]
+}

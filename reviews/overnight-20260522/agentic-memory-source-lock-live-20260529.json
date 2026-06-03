@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "agentic-memory-source-lock-check",
+  "generatedAt": "2026-05-29T22:58:10.353Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "liveChecksRequested": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsBenchmarkScore": false,
+  "sourceLockReadyForMaterialization": true,
+  "sourceLockReadyForPublicClaim": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "target": {
+    "id": "longmemeval-v2",
+    "name": "LongMemEval-V2",
+    "sourceHosts": {
+      "repository": "github.com",
+      "dataset": "huggingface.co",
+      "leaderboard": "xiaowu0162.github.io",
+      "paper": "arxiv.org"
+    },
+    "sourceUrlsHash": "sha256:e314964c6aa15570881efb6a32e4be931ba9a7c424d916244853760fd202d4ff",
+    "expectedPublicShape": {
+      "questionCount": 451,
+      "publicLeaderboardTiers": [
+        "small",
+        "medium"
+      ],
+      "largestHaystackTokens": "up-to-115M",
+      "domains": [
+        "web",
+        "enterprise"
+      ],
+      "abilityFamilies": [
+        "state-recall",
+        "dynamic-state-tracking",
+        "workflow-knowledge",
+        "environment-gotchas",
+        "premise-awareness"
+      ],
+      "memoryModules": [
+        "no_retrieval",
+        "rag_query_to_slice",
+        "rag_query_to_slice_notes",
+        "agentrunbook_r",
+        "codex",
+        "agentrunbook_c"
+      ]
+    }
+  },
+  "proofChecks": [
+    {
+      "field": "repoCommit",
+      "provided": true,
+      "kind": "git-commit",
+      "reason": "Pin the exact benchmark harness revision before comparing scores.",
+      "valueHash": "sha256:11bf5666eaac2576fe87d3fdfcd1b7fa7fe2e835b3feb0bdbcbd721779b335f6"
+    },
+    {
+      "field": "datasetRevision",
+      "provided": true,
+      "kind": "revision-id",
+      "reason": "Pin the public dataset snapshot without committing raw rows.",
+      "valueHash": "sha256:43eb8790db2b1afe40c4f6e4ea57d9d3dd167a88ce5a63b39f17005aabb5e282"
+    },
+    {
+      "field": "leaderboardTier",
+      "provided": true,
+      "kind": "enum:small|medium",
+      "reason": "Keep comparison rows on the same cost/scale tier.",
+      "valueHash": "sha256:81db8ebbbbc69c6c6ad4a6aa92b76e0c08af547da236b9e2c9dbe1d8285a8130"
+    },
+    {
+      "field": "questionIdsHash",
+      "provided": true,
+      "kind": "sha256",
+      "reason": "Prove the evaluated question set while hiding raw ids.",
+      "valueHash": "sha256:4d55e549847bbb99a4335ac7689c96a34f5094b23b1d18a8fdd5b9cfaf852a47"
+    },
+    {
+      "field": "answerLabelsHash",
+      "provided": true,
+      "kind": "sha256",
+      "reason": "Bind scoring to the exact labels without committing labels.",
+      "valueHash": "sha256:9212bf36da601061def69850f663ea61b2b56d0c43b3c1331d31cbf27a21e510"
+    },
+    {
+      "field": "scoringCodeHash",
+      "provided": true,
+      "kind": "sha256",
+      "reason": "Make score changes reviewable when the scorer changes.",
+      "valueHash": "sha256:29d2aa507c6c55aa0a967207e4ef00cd7c48d47dba3d5b87052d41b7ac12beaf"
+    },
+    {
+      "field": "leaderboardRowHash",
+      "provided": true,
+      "kind": "sha256",
+      "reason": "Attach a comparable public row without copying leaderboard text.",
+      "valueHash": "sha256:5de99594a1f0c1dbead7c58598f36bf68a1fd89ebf552054fbb31154601edf96"
+    },
+    {
+      "field": "trajectoryIngestContractHash",
+      "provided": true,
+      "kind": "sha256",
+      "reason": "Pin how agent trajectories become RecallWeave sessions/wiki topics.",
+      "valueHash": "sha256:c122bc98db72af6817440ddc53ba82f33c6bd57619edcd388b293033f7a8c25f"
+    },
+    {
+      "field": "readerModel",
+      "provided": true,
+      "kind": "model-id",
+      "reason": "Record the model that answers from retrieved memory.",
+      "valueHash": "sha256:4c87a62360872f7904c5236e147a37926beb24bebd1feb85e794be847055021d"
+    },
+    {
+      "field": "judgeModel",
+      "provided": true,
+      "kind": "model-id",
+      "reason": "Record the model that grades output so judge strength is not hidden.",
+      "valueHash": "sha256:131e2083b68bde4fe879efc38ed9651b1623f8735eeb42157fa3b63ef943fdc6"
+    }
+  ],
+  "structuralChecks": [
+    {
+      "name": "target-is-longmemeval-v2",
+      "ok": true
+    },
+    {
+      "name": "source-url-count",
+      "ok": true
+    },
+    {
+      "name": "source-urls-https",
+      "ok": true
+    },
+    {
+      "name": "expected-public-shape",
+      "ok": true
+    },
+    {
+      "name": "required-proof-fields",
+      "ok": true
+    },
+    {
+      "name": "repository-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "dataset-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "leaderboard-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "paper-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "live-source-snapshot",
+      "ok": true
+    }
+  ],
+  "liveChecks": [
+    {
+      "role": "repository",
+      "host": "github.com",
+      "urlHash": "sha256:000b85cb4b1625ffd55b24c8ac8c584611921ba6a5c42db41d7fdccda03eea55",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "role": "dataset",
+      "host": "huggingface.co",
+      "urlHash": "sha256:bd7f7eb2884fd183c9a7cf67c6905596c2271651e5fbfdf87c20111c9fdd58cd",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "role": "leaderboard",
+      "host": "xiaowu0162.github.io",
+      "urlHash": "sha256:73910430aef56148dcb0ed25a30c0f6b46ea50fb635ffddc69371e1ceac5b219",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "role": "paper",
+      "host": "arxiv.org",
+      "urlHash": "sha256:1c5d49ed3f6734bac1134bbdf9354fa6c274f87c7fdbc5939c8f0bb0cb8ffeb8",
+      "ok": true,
+      "status": 200
+    }
+  ],
+  "liveSourceSnapshot": {
+    "ok": true,
+    "checkedAt": "2026-05-29T22:58:09.430Z",
+    "repoHost": "github.com",
+    "datasetHost": "huggingface.co",
+    "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
+    "datasetRevision": "f152293e235517d504809563c833d7190b8c713b",
+    "repoContentsHash": "sha256:3d09d12e19ae6331d90eb9396c8e53285ad5b679a79ef267f610e029afc8a911",
+    "datasetSiblingsHash": "sha256:8c412be7d7c772cb91cfed53043c7882a77271a4a913380f13fcd42438b503c8",
+    "scoringCodeHash": "sha256:a83a33038481eff08d1d8305f28f668bdf735ab09a861df40198e4efece6ed86",
+    "scoringCodeBlobCount": 22,
+    "scoringCodeBytes": 161374,
+    "scoringCodePathHash": "sha256:737b4086ff56636a4ed3c446a74b7ff7e6b13023d84821f8878bc2471e5fc0c8",
+    "questionIdsHash": "sha256:3ff7161a63a2c36797d7513d7a6cea27f198639bbda5d41257f9334aa998b47d",
+    "answerLabelsHash": "sha256:4bee3374026eaecd0efb8ba2c6dc90366d150bc627fb2d3732162ea01e3f6122",
+    "questionSchemaHash": "sha256:622bd5e9b2fd6151cab458e1ff9ccf213ac67c61857892ebb0dfeec6cba4f5a5",
+    "questionCount": 451,
+    "repoEntryCount": 11,
+    "datasetSiblingCount": 41,
+    "requiredRepoEntriesPresent": [
+      "README.md",
+      "LICENSE",
+      "data",
+      "evaluation",
+      "leaderboard",
+      "memory_modules"
+    ],
+    "requiredDatasetEntriesPresent": [
+      "README.md",
+      "DATA_CARD.md",
+      "SCHEMA.md",
+      "LICENSE"
+    ],
+    "errors": []
+  },
+  "failedChecks": [],
+  "blockersBeforeRun": [],
+  "nextActions": [
+    "Materialize LongMemEval-V2 through an operator-private run directory.",
+    "Export RecallWeave arms with raw rows retained outside the repository.",
+    "Run the same reader and judge model declared in this source-lock report.",
+    "Compare only against the same leaderboard tier and scoring contract."
+  ],
+  "safety": {
+    "storesRawBenchmarkData": false,
+    "storesCredentials": false,
+    "printsPrivatePaths": false,
+    "permitsProviderCalls": false,
+    "sourceLockOnly": true
+  }
+}

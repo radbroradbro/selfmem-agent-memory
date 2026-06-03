@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "mode": "baseline-reviewer-approval",
+  "fixtureOnly": false,
+  "reviewer": {
+    "id": "gemini-3-1-pro-reviewer-c",
+    "provider": "gemini",
+    "model": "gemini-3.1-pro-preview"
+  },
+  "verdict": "APPROVE_SOURCE_MATCHED_BASELINE",
+  "countsAsBenchmarkApproval": true,
+  "claimScope": "source-matched-canary",
+  "target": {
+    "packetSha256": null,
+    "runHash": "b3a2207a584827e5ad0bfeca9edd53834df64518af6e921ee7f5ede604f31221",
+    "comparisonHash": null,
+    "querySetHash": "sha256:9403d36215cb92e643bd0c640690695d57d98fe946f3dfef30b54aafc0eea5e4",
+    "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+    "sourceCommit": null,
+    "datasetSlice": null,
+    "judgeModel": null,
+    "answerModel": null
+  },
+  "attestations": {
+    "metricsOnlyEvidenceReviewed": true,
+    "noRawMemoryText": true,
+    "noRawTranscriptText": true,
+    "noRawPromptText": true,
+    "noRawAnswerText": true,
+    "noCredentials": true,
+    "privacyLeakCountZero": true,
+    "sameHarnessReviewed": true,
+    "sourceMatchedReviewed": true,
+    "contextTokenCaveatReviewed": true,
+    "publicLaunchStillBlocked": true,
+    "ownerApprovalStillRequired": true
+  },
+  "blockingConcerns": [],
+  "nonBlockingConcerns": [
+    "Public launch still requires owner approval.",
+    "This approves only a source-matched canary claim unless the packet proves a larger benchmark."
+  ]
+}
+

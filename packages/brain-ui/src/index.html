@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RecallWeave Brain</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="nucleus-shell" data-app-shell>
+      <aside class="rail" aria-label="Brain navigation">
+        <div class="brand">
+          <span class="brand-mark">RW</span>
+          <div>
+            <strong>RecallWeave</strong>
+            <span>fixture brain</span>
+          </div>
+        </div>
+        <label class="search">
+          <span>Search</span>
+          <input id="searchInput" name="searchInput" type="search" placeholder="Search memory, docs, trace, research" aria-label="Search Nucleus graph" />
+        </label>
+        <nav class="kind-filter" aria-label="Filter by node kind">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="memory">Memory</button>
+          <button data-filter="derived_doc">Docs</button>
+          <button data-filter="retrieval_trace">Trace</button>
+          <button data-filter="research_query">Research</button>
+          <button data-filter="lifecycle_event">Lifecycle</button>
+        </nav>
+        <div class="metrics" aria-label="Brain metrics">
+          <div><span id="nodeCount">0</span><small>nodes</small></div>
+          <div><span id="edgeCount">0</span><small>edges</small></div>
+          <div><span id="editableCount">0</span><small>editable</small></div>
+        </div>
+        <section class="container-health" aria-label="Container health">
+          <header>
+            <h2>Container</h2>
+            <span id="healthStatus">loading</span>
+          </header>
+          <dl id="containerFacts"></dl>
+        </section>
+        <section class="ops-flow" aria-label="Agent update flow">
+          <h2>Update Flow</h2>
+          <ol>
+            <li>Pull update</li>
+            <li>Run doctor</li>
+            <li>Smoke test</li>
+            <li>Open PR</li>
+          </ol>
+        </section>
+      </aside>
+
+      <section class="graph-panel" aria-label="Nucleus graph">
+        <header class="topbar">
+          <div>
+            <h1>Nucleus</h1>
+            <p>Hybrid recall, lifecycle, wiki sync, and research lineage in one inspectable map.</p>
+          </div>
+          <div class="review-pill">fixture-safe evidence</div>
+          <div class="graph-toolbar" aria-label="Graph navigation controls">
+            <div class="scope-toggle" role="group" aria-label="Graph scope">
+              <button type="button" data-graph-scope="all" class="active">All</button>
+              <button type="button" data-graph-scope="neighborhood">Neighborhood</button>
+            </div>
+            <label>
+              <span>Jump</span>
+              <select id="graphNodeJump" name="graphNodeJump" aria-label="Jump to Nucleus node"></select>
+            </label>
+            <button id="centerSelected" type="button">Center</button>
+            <p id="graphNavigationStatus" role="status"></p>
+          </div>
+        </header>
+        <div id="graph" class="graph" aria-label="Interactive Nucleus graph"></div>
+        <section class="timeline" aria-label="Low-noise memory timeline">
+          <header>
+            <h2>Timeline</h2>
+            <span>chronological derived events</span>
+          </header>
+          <ol id="timelineList"></ol>
+        </section>
+      </section>
+
+      <aside class="detail-panel" aria-label="Node details">
+        <header>
+          <span id="detailKind">node</span>
+          <h2 id="detailTitle">Loading</h2>
+        </header>
+        <dl class="facts" id="detailFacts"></dl>
+        <section>
+          <h3>Provenance</h3>
+          <div id="provenance" class="provenance"></div>
+        </section>
+        <section>
+          <h3>Lifecycle Trail</h3>
+          <div id="lifecycleTrail" class="lifecycle-trail" aria-label="Selected node lifecycle trail"></div>
+        </section>
+        <section>
+          <h3>Nucleus Snapshot</h3>
+          <div id="snapshotSummary" class="snapshot-summary" aria-label="Fixture Nucleus snapshot summary"></div>
+          <pre id="snapshotExport" class="snapshot-export" aria-label="Fixture Nucleus snapshot export"></pre>
+        </section>
+        <section>
+          <h3>Research Lineage</h3>
+          <div id="researchLineage" class="research-lineage" aria-label="Fixture research lineage"></div>
+        </section>
+        <section id="research-source-lock">
+          <h3>Research Source Lock</h3>
+          <p id="researchSourceLockStatus" class="source-lock-status" role="status">loading</p>
+          <div id="researchSourceLockSummary" class="source-lock-summary" aria-label="Fixture research source-lock summary"></div>
+          <ol id="researchSourceLockSources" class="source-lock-list" aria-label="Fixture research source-lock sources"></ol>
+          <ol id="researchSourceLockRules" class="source-lock-list source-lock-rules" aria-label="Fixture research source-lock implementation rules"></ol>
+          <details class="technical-export">
+            <summary>Technical export</summary>
+            <pre id="researchSourceLockExport" class="policy-draft" aria-label="Fixture research source-lock export"></pre>
+          </details>
+        </section>
+        <section id="model-matrix">
+          <h3>Model Matrix</h3>
+          <p id="modelMatrixStatus" class="model-matrix-status" role="status">loading</p>
+          <div id="modelMatrixSummary" class="model-matrix-summary" aria-label="Fixture model matrix summary"></div>
+          <div id="modelMatrixLocal" class="model-matrix-local" aria-label="Fixture Apple Silicon local model lane"></div>
+          <ol id="modelMatrixArms" class="model-matrix-list" aria-label="Fixture provider model arms"></ol>
+          <ol id="modelMatrixGates" class="model-matrix-list blocker-list" aria-label="Fixture autoresearch model gates"></ol>
+          <details class="technical-export">
+            <summary>Technical export</summary>
+            <pre id="modelMatrixExport" class="policy-draft" aria-label="Fixture model matrix export"></pre>
+          </details>
+        </section>
+        <section>
+          <h3>Compaction Audit</h3>
+          <div id="compactionAuditSummary" class="audit-summary" aria-label="Fixture local session compaction audit summary"></div>
+          <ol id="compactionAuditFingerprints" class="audit-files" aria-label="Fixture local session compaction audit candidate fingerprints"></ol>
+          <ol id="compactionAuditSessionMap" class="audit-files" aria-label="Fixture local session compaction audit session map"></ol>
+          <pre id="compactionAuditExport" class="policy-draft" aria-label="Fixture local session compaction audit export"></pre>
+        </section>
+        <section id="benchmark-dashboard">
+          <h3>Benchmark Dashboard</h3>
+          <p id="benchmarkStatus" class="benchmark-verdict" role="status">loading</p>
+          <div id="benchmarkSummary" class="benchmark-summary" aria-label="Benchmark summary"></div>
+          <ol id="benchmarkScenarios" class="benchmark-scenarios" aria-label="Benchmark scenarios and memory strategy arms"></ol>
+          <ol id="benchmarkCaveats" class="benchmark-caveats" aria-label="Benchmark caveats"></ol>
+          <pre id="benchmarkExport" class="policy-draft" aria-label="Benchmark export"></pre>
+        </section>
+        <section id="canary-rollout">
+          <h3>Canary Rollout</h3>
+          <p id="canaryStatus" class="canary-verdict" role="status">loading</p>
+          <div id="canarySummary" class="canary-summary" aria-label="Fixture one-agent canary rollout summary"></div>
+          <ol id="canaryPrerequisites" class="canary-list" aria-label="Fixture one-agent canary prerequisites"></ol>
+          <ol id="canarySteps" class="canary-list" aria-label="Fixture one-agent canary steps"></ol>
+          <ol id="canaryMetrics" class="canary-list" aria-label="Fixture one-agent canary metrics"></ol>
+          <ol id="canaryBlockers" class="canary-list blocker-list" aria-label="Fixture one-agent canary blockers and caveats"></ol>
+          <pre id="canaryExport" class="policy-draft" aria-label="Fixture one-agent canary rollout export"></pre>
+        </section>
+        <section id="context-preview">
+          <h3>Context Preview</h3>
+          <div id="contextPreviewSummary" class="context-summary" aria-label="Fixture prompt context preview summary"></div>
+          <ol id="contextPreviewMemories" class="context-memory-list" aria-label="Fixture prompt context selected memories"></ol>
+          <div id="contextPreviewSections" class="context-section-list" aria-label="Fixture prompt context sections"></div>
+          <ol id="contextPreviewOmitted" class="context-omitted-list" aria-label="Fixture prompt context omitted candidates"></ol>
+          <pre id="contextPreviewExport" class="policy-draft" aria-label="Fixture prompt context preview export"></pre>
+        </section>
+        <section id="release-readiness">
+          <h3>Release Readiness</h3>
+          <p id="releaseReadinessStatus" class="release-verdict" role="status">loading</p>
+          <div id="releaseReadinessSummary" class="release-summary" aria-label="Fixture release readiness summary"></div>
+          <ol id="releaseReadinessSurfaces" class="release-list" aria-label="Fixture release readiness proven surfaces"></ol>
+          <ol id="releaseReadinessBlockers" class="release-list blocker-list" aria-label="Fixture release readiness blockers"></ol>
+          <ol id="releaseReadinessActions" class="release-list manual-actions" aria-label="Fixture release readiness manual actions"></ol>
+          <pre id="releaseReadinessExport" class="policy-draft" aria-label="Fixture release readiness export"></pre>
+        </section>
+        <section>
+          <h3>Lifecycle Policy</h3>
+          <div id="policySummary" class="policy-summary" aria-label="Fixture lifecycle policy summary"></div>
+          <form id="policyForm" class="policy-form" aria-label="Fixture lifecycle policy draft">
+            <label class="check-row">
+              <input id="policyForceRecall" name="policyForceRecall" type="checkbox" />
+              <span>Recall every turn</span>
+            </label>
+            <label class="check-row">
+              <input id="policyPreCompress" name="policyPreCompress" type="checkbox" />
+              <span>Store pre-compress checkpoints</span>
+            </label>
+            <label>
+              <span>Max auto writes</span>
+              <input id="policyMaxWrites" name="policyMaxWrites" type="number" min="0" max="200" step="1" />
+            </label>
+            <label>
+              <span>Low-confidence writes</span>
+              <select id="policyLowConfidence" name="policyLowConfidence" aria-label="Low-confidence write action">
+                <option value="review_queue">Review queue</option>
+                <option value="suppress">Suppress</option>
+                <option value="write_with_low_confidence_flag">Write with flag</option>
+              </select>
+            </label>
+            <button id="stagePolicy" type="submit">Stage policy</button>
+            <p id="policyStatus" role="status"></p>
+          </form>
+          <pre id="policyDraft" class="policy-draft" aria-label="Fixture lifecycle policy draft export"></pre>
+          <form id="policyApplyForm" class="policy-form policy-apply-form" aria-label="Selected local lifecycle policy apply">
+            <label>
+              <span>Policy container path</span>
+              <input id="policyApplyPath" name="policyApplyPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local lifecycle policy path" />
+            </label>
+            <label class="check-row">
+              <input id="policyApplyConfirm" name="policyApplyConfirm" type="checkbox" />
+              <span>Write lifecycle policy</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="policyApplyPhrase" name="policyApplyPhrase" type="text" autocomplete="off" aria-label="Selected local lifecycle policy confirmation phrase" />
+            </label>
+            <button id="applyPolicy" type="submit">Apply policy</button>
+            <p id="policyApplyStatus" role="status"></p>
+            <div id="policyApplySummary" class="policy-summary" aria-label="Selected local lifecycle policy apply summary"></div>
+            <ol id="policyApplyActions" class="audit-reasons" aria-label="Selected local lifecycle policy apply audit trail"></ol>
+          </form>
+        </section>
+        <section>
+          <h3>Review Queue</h3>
+          <div id="reviewQueueSummary" class="review-summary" aria-label="Fixture memory review queue summary"></div>
+          <form id="reviewQueueForm" class="review-queue" aria-label="Fixture memory review queue">
+            <div id="reviewQueueItems" class="review-queue-items"></div>
+            <button id="stageReviewQueue" type="submit">Stage review</button>
+            <p id="reviewQueueStatus" role="status"></p>
+          </form>
+          <pre id="reviewQueueDraft" class="policy-draft" aria-label="Fixture memory review queue draft export"></pre>
+          <form id="reviewQueueApplyForm" class="review-queue review-apply-form" aria-label="Selected local review queue apply">
+            <label>
+              <span>Review container path</span>
+              <input id="reviewQueueApplyPath" name="reviewQueueApplyPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local review queue path" />
+            </label>
+            <label class="check-row">
+              <input id="reviewQueueApplyConfirm" name="reviewQueueApplyConfirm" type="checkbox" />
+              <span>Write review decisions</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="reviewQueueApplyPhrase" name="reviewQueueApplyPhrase" type="text" autocomplete="off" aria-label="Selected local review queue confirmation phrase" />
+            </label>
+            <button id="applyReviewQueue" type="submit">Apply review</button>
+            <p id="reviewQueueApplyStatus" role="status"></p>
+            <div id="reviewQueueApplySummary" class="review-summary" aria-label="Selected local review queue apply summary"></div>
+            <ol id="reviewQueueApplyActions" class="audit-reasons" aria-label="Selected local review queue apply audit trail"></ol>
+          </form>
+        </section>
+        <section>
+          <h3>Wiki Vault Preview</h3>
+          <div class="vault-controls">
+            <label>
+              <span>Compiled file</span>
+              <select id="vaultFileSelect" name="vaultFileSelect" aria-label="Compiled wiki vault file"></select>
+            </label>
+            <p id="vaultStatus" role="status"></p>
+          </div>
+          <pre id="vaultPreview" class="vault-preview" aria-label="Compiled wiki vault preview"></pre>
+        </section>
+        <section>
+          <h3>Vault Sync Report</h3>
+          <div id="syncSummary" class="sync-summary" aria-label="Fixture vault sync summary"></div>
+          <ol id="syncActions" class="sync-actions" aria-label="Fixture vault sync actions"></ol>
+          <form id="selectedSyncForm" class="selected-sync" aria-label="Selected local vault sync dry run">
+            <label>
+              <span>Local vault path</span>
+              <input id="selectedSyncPath" name="selectedSyncPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local vault path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedSyncConfirm" name="selectedSyncConfirm" type="checkbox" />
+              <span>Read-only dry run</span>
+            </label>
+            <button id="runSelectedSync" type="submit">Preview sync</button>
+            <p id="selectedSyncStatus" role="status"></p>
+            <div id="selectedSyncSummary" class="sync-summary" aria-label="Selected local vault sync dry-run summary"></div>
+            <ol id="selectedSyncActions" class="sync-actions" aria-label="Selected local vault sync dry-run actions"></ol>
+          </form>
+          <form id="selectedSyncApplyForm" class="selected-sync apply-sync" aria-label="Selected local vault sync apply">
+            <label>
+              <span>Apply vault path</span>
+              <input id="selectedSyncApplyPath" name="selectedSyncApplyPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local vault apply path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedSyncApplyConfirm" name="selectedSyncApplyConfirm" type="checkbox" />
+              <span>Write compiled wiki files</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="selectedSyncApplyPhrase" name="selectedSyncApplyPhrase" type="text" autocomplete="off" aria-label="Selected local vault apply confirmation phrase" />
+            </label>
+            <button id="runSelectedSyncApply" type="submit">Apply sync</button>
+            <p id="selectedSyncApplyStatus" role="status"></p>
+            <div id="selectedSyncApplySummary" class="sync-summary" aria-label="Selected local vault sync apply summary"></div>
+            <ol id="selectedSyncApplyActions" class="sync-actions" aria-label="Selected local vault sync apply actions"></ol>
+          </form>
+        </section>
+        <section>
+          <h3>Local Audit Preflight</h3>
+          <div id="localAuditSummary" class="audit-summary" aria-label="Fixture local container audit summary"></div>
+          <ol id="localAuditFiles" class="audit-files" aria-label="Fixture local container audit files"></ol>
+          <ol id="localAuditReasons" class="audit-reasons" aria-label="Fixture local container audit reasons"></ol>
+          <div id="localBrowseSummary" class="audit-summary" aria-label="Fixture local container browse summary"></div>
+          <ol id="localBrowseItems" class="audit-files" aria-label="Fixture local container browse items"></ol>
+          <form id="selectedBrowseForm" class="selected-audit" aria-label="Selected local container browse">
+            <label>
+              <span>Browse container path</span>
+              <input id="selectedBrowsePath" name="selectedBrowsePath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local container browse path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedBrowseConfirm" name="selectedBrowseConfirm" type="checkbox" />
+              <span>Read-only browse</span>
+            </label>
+            <label>
+              <span>Max items</span>
+              <input id="selectedBrowseMaxItems" name="selectedBrowseMaxItems" type="number" min="1" max="25" value="12" aria-label="Selected local browse max items" />
+            </label>
+            <button id="runSelectedBrowse" type="submit">Browse entries</button>
+            <p id="selectedBrowseStatus" role="status"></p>
+            <div id="selectedBrowseSummary" class="audit-summary" aria-label="Selected local container browse summary"></div>
+            <ol id="selectedBrowseItems" class="audit-files" aria-label="Selected local container browse items"></ol>
+          </form>
+          <form id="localEditForm" class="selected-audit local-edit" aria-label="Selected local memory edit">
+            <label>
+              <span>Edit container path</span>
+              <input id="localEditPath" name="localEditPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local memory edit path" />
+            </label>
+            <label>
+              <span>Source file</span>
+              <select id="localEditSourceFile" name="localEditSourceFile" aria-label="Selected local memory edit source file">
+                <option value="memories.jsonl">memories.jsonl</option>
+              </select>
+            </label>
+            <label>
+              <span>Line</span>
+              <input id="localEditLine" name="localEditLine" type="number" min="1" step="1" value="1" aria-label="Selected local memory edit line" />
+            </label>
+            <label>
+              <span>Source id</span>
+              <input id="localEditSourceId" name="localEditSourceId" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local memory edit source id" />
+            </label>
+            <label>
+              <span>Action</span>
+              <select id="localEditAction" name="localEditAction" aria-label="Selected local memory edit action">
+                <option value="append_correction">Append correction</option>
+                <option value="replace">Replace derived memory</option>
+                <option value="suppress">Suppress</option>
+                <option value="needs_review">Needs review</option>
+              </select>
+            </label>
+            <label>
+              <span>Reason</span>
+              <select id="localEditReason" name="localEditReason" aria-label="Selected local memory edit reason">
+                <option value="manual_correction">Manual correction</option>
+                <option value="duplicate">Duplicate</option>
+                <option value="stale">Stale</option>
+                <option value="noise">Noise</option>
+                <option value="privacy">Privacy</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Replacement text</span>
+              <textarea id="localEditText" name="localEditText" aria-label="Selected local memory edit replacement text"></textarea>
+            </label>
+            <label class="check-row">
+              <input id="localEditConfirm" name="localEditConfirm" type="checkbox" />
+              <span>Write edit overlay</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="localEditPhrase" name="localEditPhrase" type="text" autocomplete="off" aria-label="Selected local memory edit confirmation phrase" />
+            </label>
+            <button id="applyLocalEdit" type="submit">Apply edit</button>
+            <p id="localEditStatus" role="status"></p>
+            <div id="localEditSummary" class="audit-summary" aria-label="Selected local memory edit summary"></div>
+            <ol id="localEditActions" class="audit-reasons" aria-label="Selected local memory edit audit trail"></ol>
+          </form>
+          <form id="localMaterializeForm" class="selected-audit local-edit" aria-label="Selected local memory materialize">
+            <label>
+              <span>Materialize container path</span>
+              <input id="localMaterializePath" name="localMaterializePath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local memory materialize path" />
+            </label>
+            <label class="check-row">
+              <input id="localMaterializeConfirm" name="localMaterializeConfirm" type="checkbox" />
+              <span>Write memory file with backup</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="localMaterializePhrase" name="localMaterializePhrase" type="text" autocomplete="off" aria-label="Selected local memory materialize confirmation phrase" />
+            </label>
+            <button id="applyLocalMaterialize" type="submit">Materialize edits</button>
+            <p id="localMaterializeStatus" role="status"></p>
+            <div id="localMaterializeSummary" class="audit-summary" aria-label="Selected local memory materialize summary"></div>
+            <ol id="localMaterializeActions" class="audit-reasons" aria-label="Selected local memory materialize audit trail"></ol>
+          </form>
+          <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
+            <label>
+              <span>Local container path</span>
+              <input id="selectedAuditPath" name="selectedAuditPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local container path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedAuditConfirm" name="selectedAuditConfirm" type="checkbox" />
+              <span>Read-only</span>
+            </label>
+            <button id="runSelectedAudit" type="submit">Audit</button>
+            <p id="selectedAuditStatus" role="status"></p>
+            <div id="selectedAuditSummary" class="audit-summary" aria-label="Selected local container audit summary"></div>
+            <ol id="selectedAuditMeta" class="audit-reasons" aria-label="Selected local container audit trail"></ol>
+            <ol id="selectedAuditHistory" class="audit-history" aria-label="Browser-local selected audit history"></ol>
+          </form>
+        </section>
+        <section>
+          <h3>Derived Doc Editor</h3>
+          <textarea id="docEditor" name="docEditor" aria-label="Derived document editor"></textarea>
+          <div class="editor-actions">
+            <button id="saveEdit">Save fixture edit</button>
+            <button id="resetEdit">Reset</button>
+          </div>
+          <p id="editStatus" role="status"></p>
+          <div class="edit-export-panel">
+            <h4>Draft Export</h4>
+            <p id="exportStatus" role="status"></p>
+            <pre id="editExport" class="edit-export" aria-label="Fixture edit draft export"></pre>
+          </div>
+        </section>
+      </aside>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

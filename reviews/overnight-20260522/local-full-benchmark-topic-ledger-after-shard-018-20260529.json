@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-full-benchmark-topic-ledger",
+  "status": "PARTIAL_LOCAL_FULL_TOPIC_LEDGER",
+  "generatedAt": "2026-05-29T15:30:08.083Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsPrivatePaths": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "sourceEvidence": {
+    "performance": {
+      "path": "reviews/overnight-20260522/local-full-shard-performance-report-after-shard-018-20260529.json",
+      "hash": "sha256:53aa8334b47aa4097b5fe2260a6dc0928827f12b5efae8d932dfa7a191ef8213"
+    },
+    "intake": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-018-20260529.json",
+      "hash": "sha256:2e4b1166227a1c2c570639201b1873c2f0eb953587383ec3e3c4285c5106984c"
+    },
+    "wikiFixture": {
+      "path": "reviews/overnight-20260522/public-longmemeval-wiki-amplification-fixture-20260526.json",
+      "hash": "sha256:63ed4cc348188d483e9f1325f9d10fee24680974e6299d7bdac27f97644b10df"
+    },
+    "hostedBaseline": {
+      "path": "reviews/overnight-20260522/hosted-baseline-live-budgeted-run.json",
+      "hash": "sha256:b3a2207a584827e5ad0bfeca9edd53834df64518af6e921ee7f5ede604f31221"
+    }
+  },
+  "coverage": {
+    "acceptedShards": 18,
+    "shardCount": 20,
+    "acceptedQueries": 450,
+    "queryCount": 500,
+    "coveragePercent": 90,
+    "nextPendingShardId": "shard-019",
+    "nextPendingShardRange": "450-475",
+    "blockers": [
+      "local-full-coverage-incomplete"
+    ]
+  },
+  "currentScores": {
+    "bestStrategy": {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "scoredQueryCount": 450,
+      "answerQuality": 27,
+      "quality": 0.27,
+      "judgeCorrectRate": 0.2622,
+      "answerLatencyP50Ms": 9317.6111,
+      "deltaVsBm25": 3.2644
+    },
+    "bm25": {
+      "strategy": "bm25-lite",
+      "scoredQueryCount": 450,
+      "answerQuality": 23.7356,
+      "quality": 0.2374,
+      "judgeCorrectRate": 0.2311,
+      "answerLatencyP50Ms": 8800.1667,
+      "deltaVsBm25": 0
+    },
+    "fullHybrid": {
+      "strategy": "full-hybrid-rerank",
+      "scoredQueryCount": 450,
+      "answerQuality": 19.9244,
+      "quality": 0.1992,
+      "judgeCorrectRate": 0.1933,
+      "answerLatencyP50Ms": 10334.1667,
+      "deltaVsBm25": -3.8112
+    },
+    "queryExpanded": {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "scoredQueryCount": 450,
+      "answerQuality": 19.6578,
+      "quality": 0.1966,
+      "judgeCorrectRate": 0.1889,
+      "answerLatencyP50Ms": 9304.4444,
+      "deltaVsBm25": -4.0778
+    },
+    "localApple": {
+      "strategy": "local-apple-qwen3-0_6b",
+      "scoredQueryCount": 450,
+      "answerQuality": 22.0778,
+      "quality": 0.2208,
+      "judgeCorrectRate": 0.2111,
+      "answerLatencyP50Ms": 10300.6667,
+      "deltaVsBm25": -1.6578
+    },
+    "localAppleLocalRerank": {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "scoredQueryCount": 450,
+      "answerQuality": 27,
+      "quality": 0.27,
+      "judgeCorrectRate": 0.2622,
+      "answerLatencyP50Ms": 9317.6111,
+      "deltaVsBm25": 3.2644
+    }
+  },
+  "topicLedger": [
+    {
+      "id": "local-full-coverage",
+      "title": "Local-full coverage is still partial",
+      "status": "blocked",
+      "evidence": "450/500 questions accepted across 18/20 shards.",
+      "decision": "Do not claim local-full or SOTA completion until all planned shards are accepted and combined.",
+      "nextAction": "Run shard-019 (450-475)."
+    },
+    {
+      "id": "bm25-control",
+      "title": "BM25 remains the lexical floor",
+      "status": "active-control",
+      "evidence": "bm25-lite score 23.7356; p50 8800.1667 ms.",
+      "decision": "Keep BM25 in every fair comparison and use it as the fallback/control arm.",
+      "nextAction": "Compare every promoted retrieval method against BM25 on the same accepted shard set."
+    },
+    {
+      "id": "local-rerank-positive",
+      "title": "Local Apple rerank is the current local winner",
+      "status": "positive-signal",
+      "evidence": "local-apple-qwen3-0_6b-local-rerank score 27; delta vs BM25 3.2644; delta vs base 4.9222.",
+      "decision": "Treat local rerank as the current method-refinement candidate, not as a public benchmark claim.",
+      "nextAction": "Keep local rerank in shard-019 and watch whether the gain survives beyond 90% coverage."
+    },
+    {
+      "id": "full-hybrid-regressed",
+      "title": "Plain full-hybrid is not promoted on current answer-quality evidence",
+      "status": "not-promoted",
+      "evidence": "full-hybrid-rerank score 19.9244; delta vs BM25 -3.8112.",
+      "decision": "Do not treat deterministic full-hybrid as superior on the current accepted-shard aggregation.",
+      "nextAction": "Use per-shard diagnostics to identify whether dense or rerank ordering is hurting specific categories."
+    },
+    {
+      "id": "query-expansion-negative",
+      "title": "Query expansion remains negative",
+      "status": "negative-signal",
+      "evidence": "query-expanded-full-hybrid-rerank score 19.6578; delta vs BM25 -4.0778.",
+      "decision": "Keep query expansion experimental and disabled as a default method until a same-data accepted shard win appears.",
+      "nextAction": "Audit rewrite quality, fallback frequency, and category sensitivity before spending more full-shard cycles."
+    },
+    {
+      "id": "wiki-amplification-unproven",
+      "title": "Wiki title and subtopic amplification are wired but unproven",
+      "status": "fixture-only",
+      "evidence": "wiki fixture query count 3; winner bm25-lite; quality delta vs BM25 0.",
+      "decision": "Do not promote title or subtopic boost from a fixture tie.",
+      "nextAction": "Run a local-wiki shard plan or retrieval-proxy stress slice that includes wiki-title and wiki-subtopic arms."
+    },
+    {
+      "id": "hosted-supermemory-boundary",
+      "title": "Hosted Supermemory comparison is separate from local-full methodology",
+      "status": "canary-boundary-recorded",
+      "evidence": "hosted canary quality 0; RecallWeave canary quality 0.1212; query count 8.",
+      "decision": "Do not compare local-full partial shards to Supermemory reported SOTA or free-tier canaries as if they are the same benchmark.",
+      "nextAction": "Use hosted Supermemory only in explicit hosted-baseline runs; keep it disabled for method refinement shards."
+    }
+  ],
+  "storagePolicy": {
+    "publicWikiStores": [
+      "strategy names",
+      "metric aggregates",
+      "query shard ranges",
+      "hashes",
+      "method decisions",
+      "blocker classes"
+    ],
+    "privateIndexStores": [
+      "raw benchmark questions",
+      "raw answer labels",
+      "raw memory/session text",
+      "retrieved candidate chunks",
+      "local vector index payloads"
+    ],
+    "rule": "Use public wiki pages for method recall and private local indexes for raw evidence review."
+  },
+  "promotionPolicy": {
+    "defaultPersonalPath": "cloud-voyage-provider-lane",
+    "methodRefinementPath": "local-apple-full-shard-lane",
+    "bm25Role": "lexical-floor-control",
+    "queryExpansionRole": "experimental-negative-until-same-data-win",
+    "wikiAmplificationRole": "experimental-unproven-until-accepted-shard-win"
+  },
+  "nextActions": [
+    "Run shard-019 with hosted Supermemory search disabled and regenerate this ledger.",
+    "Run a local-wiki shard plan before promoting title or subtopic amplification beyond fixture status.",
+    "Keep raw LongMemEval material outside repo-facing wiki artifacts; index it only in local private storage."
+  ]
+}

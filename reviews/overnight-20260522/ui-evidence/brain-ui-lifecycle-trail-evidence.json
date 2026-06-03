@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "mode": "brain-ui-lifecycle-trail-browser",
+  "generatedAt": "2026-05-22T23:05:24.928Z",
+  "head": "8777290169f598ff9172e889e927858b3956f764",
+  "url": "http://127.0.0.1:4189/",
+  "title": "RecallWeave Brain",
+  "screenshot": "brain-ui-lifecycle-trail.png",
+  "screenshotPixels": {
+    "width": 1280,
+    "height": 1223
+  },
+  "writesRealFiles": false,
+  "fixtureOnly": true,
+  "consoleErrorOrWarningCount": 0,
+  "privateLeakCount": 0,
+  "evidence": {
+    "cardCount": 2,
+    "graphNodeCount": 9,
+    "graphVisibleNodeCount": 9,
+    "hasCapturedByEdge": false,
+    "hasLifecycleEventCard": true,
+    "hasLifecycleTrail": true,
+    "hasPreCompressText": true,
+    "hasPrivateOrKeyText": false,
+    "hasRetrievalTraceCard": true,
+    "lifecycleMode": "fixture-lifecycle-trail",
+    "lifecycleTrailVisible": true,
+    "selectedKind": "wiki page",
+    "selectedTitle": "RecallWeave Index",
+    "summary": {
+      "Events": "1",
+      "Links": "3",
+      "Selected": "wiki page",
+      "Traces": "1"
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "mode": "one-agent-canary-runtime-report",
+  "generatedAt": "2026-05-22T20:30:00.000Z",
+  "commit": "fixture-failing-canary-commit",
+  "fixtureOnly": true,
+  "evidenceType": "fixture-trace-derived-canary-report",
+  "agent": {
+    "host": "hermes",
+    "agentIdentityHash": "agent_0123456789ab",
+    "localContainerHash": "container_0123456789ab",
+    "sourceContainerHash": "source_0123456789ab"
+  },
+  "adapter": {
+    "name": "recallweave-selfmem-canary",
+    "contractVersion": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": true,
+    "storeLatencyInstrumentation": true
+  },
+  "window": {
+    "startedAt": "2026-05-22T20:00:00.000Z",
+    "endedAt": "2026-05-22T20:30:00.000Z",
+    "durationMinutes": 30
+  },
+  "provider": {
+    "mode": "local-write-hosted-read-through",
+    "localWriteMode": "enabled",
+    "hostedSupermemoryMode": "read-through-only",
+    "embedder": "voyage-4-large",
+    "reranker": "rerank-2.5",
+    "hostedWriteBack": false
+  },
+  "nativeMemory": {
+    "providerId": "selfmem_canary",
+    "slot": "memory.provider",
+    "defaultActive": true,
+    "shadowOnly": false,
+    "newWrites": "local",
+    "hostedReadThrough": true,
+    "hostedWriteBack": false,
+    "proof": [
+      "provider-id-selfmem-canary",
+      "before-prompt-lifecycle-fired",
+      "local-store-events-observed",
+      "local-write-mode-enabled",
+      "hermes-native-adapter-loaded",
+      "explicit-native-default-config"
+    ]
+  },
+  "counts": {
+    "sessionStart": 2,
+    "beforePromptBuild": 18,
+    "preCompress": 2,
+    "agentEnd": 14,
+    "search": 24,
+    "store": 12,
+    "forget": 0,
+    "errors": 0,
+    "skippedUnknownIdentity": 0,
+    "unknownContainerWrites": 0
+  },
+  "latencyMs": {
+    "recallP50": 817,
+    "recallP95": 3894,
+    "storeP50": 0,
+    "storeP95": 0
+  },
+  "instrumentation": {
+    "searchLatencySampleCount": 24,
+    "storeLatencySampleCount": 0,
+    "missingSearchLatencyCount": 0,
+    "missingStoreLatencyCount": 12,
+    "metadataOnlyTrace": true,
+    "summaryOnlyTrace": false
+  },
+  "quality": {
+    "beforePromptHasContextRate": 0.83,
+    "zeroResultRate": 0.04,
+    "writeSuccessRate": 1,
+    "lcmHookObserved": true,
+    "lifecycleCovered": true,
+    "hybridSearchCovered": true,
+    "localWritesObserved": true,
+    "hostedReadThroughObserved": true
+  },
+  "privacy": {
+    "privacyLeakCount": 0,
+    "redactionCount": 4,
+    "secretPatternHits": 0,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPromptIncluded": false,
+    "rawAnswerIncluded": false
+  },
+  "rollback": {
+    "available": true,
+    "tested": true,
+    "command": "selfmem_update --rollback"
+  },
+  "failures": []
+}

@@ -1,0 +1,305 @@
+{
+  "ok": true,
+  "capturedAt": "2026-05-22T14:57:35.257Z",
+  "head": "21fd4d6c82bf2c07f8e5dba70f8508b0b9884649",
+  "evidence": {
+    "bodyLength": 36937,
+    "buttons": [
+      "All",
+      "Memory",
+      "Docs",
+      "Trace",
+      "Research",
+      "Lifecycle",
+      "retrieval trace Retrieval trace for native memory optimization",
+      "derived doc Native Memory Optimization Plan 88% confidence",
+      "Stage policy",
+      "Apply policy",
+      "Stage review",
+      "Apply review",
+      "Preview sync",
+      "Apply sync",
+      "Browse entries",
+      "Apply edit",
+      "Materialize edits",
+      "Audit",
+      "Save fixture edit",
+      "Reset"
+    ],
+    "checks": {
+      "hasContainer": true,
+      "hasDraftExport": true,
+      "hasFixtureLanguage": true,
+      "hasLifecyclePolicy": true,
+      "hasLocalAudit": true,
+      "hasNucleus": true,
+      "hasPrivateOrKeyText": false,
+      "hasResearchLineage": true,
+      "hasReviewQueue": true,
+      "hasSelectedAuditForm": true,
+      "hasSelectedSyncApplyForm": true,
+      "hasSelectedSyncForm": true,
+      "hasSyncReport": true,
+      "hasVaultPreview": true,
+      "hasWriteDisabledLanguage": true,
+      "pathInputsAreVisibleText": true,
+      "hasSearch": true,
+      "hasVaultSyncApply": true,
+      "hasLifecyclePolicyApply": true,
+      "hasReviewQueueApply": true,
+      "hasSelectedLocalBrowse": true,
+      "hasSelectedLocalEdit": true,
+      "hasLocalEditPath": true,
+      "hasLocalEditText": true,
+      "hasLocalEditPhrase": true,
+      "hasLocalEditOverlayBrowse": true,
+      "hasLocalEditOverlayPreview": true,
+      "hasSelectedBrowsePanel": true,
+      "hasLocalMemoryMaterialize": true,
+      "hasLocalMaterializeBackup": true
+    },
+    "h1": "Nucleus",
+    "inputs": [
+      {
+        "id": "searchInput",
+        "tag": "input",
+        "type": "search",
+        "ariaLabel": "Search Nucleus graph"
+      },
+      {
+        "id": "policyForceRecall",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "policyPreCompress",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "policyMaxWrites",
+        "tag": "input",
+        "type": "number",
+        "ariaLabel": ""
+      },
+      {
+        "id": "policyLowConfidence",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Low-confidence write action"
+      },
+      {
+        "id": "policyApplyPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local lifecycle policy path"
+      },
+      {
+        "id": "policyApplyConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "policyApplyPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local lifecycle policy confirmation phrase"
+      },
+      {
+        "id": "review-candidate-maintenance-noise",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": ""
+      },
+      {
+        "id": "review-candidate-duplicate-recallweave-decision",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": ""
+      },
+      {
+        "id": "review-candidate-high-value-policy",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": ""
+      },
+      {
+        "id": "reviewQueueApplyPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local review queue path"
+      },
+      {
+        "id": "reviewQueueApplyConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "reviewQueueApplyPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local review queue confirmation phrase"
+      },
+      {
+        "id": "vaultFileSelect",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Compiled wiki vault file"
+      },
+      {
+        "id": "selectedSyncPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local vault path"
+      },
+      {
+        "id": "selectedSyncConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "selectedSyncApplyPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local vault apply path"
+      },
+      {
+        "id": "selectedSyncApplyConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "selectedSyncApplyPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local vault apply confirmation phrase"
+      },
+      {
+        "id": "selectedBrowsePath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local container browse path"
+      },
+      {
+        "id": "selectedBrowseConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "selectedBrowseMaxItems",
+        "tag": "input",
+        "type": "number",
+        "ariaLabel": "Selected local browse max items"
+      },
+      {
+        "id": "localEditPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory edit path"
+      },
+      {
+        "id": "localEditSourceFile",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Selected local memory edit source file"
+      },
+      {
+        "id": "localEditLine",
+        "tag": "input",
+        "type": "number",
+        "ariaLabel": "Selected local memory edit line"
+      },
+      {
+        "id": "localEditSourceId",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory edit source id"
+      },
+      {
+        "id": "localEditAction",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Selected local memory edit action"
+      },
+      {
+        "id": "localEditReason",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Selected local memory edit reason"
+      },
+      {
+        "id": "localEditText",
+        "tag": "textarea",
+        "type": "textarea",
+        "ariaLabel": "Selected local memory edit replacement text"
+      },
+      {
+        "id": "localEditConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "localEditPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory edit confirmation phrase"
+      },
+      {
+        "id": "localMaterializePath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory materialize path"
+      },
+      {
+        "id": "localMaterializeConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "localMaterializePhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory materialize confirmation phrase"
+      },
+      {
+        "id": "selectedAuditPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local container path"
+      },
+      {
+        "id": "selectedAuditConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "docEditor",
+        "tag": "textarea",
+        "type": "textarea",
+        "ariaLabel": "Derived document editor"
+      }
+    ],
+    "sectionCount": 13,
+    "title": "RecallWeave Brain",
+    "url": "http://127.0.0.1:4177/",
+    "inputCount": 38,
+    "localEditText": "Edit container path Source file memories.jsonl Line Source id Action Append correction Replace derived memory Suppress Needs review Reason Manual correction Duplicate Stale Noise Privacy Other Replacement text Write edit overlay Confirmation phrase Apply edit Materialize container path",
+    "localMaterializeText": "Materialize container path Write memory file with backup Confirmation phrase Materialize edits Local container path",
+    "selectedBrowseText": ""
+  },
+  "screenshot": {
+    "ok": true,
+    "path": "ui-evidence/brain-ui-local-memory-materialize.png"
+  },
+  "note": "Captured with headless Chrome against localhost fixture UI with selected local memory materialize controls visible. Screenshot is fixture-only."
+}

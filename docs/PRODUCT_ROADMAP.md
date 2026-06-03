@@ -10,7 +10,24 @@ This roadmap tracks useful user-facing features without mixing them into the cur
 - Voyage embedding and rerank when local credentials are present.
 - Maintenance/status recall skip gate.
 - Lifecycle traces for recall, writes, compression checkpoints, provider errors, and privacy counts.
-- `selfmem_update.py` for dry-run updates and safer agent patching.
+- `selfmem_update` for dry-run updates and safer agent patching.
+- Fixture-safe Nucleus-to-wiki compiler and explicit disk-sync helper with
+  reviewed-page conflict protection.
+- Fixture-safe Brain UI panels for graph/editor, container health, Nucleus
+  snapshot, research lineage, compiled vault preview, and dry-run sync report.
+- Read-only local-container audit preflight that returns counts and health
+  reasons without exposing raw memory content or private paths.
+- Disabled-by-default selected local-container audit preview with read-only
+  confirmation and redacted `.../container` path display.
+- Browser-local selected-audit history with content-free metadata only.
+- Metrics-only local-session batch compaction audit for several private Codex,
+  Claude, Hermes, or OpenClaw exports at once.
+- Disabled-by-default selected local vault sync dry-run with read-only
+  confirmation and redacted `.../container` path display.
+- Fixture-safe lifecycle policy preview that stages recall/write settings as a
+  no-write draft export.
+- Fixture-safe memory review queue preview that stages approve, suppress, and
+  merge decisions for candidate memories as a no-write draft export.
 
 ## Brain UI
 
@@ -43,6 +60,11 @@ For RecallWeave, this should become an optional view layer:
 - `schema.md` or `AGENTS.md` defines citation, tagging, and lint rules.
 - Obsidian can open the folder, but Obsidian is optional.
 - The Brain UI should read the same wiki graph for users who do not want Obsidian.
+- Current sync writes compiled, lint-clean files only after an explicit apply
+  call. If a page is marked `reviewed: true`, sync writes a conflict note rather
+  than overwriting it.
+- Current sync can write a local content-free audit log before each vault file
+  write when `auditLogPath` is supplied.
 
 References for the design direction:
 
@@ -83,6 +105,44 @@ Cloud Voyage remains the current default cloud-quality arm. Future self-hosted m
 
 Self-hosted models should be benchmark arms, not silent fallbacks. Changing embedding models changes the vector space, so the index must be rebuilt or kept separate.
 
+For Apple Silicon, the first recommended local arm is small and practical:
+Qwen3 Embedding 0.6B through llama.cpp/Metal plus the deterministic RecallWeave
+rerank proxy. Qwen3 Reranker 0.6B through a local rerank sidecar is the next
+local challenger, not a tested default. Qwen3 4B and 8B arms should remain
+optional quality challengers until latency, memory pressure, and recall gains
+are measured on 24GB-class Macs.
+
+## Public Benchmark Autoresearch
+
+The benchmark loop should optimize toward public benchmark targets, not toward
+spending a locked hosted Supermemory plan. Hosted Supermemory remains useful for
+read-through parity and old-history export, but the main quality target is a
+real public benchmark slice compared to reported leader stats.
+
+Current benchmark direction:
+
+- Source-lock MemoryBench, LongMemEval, LoCoMo, ConvoMem, BEAM, or another
+  documented memory benchmark.
+- Record the reported leader target, source URL, checked date, metric name,
+  judge, answer model, token budget, and caveats.
+- Run RecallWeave on a small canary slice first as a smoke gate, then run full
+  local/offline benchmark sets when the method is stable.
+- Use autoresearch to change one methodology element at a time. Compare BM25 or
+  grep-like wiki retrieval against hybrid methods before promoting vectors.
+- Include title amplification, subtopic amplification, and summary-to-session
+  hybrid arms. The target pattern is condensed wiki pages first, then
+  vectorized full-session chunks only when extra context is needed.
+- Expand public claims only after the same-data slice is privacy-clean,
+  reviewer-approved, and not limited by avoidable harness or UI design flaws.
+
+The allowed claim after a narrow win is "canary trending toward a win." A broad
+SOTA claim needs full comparable benchmark evidence.
+
+For the local Apple lane, M-series unified memory is a real constraint. A result
+should be called model-limited only after the harness, retrieval method, and
+review UI are clean enough that the remaining blocker is model size, context,
+or local runtime capacity.
+
 ## Lifecycle Policy Controls
 
 Goal: make memory behavior editable by users instead of buried in code.
@@ -104,5 +164,7 @@ Planned controls:
 - minimum importance threshold,
 - review queue for low-confidence writes,
 - UI toggles for recall frequency and write aggressiveness.
+- Current Brain UI can preview these settings as fixture draft exports; a real
+  apply path still needs explicit config-file confirmation.
 
 See `configs/lifecycle-policy.example.yaml` for the target shape.

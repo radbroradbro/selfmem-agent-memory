@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "mode": "baseline-evidence-packet",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "strictReal": true,
+  "fixtureOnly": false,
+  "countsAsHostedBaselineEvidence": true,
+  "countsAsComparisonEvidence": true,
+  "packagePassesStrictReal": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "publicLaunchAllowed": false,
+  "packet": {
+    "pathLabel": "recallweave-live-mirror-baseline-packet.zip",
+    "sha256": "7b1d7b2587e21454333ec764fb8ceb0a2248365a4ab1ad8add02d7559fad6051",
+    "entries": [
+      "README.md",
+      "baseline-comparison.json",
+      "hosted-baseline-preflight.json",
+      "hosted-baseline-result.json",
+      "manifest.json",
+      "recallweave-result.json"
+    ]
+  }
+}

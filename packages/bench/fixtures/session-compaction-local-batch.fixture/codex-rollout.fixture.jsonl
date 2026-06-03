@@ -1,0 +1,5 @@
+{"type":"session_meta","payload":{"id":"fixture-codex-batch"}}
+{"type":"turn_context","timestamp":"2026-05-22T12:00:00.000Z","summary":"Decision: RecallWeave should keep local compaction chronological and metrics-only before any durable memory import."}
+{"type":"response_item","timestamp":"2026-05-22T12:01:00.000Z","item":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Procedure: run the batch audit across recent Codex session exports before turning compacted candidates into durable memories."}]}}
+{"type":"response_item","timestamp":"2026-05-22T12:02:00.000Z","item":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Fix: exact identifier RW-BATCH-20260522 remains searchable while raw candidate text stays out of the public report."}]}}
+{"type":"response_item","timestamp":"2026-05-22T12:03:00.000Z","item":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok done"}]}}

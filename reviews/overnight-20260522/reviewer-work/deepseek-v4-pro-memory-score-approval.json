@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "mode": "memory-score-reviewer-approval",
+  "fixtureOnly": false,
+  "reviewer": {
+    "id": "deepseek-v4-pro-memory-score-a",
+    "provider": "deepseek-pro",
+    "model": "deepseek-v4-pro"
+  },
+  "verdict": "APPROVE_MEMORY_SCORE_EVIDENCE",
+  "countsAsBenchmarkApproval": true,
+  "claimScope": "source-locked-memory-score",
+  "publicLaunchAllowed": false,
+  "target": {
+    "resultHash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
+    "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "benchmark": "longmemeval",
+    "strategyNamesHash": "sha256:1bd91cf633ac7a28810945f90609ee6582935180571de23add9e509a78b0b0c6"
+  },
+  "attestations": {
+    "metricsOnlyEvidenceReviewed": true,
+    "noRawQuestionText": true,
+    "noRawMemoryText": true,
+    "noRawTranscriptText": true,
+    "noRawPromptText": true,
+    "noRawAnswerText": true,
+    "noCredentials": true,
+    "privacyLeakCountZero": true,
+    "sameDataTargetReviewed": true,
+    "answerQualityHarnessReviewed": true,
+    "strategyCoverageReviewed": true,
+    "componentBenchmarksNotSubstituted": true,
+    "publicLaunchStillBlocked": true,
+    "ownerApprovalStillRequired": true,
+    "uiDocsReleaseNotesStillRequired": true
+  },
+  "blockingConcerns": [],
+  "nonBlockingConcerns": [
+    "Public launch still requires owner approval.",
+    "Full SOTA replacement wording remains blocked until the missing provider arms, UI/docs/release-note updates, and owner approval pass."
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "mode": "nvidia-contextual-method-shard",
+  "status": "TINY_SHARD_RETRIEVAL_PROXY_COMPLETE",
+  "generatedAt": "2026-05-31T00:00:00.000Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "privatePathIncluded": false,
+  "countsAsAnswerQuality": false,
+  "countsAsSotaEvidence": false,
+  "target": {
+    "benchmark": "longmemeval",
+    "target": "public-longmemeval-full-run-target",
+    "queryShard": {
+      "startIndex": 0,
+      "endIndexExclusive": 3,
+      "totalQueryCount": 500,
+      "selectedCount": 3
+    },
+    "contextTokenBudget": 800,
+    "limit": 5
+  },
+  "provider": {
+    "primaryCloudLane": "nvidia",
+    "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "embedModel": "nvidia/nv-embed-v1",
+    "rerankModel": "nv-rerank-qa-mistral-4b:1",
+    "providerKeyCount": 1,
+    "keyScopedThrottleMs": 1500
+  },
+  "materialization": {
+    "sessionV1": {
+      "memoryMethod": "session-v1"
+    },
+    "contextualSourceChunkV1": {
+      "memoryMethod": "contextual-source-chunk-v1",
+      "exampleThreeQueryShardMemoryBytes": 2409101,
+      "exampleThreeQueryShardContextualChunkCount": 1064
+    }
+  },
+  "rows": [
+    {
+      "method": "session-v1",
+      "strategy": "bm25-lite",
+      "quality": 0.5117,
+      "recallAt5": 0.3056,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "session-v1",
+      "strategy": "full-hybrid-rerank",
+      "quality": 0.3753,
+      "recallAt5": 0.25,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "bm25-lite",
+      "quality": 0.2459,
+      "recallAt5": 0.062,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "full-hybrid-rerank",
+      "quality": 0.2459,
+      "recallAt5": 0.062,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "session-v1",
+      "strategy": "metadata-aware-full-hybrid-rerank",
+      "quality": 0.1575,
+      "recallAt5": 0.0833,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "session-v1",
+      "strategy": "wiki-subtopic-amplified-hybrid",
+      "quality": 0.1575,
+      "recallAt5": 0.0833,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "wiki-subtopic-amplified-hybrid",
+      "quality": 0.1291,
+      "recallAt5": 0.0317,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "quality": 0.1096,
+      "recallAt5": 0.0159,
+      "queryCount": 3,
+      "providerCalls": 9,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "metadata-aware-full-hybrid-rerank",
+      "quality": 0.0462,
+      "recallAt5": 0.0462,
+      "queryCount": 3,
+      "providerCalls": 0,
+      "contextTokensAvg": 800
+    },
+    {
+      "method": "session-v1",
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "quality": 0,
+      "recallAt5": 0,
+      "queryCount": 3,
+      "providerCalls": 9,
+      "contextTokensAvg": 800
+    }
+  ],
+  "interpretation": [
+    "This tiny retrieval-proxy shard does not promote contextual-source-chunk-v1.",
+    "The old session-v1 control won this shard on BM25 and full-hybrid.",
+    "The NVIDIA adapter made live calls on the sharded method path, but the hard-zero session-v1 result needs adapter, rerank parsing, scoring, or tiny-shard integration investigation before treating it as provider-quality evidence.",
+    "Treat this as method-debug evidence only; answer-quality and larger shard runs are still required."
+  ],
+  "nextActions": [
+    "Run a larger shard after improving contextual chunk indexing or adding a separate atomic/contextual index layer.",
+    "Keep NVIDIA as the primary cheap cloud challenger lane for method shards.",
+    "Do not spend more provider calls on contextual-source-chunk-v1 as currently shaped without a targeted retrieval fix."
+  ]
+}

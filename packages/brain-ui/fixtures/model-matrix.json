@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "mode": "model-autoresearch-matrix",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "generatedAt": "2026-05-31T07:12:17.768Z",
+  "defaults": {
+    "cloudArm": "cloud-voyage4-voyage",
+    "localArm": "local-apple-qwen3-0_6b",
+    "queryExpansion": "off",
+    "credentialMode": "env-only"
+  },
+  "localLane": {
+    "label": "Apple Silicon local",
+    "targetHardware": "Apple Silicon 24GB unified memory",
+    "embedder": "Qwen3-Embedding-0.6B-GGUF",
+    "reranker": "Qwen3-Reranker-0.6B sidecar challenger",
+    "runtime": "llama.cpp with Metal",
+    "sourcePolicy": "Hugging Face or official model-card artifacts only",
+    "staleProcessPolicy": "Stop only RecallWeave-owned model processes; block when ownership is unclear.",
+    "quantizationPolicy": "No experimental quantization in the default lane."
+  },
+  "arms": [
+    {
+      "id": "atomic-memory-v1-deepseek-flash-smoke",
+      "lane": "methodology",
+      "embedder": "BM25 lexical floor over atomic memories",
+      "reranker": "RecallWeave full-hybrid-rerank challenger",
+      "status": "bounded-model-challenger-smoke",
+      "purpose": "Validates atomic-memory-v1 end-to-end answer-quality wiring on a 3-query public-data shard with DeepSeek V4 Flash; not public SOTA evidence."
+    },
+    {
+      "id": "cloud-voyage4-voyage",
+      "lane": "cloud",
+      "embedder": "voyage-4-large",
+      "reranker": "rerank-2.5",
+      "status": "personal-default",
+      "purpose": "Default personal/prod cloud path; retrieval-proxy canaries beat BM25, but answer-quality same-data provider proof is still required."
+    },
+    {
+      "id": "cloud-gemini2-cohere4pro",
+      "lane": "cloud",
+      "embedder": "Gemini Embedding 2",
+      "reranker": "Cohere Rerank 4 Pro",
+      "status": "challenger",
+      "purpose": "Multimodal and document-heavy memory challenger."
+    },
+    {
+      "id": "cloud-nvidia-nemotron-1b",
+      "lane": "cloud",
+      "embedder": "nvidia/llama-nemotron-embed-1b-v2",
+      "reranker": "nvidia/llama-nemotron-rerank-1b-v2",
+      "status": "zero-dollar-repair-lane",
+      "purpose": "NVIDIA NIM text retrieval comparison; provider-wave intake currently makes NVIDIA the preferred free repair lane."
+    },
+    {
+      "id": "cloud-nvidia-nemotron-vl-1b",
+      "lane": "cloud",
+      "embedder": "nvidia/llama-nemotron-embed-vl-1b-v2",
+      "reranker": "nvidia/llama-nemotron-rerank-vl-1b-v2",
+      "status": "challenger",
+      "purpose": "NVIDIA NIM multimodal retrieval comparison."
+    },
+    {
+      "id": "local-apple-qwen3-0_6b",
+      "lane": "local",
+      "embedder": "Qwen3-Embedding-0.6B-GGUF",
+      "reranker": "RecallWeave deterministic rerank proxy",
+      "status": "default-local-canary",
+      "purpose": "Fast Apple Silicon local embedding proof for 24GB-class Macs; local reranker is a challenger."
+    },
+    {
+      "id": "local-apple-qwen3-0_6b-local-rerank",
+      "lane": "local",
+      "embedder": "Qwen3-Embedding-0.6B-GGUF",
+      "reranker": "Qwen3-Reranker-0.6B sidecar",
+      "status": "local-full-diagnostic-leader",
+      "purpose": "Current 500-query local-full diagnostic leader at 24.9 answer quality, +2.738 versus BM25; not SOTA evidence."
+    },
+    {
+      "id": "local-apple-qwen3-4b",
+      "lane": "local",
+      "embedder": "Qwen3-Embedding-4B",
+      "reranker": "RecallWeave deterministic rerank proxy",
+      "status": "optional-quality-arm",
+      "purpose": "Measured larger local embedding challenger when memory pressure allows; not promoted by the first 30-query run."
+    }
+  ],
+  "gates": [
+    "Query expansion stays off until a matched source-locked canary proves better quality.",
+    "Public scores require same dataset slice, query set, judge, answer model, scoring code, privacy scan, and reviewer sign-off.",
+    "Claude Opus and a separate GPT-5.5 Pro review should challenge the autoresearch setup before promotion claims.",
+    "Local latency runs must start from a clean RecallWeave-owned model runtime.",
+    "Provider credentials stay in local environment variables only."
+  ],
+  "blockers": [
+    "full-memory-sota-benchmark-gate",
+    "same-data-voyage-answer-quality-missing",
+    "two-independent-memory-score-reviewers-missing",
+    "human-public-launch-approval-required"
+  ]
+}

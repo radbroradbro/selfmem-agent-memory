@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "mode": "github-live-sync-check",
+  "writesRealFiles": true,
+  "callsGitHubApi": true,
+  "repository": "radbroradbro/selfmem-agent-memory",
+  "pullRequest": 5,
+  "issueNumber": 6,
+  "reviewDir": "reviews/overnight-20260522",
+  "localHead": "4858c33a24a30ffa3fc9ff40a86cc365b12387ce",
+  "localBranch": "feat/nucleus-wiki-native-contract",
+  "livePrOpen": true,
+  "liveIssueOpen": true,
+  "livePrHeadMatches": true,
+  "livePrHeadSha": "4858c33a24a30ffa3fc9ff40a86cc365b12387ce",
+  "expectedHeadRef": "feat/nucleus-wiki-native-contract",
+  "remoteBranchHead": "4858c33a24a30ffa3fc9ff40a86cc365b12387ce",
+  "remotePullRequestHead": "4858c33a24a30ffa3fc9ff40a86cc365b12387ce",
+  "remotePullRequestMergeRef": "c4b55433d337a48fd09619cafcbcb75bd90247cd",
+  "remoteBranchHeadMatchesCurrentHead": true,
+  "remotePullRequestHeadMatchesCurrentHead": true,
+  "livePrHeadShaMatchesCurrentHead": true,
+  "prBodyMatches": true,
+  "issueTitleMatches": true,
+  "issueBodyMatches": true,
+  "prBodyHash": "abf2734afa84ceb9445c0f9373abaea363c2ece11378873627caef52c847f204",
+  "issueTitleHash": "e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c",
+  "issueBodyHash": "51ad4d6b51e00eddd3c522b770dc23012d0a8a4e379b70f40b0e4749f82baa34",
+  "liveUpdatedAt": {
+    "pullRequest": "2026-06-03T14:59:32Z",
+    "issue": "2026-06-03T11:05:19Z"
+  },
+  "safety": {
+    "printsBodyText": false,
+    "printsCredentials": false,
+    "privateLeakCount": 0,
+    "hasSecretPattern": false,
+    "hasPrivatePathPattern": false
+  }
+}

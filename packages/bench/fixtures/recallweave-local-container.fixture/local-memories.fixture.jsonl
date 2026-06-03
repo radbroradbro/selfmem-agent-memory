@@ -1,0 +1,6 @@
+{"id":"mem_local_first_policy","content":"RecallWeave writes locally by default and uses hosted Supermemory as read-through only.","metadata":{"kind":"decision"}}
+{"id":"mem_release_gate","content":"Public launch remains blocked until owner approval.","metadata":{"kind":"decision"}}
+{"id":"mem_hosted_baseline","content":"Hosted comparison claims require a fresh metrics-only baseline.","metadata":{"kind":"methodology"}}
+{"id":"mem_strict_real_canary","content":"A strict real canary must prove lifecycle coverage, hybrid search, local writes, hosted read-through, latency, rollback, and zero privacy leaks.","metadata":{"kind":"procedure"}}
+{"id":"mem_brain_ui_fixture","content":"The Brain UI preview is proven with sanitized fixture graph, lifecycle trail, context preview, and release readiness evidence.","metadata":{"kind":"evidence"}}
+{"id":"mem_private_decoy","content":"<private>this fixture decoy must not be exported</private>","metadata":{"kind":"private"}}

@@ -8,3 +8,8 @@ export * from "./hybrid/search.js";
 export * from "./hybrid/sync.js";
 export * from "./hybrid/export-cache.js";
 export * from "./hybrid/distill.js";
+export * from "./nucleus/index.js";
+export * from "./compaction/session.js";
+export * from "./wiki/compiler.js";
+export * from "./wiki/sync.js";
+export * from "./local-container/audit.js";

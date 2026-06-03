@@ -1,0 +1,148 @@
+{
+  "ok": true,
+  "mode": "local-session-compaction-audit",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "input": {
+    "source": "codex",
+    "sessionIdHash": "38fc8783a22540b793eafcb9",
+    "inputPathDisplay": ".../session-compaction-local-audit.fixture.jsonl",
+    "eventCount": 6
+  },
+  "metrics": {
+    "inputEvents": 6,
+    "redactionCount": 2,
+    "skippedFullyPrivate": 0,
+    "skippedNoise": 2,
+    "outputCandidates": 4,
+    "chronological": true,
+    "noiseReductionRatio": 0.33333333333333337
+  },
+  "quality": {
+    "candidateCount": 4,
+    "kindCounts": {
+      "preference": 1,
+      "decision": 1,
+      "fix": 1,
+      "procedure": 1
+    },
+    "staleCandidateCount": 0,
+    "exactIdentifierCandidateCount": 1,
+    "averageSalience": 0.85,
+    "salienceBands": {
+      "high": 4,
+      "medium": 0,
+      "low": 0
+    },
+    "firstObservedAt": "2026-05-22T09:00:00.000Z",
+    "lastObservedAt": "2026-05-22T09:04:00.000Z",
+    "privacyLeakCount": 0
+  },
+  "sessionMap": {
+    "idHash": "1e29cdff413c8e597db73df7",
+    "topicLinkCount": 4,
+    "lifecycleEventCount": 6,
+    "linkedCandidateCount": 4,
+    "unlinkedCandidateCount": 0,
+    "statementsInspected": 6,
+    "durableStatements": 4,
+    "duplicateCandidateMerges": 0,
+    "wasteSignals": [
+      "redaction-observed"
+    ],
+    "warnings": [],
+    "lifecyclePhaseCounts": {
+      "session_start": 1,
+      "pre_compact": 1,
+      "candidate_distilled": 1,
+      "topic_linked": 1,
+      "session_map_ready": 1,
+      "session_end": 1
+    },
+    "topicFingerprints": [
+      {
+        "idHash": "fb5c449830bc0ae4ad761652",
+        "topicPathHash": "2009ac27187a75834d35ba7d",
+        "depth": 2,
+        "candidateCount": 1,
+        "sourceEventCount": 1,
+        "reasonCount": 1,
+        "salience": 0.89,
+        "firstObservedAt": "2026-05-22T09:01:00.000Z",
+        "lastObservedAt": "2026-05-22T09:01:00.000Z"
+      },
+      {
+        "idHash": "4e91a65802c6cd4e9058481f",
+        "topicPathHash": "469a7951f9a8e11a4dbc43ea",
+        "depth": 2,
+        "candidateCount": 1,
+        "sourceEventCount": 1,
+        "reasonCount": 1,
+        "salience": 0.85,
+        "firstObservedAt": "2026-05-22T09:04:00.000Z",
+        "lastObservedAt": "2026-05-22T09:04:00.000Z"
+      },
+      {
+        "idHash": "1853a06a0502cbfa34c5a465",
+        "topicPathHash": "eefd3db4479480d9adfc3469",
+        "depth": 2,
+        "candidateCount": 1,
+        "sourceEventCount": 1,
+        "reasonCount": 2,
+        "salience": 0.84,
+        "firstObservedAt": "2026-05-22T09:00:00.000Z",
+        "lastObservedAt": "2026-05-22T09:00:00.000Z"
+      },
+      {
+        "idHash": "9104e8497747f2b242ceb310",
+        "topicPathHash": "8199937192d1bceb16b9b923",
+        "depth": 2,
+        "candidateCount": 1,
+        "sourceEventCount": 1,
+        "reasonCount": 2,
+        "salience": 0.82,
+        "firstObservedAt": "2026-05-22T09:03:00.000Z",
+        "lastObservedAt": "2026-05-22T09:03:00.000Z"
+      }
+    ]
+  },
+  "candidateFingerprints": [
+    {
+      "idHash": "e89dc069769bcbe199829027",
+      "kind": "preference",
+      "stale": false,
+      "salience": 0.84,
+      "reasonCount": 2,
+      "sourceEventCount": 1,
+      "observedAt": "2026-05-22T09:00:00.000Z"
+    },
+    {
+      "idHash": "1af63da89918132f0a99fcc3",
+      "kind": "decision",
+      "stale": false,
+      "salience": 0.89,
+      "reasonCount": 1,
+      "sourceEventCount": 1,
+      "observedAt": "2026-05-22T09:01:00.000Z"
+    },
+    {
+      "idHash": "d5b3b4c97ec42b70206bcc50",
+      "kind": "fix",
+      "stale": false,
+      "salience": 0.82,
+      "reasonCount": 2,
+      "sourceEventCount": 1,
+      "observedAt": "2026-05-22T09:03:00.000Z"
+    },
+    {
+      "idHash": "b5d7021eb8eee06ea377b8fb",
+      "kind": "procedure",
+      "stale": false,
+      "salience": 0.85,
+      "reasonCount": 1,
+      "sourceEventCount": 1,
+      "observedAt": "2026-05-22T09:04:00.000Z"
+    }
+  ],
+  "strict": true
+}

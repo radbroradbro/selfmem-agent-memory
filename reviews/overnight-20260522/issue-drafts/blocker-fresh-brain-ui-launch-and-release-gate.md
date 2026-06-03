@@ -1,0 +1,700 @@
+# Release Gate: Final Reviewer, Hosted Baseline, And Real Canary
+
+## Summary
+
+Track the final blockers before PR #5 can be treated as public-launch ready.
+The code, fixture UI, and release gates are green, but public launch should
+remain conservative until owner, hosted-baseline, and real canary
+requirements are resolved.
+
+## Current Evidence
+
+- Latest verified PR branch head:
+- `5613051455f056f8161da8f9d4aac7c7aefe77cc`.
+- GitHub Actions run `26779783551` passed CI after promoting the
+  provider-shard-fixed OpenClaw canary baseline into release-state and
+  correcting the release gate identity contract. This does not authorize public
+  SOTA claims or production rollout.
+- Approved runtime canary/report commit:
+- `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- GitHub Actions run `26778156742` passed CI after fixing the source-locked
+  provider shard repair path so materialized one-query provider repairs do not
+  double-apply parent offsets.
+- Previous verified PR branch head before the provider shard fix handoff refresh:
+- `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
+- GitHub Actions run `26769805087` passed CI after refreshing the previous
+  OpenClaw next-agent canary handoff packet, moving superseded handoff zips out
+  of the active Downloads root, and preserving the shard-scoped answer-quality
+  materialization evidence from the prior baseline.
+- Previous verified PR branch head before the current OpenClaw handoff refresh:
+- `4c7e6559d63772c16a007122b2dc55c880e3e051`.
+- GitHub Actions run `26766964429` passed CI after adding shard-scoped
+  answer-quality materialization, shard-local response/preflight/scoring paths,
+  and parent-coordinate preservation for public evidence.
+- Previous verified PR branch head before shard-scoped answer-quality
+  materialization:
+- `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
+- GitHub Actions run `26435511093` passed CI after adding dedicated
+  local-full shard workorder and intake scripts plus the blocked local-full
+  intake artifact. The local benchmark lane now has explicit no-provider-call
+  tracking for zero accepted shards and twenty missing shards, so local-full
+  combine or scoring claims cannot start until the full local shard set exists.
+  This does not change the approved runtime canary adapter/report commit.
+- Previous verified PR branch head before the local-full shard intake harness:
+- `2adc5268da8dd6ed8f65dfc16069ef7793296682`.
+- GitHub Actions run `26434850211` passed CI after adding the `local-full`
+  accepted-lane launch doctor and matching release-check coverage. The local
+  benchmark lane now has a no-provider-call go/no-go report for local embedding,
+  local rerank, answer-quality endpoint, and model-backed query-expansion
+  blockers without allowing SOTA or launch claims.
+- Previous verified PR branch head before the local-full launch doctor:
+- `27cd17c25cbef6f3483e9b4798af94ea64256cb4`.
+- GitHub Actions run `26434316174` passed CI after adding the `local-full`
+  answer-quality shard plan/workorder and the matching post-baseline release
+  guard allowlist entry.
+- GitHub Actions run `26379689695` passed CI after refreshing the returned
+  inbox handoff counts in `docs/RELEASE_HANDOFF.md`.
+- GitHub Actions run `26379203538` passed CI after refreshing public docs and
+  release-state evidence for the returned canary watcher.
+- GitHub Actions run `26379062431` passed CI after adding the 12-hour returned
+  canary standard-inbox watcher alias. The watcher checks Downloads and
+  Telegram Desktop every 15 minutes for 12 hours, requires production-grade
+  evidence, and exits nonzero if no returned production packet appears. This did
+  not change the approved runtime canary adapter/report commit.
+- GitHub Actions run `26378580702` passed CI after hardening returned canary
+  inbox/downloads classification. Path-like zip entries no longer make a
+  packet unreadable before classification, public output remains metrics only,
+  and the refreshed standard-inbox scan still reports 0 production evidence
+  packets. This did not change the approved runtime canary adapter/report
+  commit.
+- GitHub Actions run `26377087807` passed CI after recording the local Apple
+  provider runs.
+  This did not change the approved runtime canary adapter/report commit.
+- GitHub Actions run `26378052431` passed CI after adding the env-only local
+  reranker sidecar gate. The sidecar arm is fixture-covered and fail-closed, has
+  no live quality result yet, and does not change the approved runtime canary
+  adapter/report commit.
+- Commit `dbac92e7428904a044754de30b7e11189aedeb9c` adds metrics-only local
+  Apple benchmark preflight evidence and corrects the local-model status so the
+  branch does not imply a live local reranker has already been tested. Local
+  `release:check`, `release:github-sync`, and `goal:audit` passed after that
+  update. This still does not authorize launch or change the approved runtime
+  canary adapter/report commit.
+- The reported-target gate was refreshed on 2026-05-26. It now requires source
+  coverage for the Qwen3 local embedding/reranker ladder, EmbeddingGemma,
+  Voyage 4 with `rerank-2.5`, Gemini Embedding 2, NVIDIA retrieval NIM, and
+  MemoryBench. These rows do not unblock launch: component rows are
+  model-selection-only, MemoryBench is harness-source-only, and the full
+  same-data answer-quality benchmark/SOTA gate is still incomplete.
+- The full-shard workorder now makes query expansion lane-scoped. Deterministic
+  fallback is allowed only for diagnostic run-path evidence, the local no-spend
+  lane can report local-model expansion separately when configured, and
+  `full-sota-accepted-shards` remains blocked until exact target answer/judge
+  model matching, accepted local/provider arms, shard intake/scoring, and all
+  full benchmark evidence are present. Query expansion is a labeled ablation
+  unless the accepted lane explicitly includes it.
+- The accepted-lane launch doctor now makes that go/no-go state explicit
+  without provider calls or raw benchmark text. It reports the private
+  full-shard inputs ready, but keeps `full-sota-accepted-shards` blocked until
+  live export/no-raw-text consent, answer-quality consent, exact target model
+  matching, accepted local/provider arms, and shard intake/scoring are
+  configured and returned.
+- The local full benchmark lane is now separate from the provider/SOTA lane.
+  `benchmark:answer-quality:local-shard-plan` accepts the same 500-query target
+  with BM25, full hybrid, local Apple embedding, and local rerank, without
+  Voyage/NVIDIA blockers; query expansion is included only as an explicitly
+  labeled local arm or ablation. A completed local-full run can diagnose local
+  model limits, but it still cannot authorize SOTA or launch language. The
+  local lane now has its own diagnostic scoring policy: local
+  answer/judge model names may differ from the target only on a local endpoint,
+  and submitting that packet to the full-SOTA gate is rejected.
+- The local-full accepted-lane launch doctor now gives the first shard its own
+  no-provider-call go/no-go report. It keeps private raw-source lineage private,
+  reports missing local embedding, local rerank, answer-quality endpoint, and
+  accepted-lane runtime readiness, and avoids adding Voyage/NVIDIA or
+  public-SOTA blockers to the local-only path unless that lane explicitly asks
+  for them.
+- The local-full shard workorder and intake now have dedicated scripts. The
+  checked-in local intake report is blocked with zero accepted shards and twenty
+  missing shards, so local-full combine/scoring claims cannot start until the
+  full local shard set exists.
+- Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
+  Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
+  public LongMemEval-S retrieval-proxy target. Both local arms tied BM25
+  quality on this slice; the 4B arm added latency and was not promoted.
+- Approved one-agent canary adapter/report commit:
+- `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- Latest verified code/product baseline:
+- `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- GitHub Actions run `26778156742` passed CI after fixing the source-locked
+  provider shard repair path. Local `release:check`, `goal:audit`,
+  `release:doctor`, secret scan, and private-path scan passed. The active
+  OpenClaw handoff packet now expects returned canary evidence to report
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- Latest verified repository evidence head:
+- `5613051455f056f8161da8f9d4aac7c7aefe77cc`.
+- GitHub Actions run `26779783551` passed CI after promoting the checked-in
+  provider-shard-fixed OpenClaw canary baseline and release-gate identity
+  contract. Launch, production rollout, and full-SOTA blockers remain open.
+- The 75-question `contextual-source-chunk-v1:bm25-lite` result is a
+  memory-method/materialization ablation gate, not the final whole-harness
+  score. It is positive evidence that the new memory shape is retrievable under
+  a lexical control; it is not evidence that the end-to-end harness is or is
+  not SOTA. End-to-end harness promotion still requires same-slice
+  provider/vector and rerank arms, with BM25 retained as the lexical floor and
+  control.
+- Previous verified code/product baseline before the current OpenClaw handoff
+  refresh:
+- `4c7e6559d63772c16a007122b2dc55c880e3e051`.
+- GitHub Actions run `26766964429` passed CI with shard-scoped answer-quality
+  materialization, shard-local response/preflight/scoring paths, and
+  parent-coordinate preservation for public evidence.
+- Previous verified code/product baseline before shard-scoped answer-quality
+  materialization:
+- `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
+- GitHub Actions run `26435511093` passed CI with release checks, live GitHub
+  sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
+  green. The checked-in evidence keeps BM25 and full-hybrid controls in the
+  same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
+  beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
+  records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
+  a blocked-until-endpoint challenger, hardens returned canary zip
+  classification, adds the 12-hour returned canary watcher, requires returned
+  one-agent canary packets to report the approved runtime adapter commit,
+  contains release-check temp artifacts so repeated goal-loop checks do not
+  exhaust local temp storage, adds the no-provider-call accepted-lane launch
+  doctor for the full-shard benchmark gate, adds the `local-full` benchmark
+  shard lane, adds the local-full launch doctor, and adds dedicated local-full
+  shard workorder/intake harness support without allowing SOTA or launch claims.
+- Previous verified code/product baseline before the local-full shard intake
+  harness:
+- `2adc5268da8dd6ed8f65dfc16069ef7793296682`.
+- GitHub Actions run `26434850211` passed CI after adding the local-full
+  accepted-lane launch doctor and matching release-check coverage.
+- Previous verified code/product baseline before the local-full launch doctor:
+- `27cd17c25cbef6f3483e9b4798af94ea64256cb4`.
+- GitHub Actions run `26434316174` passed CI after adding the `local-full`
+  answer-quality shard lane/workorder and the matching post-baseline release
+  guard allowlist entry.
+- Previous verified code/product baseline before release-check temp
+  containment:
+  `fba92059552c155436e84bb05d87b1fd6aef9add`.
+- Previous verified code/product baseline before the 12-hour returned canary
+  watcher:
+  `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
+- Previous verified code/product baseline before returned canary scanner
+  hardening:
+  `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
+- Previous verified code/product baseline before provider-arm expansion:
+  `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
+- GitHub Actions run `26351957568` passed CI after requiring a same-data
+  benchmark comparator matrix and binding returned canary evidence to the
+  approved adapter commit.
+- Previous verified code/product baseline before the commit-bound canary
+  evidence gate: `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`.
+- GitHub Actions run `26351014379` passed CI after binding the provider
+  preflight to the expanded 30-query LongMemEval-S target. The checked-in
+  evidence calls no provider APIs, sends no benchmark text, and keeps the next
+  live cloud-provider run tied to the stronger expanded target.
+- Previous verified code/product baseline before the expanded provider
+  preflight: `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
+- GitHub Actions run `26350709133` passed CI after adding the expanded
+  30-query LongMemEval-S hybrid stress gate. The gate compares BM25 and local
+  hybrid-family arms on the same source-locked target, keeps BM25 as the
+  current control winner, blocks deterministic hybrid promotion, and preserves
+  the fail-closed provider-backed benchmark path for the next live
+  Voyage/Gemini-style arm.
+- Previous verified code/product baseline before the expanded hybrid stress
+  gate: `95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9`.
+- GitHub Actions run `26350184513` passed CI after adding the fail-closed live
+  provider benchmark preflight for the same source-locked LongMemEval-S target,
+  BM25/full-hybrid/Voyage/Gemini strategy list, provider-call consent flags,
+  public-data consent flags, and env-only provider readiness without provider
+  API calls or benchmark-text transmission.
+- Previous verified code/product baseline before the live provider preflight:
+  `a67c4115dc00450f5a51c09089879ec4687c596d`.
+- GitHub Actions run `26349930959` passed CI after extending the opt-in
+  provider-backed benchmark gate for BM25, full local hybrid, Voyage
+  rerank-only, Voyage embed+rerank, Gemini embed+local rerank proxy, and Gemini
+  embed+Voyage rerank arms in fixture mode with zero hosted calls.
+- Previous verified code/product baseline before the Gemini provider arms:
+  `1e71c434725be7c95350d10ec61f8763a9558e63`.
+- Previous verified code/product baseline before the provider gate:
+  `1d91c2c7afd4a3074528abeb8472b8c445dca505`.
+- Previous verified code/product baseline before the public benchmark target
+  follow-up:
+  `8eb69e848d442b08ebf4f5204d6ed17224161683`.
+- GitHub Actions run `26346613433` passed CI after adding the public
+  LongMemEval-S slice manifest, deterministic question-id policy,
+  answer-label hash, scoring-code hash, and focused Codex review.
+- Previous verified code/product baseline before public benchmark target
+  gating:
+  `67993f1d9eab7742ae70841d38ad9cd14021982c`.
+- Previous verified code/product baseline before current canary-drill handoff
+  hardening:
+  `4310e0ec7565abcf7eb4378fd165ecd5bab799f4`.
+- Earlier verified code/product baseline:
+  `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
+- GitHub Actions run `26342589049` passed CI after adding returned canary
+  workspace generation, keeping fixture workspace output temporary,
+  fast-forwarding PR #5 to the helper code, and recording the post-12h
+  readiness recheck while preserving strict-real and public-launch blockers.
+- Previous verified code/product baseline before the returned-workspace
+  follow-up:
+  `a56449db786a334db3554f7fd66721ae44261073`.
+- GitHub Actions run `26338015421` passed CI after hardening
+  `baseline:source-match` for real local selfmem exports with path-bearing
+  provenance, preserving metrics-only output, source-mismatch blockers, and
+  public-launch blockers.
+- Previous verified code/product baseline before source-match private-path
+  redaction:
+  `59ebb53824ce0e90cf9b54fbd9621d5e2e381c54`.
+- GitHub Actions run `26337456058` passed CI after hardening empty,
+  handoff-only, and no-candidate canary batch and next-agent packet behavior,
+  preserving strict-real and public-launch blockers, removing blocked output
+  zips, refreshing the release guard allowlist, and keeping the PR/issue sync
+  checks green.
+- Previous verified code/product baseline before the empty/handoff/no-candidate
+  fail-closed hardening:
+  `afcc0f44f28c00ea155cf542a22c7c7ac8530e32`.
+- GitHub Actions run `26336780942` passed CI after adding direct mixed-folder
+  next-agent handoff packet support, wiring `--allow-failed-inputs` through the
+  planner and packet builder, refreshing the sendable OpenClaw packet evidence,
+  release readiness assertions, release blocker guidance, PR/issue sync
+  evidence, and Gemini review, while preserving strict-real and public-launch
+  blockers.
+- Previous verified code/product baseline before the mixed-folder next-agent
+  handoff packet extension:
+  `db7f531b72c6a5fe347b89f537d69df49de4bb8a`.
+- GitHub Actions run `26335844586` passed CI after adding the deterministic
+  strict-real canary drill, wiring it into clean consumer smoke, canary
+  operator and next-agent packets, release readiness assertions, release blocker
+  guidance, goal audit, public docs, PR/issue sync evidence, and Gemini review,
+  while preserving strict-real and public-launch blockers.
+- Previous verified code/product baseline before the strict-real canary drill:
+  `e1f114e664e6bcf6d49ff32bd578c8eefef6e6ce`.
+- GitHub Actions run `26335300537` passed CI after adding
+  `baseline:source-gap`, wiring it into clean consumer smoke, the hosted
+  baseline operator packet, next-run planner, one-command baseline runner,
+  release readiness assertions, public benchmark docs, PR/issue sync evidence,
+  and Gemini review, while preserving strict-real and public-launch blockers.
+- Current post-baseline extension reloads blocked `baseline:source-gap`
+  reports into the hosted baseline operator packet, so agents can hand off
+  exact hashed repair targets without raw query text, expected refs, memory
+  text, private paths, or keys.
+- Current source-match follow-up lets operators smoke real local selfmem
+  exports with path-bearing provenance: local paths are redacted before hashing
+  or reporting, unsafe ids are hash-replaced, and source-mismatched exports
+  still block public benchmark claims.
+- Current canary follow-up hardens empty, handoff-only, and no-candidate
+  folders: batch audit and next-agent packet commands fail closed as
+  metrics-only JSON, remove requested output zip paths on blocked packet
+  creation, avoid stack traces, and preserve public/fleet launch blockers.
+- Current returned-packet follow-up adds `canary:returned-workspace`, so a
+  returned one-agent packet can fill public-safe markdown findings and intake
+  notes without raw logs, memories, prompts, answers, private paths, or keys.
+- Current returned-packet follow-up also adds `canary:returned-downloads`, so a
+  maintainer can scan the standard Downloads and Telegram Desktop inboxes
+  without typing private folder paths into package-manager commands. The
+  current scan found 0 production canary evidence packets and wrote a
+  metrics-only markdown findings note for the next-agent workspace.
+- The named `canary:returned-downloads:strict` alias now runs the same standard
+  inbox scan with `--require-found`, so it must fail until a returned
+  production canary packet exists.
+- GitHub Actions run `26343015277` passed CI after adding returned downloads
+  supervision and the markdown findings note.
+- GitHub Actions run `26343998064` passed CI after expanding the returned
+  downloads findings note with a per-inbox metrics table and next-action list.
+- GitHub Actions run `26344382488` passed CI after hardening the current
+  OpenClaw one-agent handoff so deterministic drill execution and the
+  native-memory/read-through contract are explicit in the main next-agent plan.
+- GitHub Actions run `26345383489` passed CI after adding the public benchmark
+  target validator for source-locked memory benchmarks, same judge model, and
+  same answer model comparability.
+- GitHub Actions run `26346310930` passed CI after adding the current
+  MemoryBench source lock, optional checkout hash verification, and
+  machine-readable source-lock evidence.
+- GitHub Actions run `26346613433` passed CI after adding the public
+  LongMemEval-S slice manifest, deterministic question-id policy,
+  answer-label hash, scoring-code hash, and focused Codex review.
+- Current benchmark plan now separates the public benchmark target lane from
+  hosted Supermemory parity. The autoresearch loop can compare RecallWeave
+  canary results to reported leaderboard/provider stats when hosted
+  Supermemory writes are quota-locked.
+- Current source lock pins MemoryBench `main` at
+  `118209a746d97d0d85e5a7234267f0b6962857e9`, with public-safe hashes for
+  harness files, benchmark/provider contracts, dataset source URLs, and
+  `locomo` / `longmemeval` / `convomem` availability. The checker also has an
+  optional checkout-verification mode that re-hashes a local MemoryBench clone
+  without printing private paths.
+- Current public LongMemEval-S slice manifest records 500 public dataset rows,
+  6 selected canary rows, one per question type, dataset hash
+  `sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442`,
+  selected-id hash
+  `sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23`,
+  answer-label hash
+  `sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e`,
+  and no raw question ids, question text, answers, memories, or transcripts.
+- Current public LongMemEval-S run-only target is generated from that slice
+  manifest and passes `benchmark:public-target -- --strict-run`. It is ready
+  for a RecallWeave run on the same public benchmark data, but it does not
+  permit public comparison claims until a source-locked reported target row is
+  met or beaten by the full-memory answer-quality ladder.
+- GitHub Actions run `26346952139` passed on `9a11452` after the LongMemEval-S
+  run-only target and sync evidence refresh.
+- Current benchmark plan also separates component model evidence from
+  memory-system evidence. MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker
+  leaderboards can choose model arms, but public RecallWeave claims still need
+  the same public benchmark data, revision, split, labels, judge model, answer
+  model, judge rule, and scoring setup as the target row.
+- Current expanded LongMemEval-S hybrid stress evidence uses 30 public
+  questions, 92 expected references, and 1,420 haystack sessions. BM25 remains
+  the control winner, so the deterministic proxy hybrid is still blocked from
+  default promotion pending live embedding/reranker runs.
+- Current metadata-aware autoresearch evidence is negative: the explicit
+  `metadata-aware-full-hybrid-rerank` challenger peaked at quality 0.1121 on
+  the same 30-query target, below BM25 at 0.2506 and the best deterministic
+  full-hybrid arm at 0.2351. This remains reproducibility evidence only.
+- Current expanded provider preflight evidence binds the next live cloud run to
+  `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`,
+  calls no provider APIs, sends no benchmark text, and remains blocked until
+  provider-call consent, public-data consent, and env-only Voyage/Gemini
+  credentials are present.
+- Current benchmark runner enforcement rejects provider-only runs and hybrid
+  runs without the `bm25-lite` control. Provider gates must include
+  `bm25-lite`, `full-hybrid-rerank`, and at least one provider-backed arm, so
+  same-data comparison is enforced by command behavior rather than prose alone.
+- Current provider benchmark preflight supports private key-file env vars such
+  as `VOYAGE_API_KEYS_FILE`, `NVIDIA_API_KEYS_FILE`, and
+  `GEMINI_API_KEYS_FILE`. Operators can run the same-data provider gate without
+  putting keys in commands or public artifacts. Reports still include only
+  credential presence and key counts.
+- Current live Voyage provider evidence now includes both a 6-query and
+  30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
+  `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on
+  retrieval-proxy quality on both slices, with zero privacy failures, but p50
+  latency was much higher. This is provider-backed canary evidence, not
+  MemoryBench answer-quality evidence or public SOTA proof.
+- Current live Voyage latency evidence adds `cloud-voyage4-voyage-lite-rerank`
+  and `cloud-voyage4-lite-voyage-lite` to the same 30-query public
+  LongMemEval-S target. `cloud-voyage4-lite-voyage-lite` reached quality
+  0.3040 versus BM25 0.2506, P@1 0.5667 versus 0.4667, NDCG@10 0.2658 versus
+  0.2193, and p50 latency 1988 ms. It is the next cloud canary default, not a
+  public MemoryBench/SOTA claim.
+- Current SOTA operator packet adds a minimum Voyage answer-quality retry flow
+  for the remaining provider blocker. It reruns only the required BM25,
+  full-hybrid, and `cloud-voyage4-lite-voyage-lite` rows after Voyage rate
+  limits clear, combines that metrics-only result with existing local,
+  query-expansion, local-rerank, and NVIDIA answer-quality reports, and then
+  reruns the provider-challenger, memory-score, and SOTA-ladder gates before
+  any public wording changes.
+- Current local Apple evidence is preflight-only:
+  `public-longmemeval-expanded-local-apple-live-preflight.json` reports
+  `BLOCKED_PROVIDER_ENV` because no local embedding endpoint is configured via
+  `SELFMEM_LOCAL_EMBED_BASE_URL`. The local arm is scaffolded and
+  fixture-covered, but not live-tested. The implemented local path is Qwen3
+  local embeddings plus RecallWeave's deterministic rerank proxy; a live Qwen3
+  reranker sidecar remains a future challenger.
+- Current benchmark tooling adds `benchmark:source-lock`,
+  `benchmark:public-slice`, `benchmark:public-target:author`, and
+  `benchmark:public-target`, a metrics-only source-lock, slice-manifest,
+  run-only target mode, plus target author-and-validator path that checks
+  source URL, dataset revision, split, labels, judge model, answer model,
+  judge rule, scoring code, claim tier, and component-evidence boundaries
+  before a public canary target can run.
+- Previous checked-in evidence refresh before source-gap:
+  `3f2eed0c6245f3827f423225478c95a71db67725`.
+- Previous verified source-gate code baseline:
+  `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
+- GitHub Actions run `26334827218` passed CI after enforcing
+  `baseline:source-match` plus `baseline:source-align` in the operator packet,
+  next-run planner, one-command baseline runner, release readiness assertions,
+  public benchmark docs, PR/issue sync evidence, and Gemini review.
+- Previous verified code baseline before source-gate enforcement:
+  `d234a566354615155dcdc0043404a14b160d4cb3`.
+- GitHub Actions run `26334426951` passed CI after adding the baseline
+  source-alignment gate and current OpenClaw label-aligned/content-divergent
+  evidence.
+- Previous verified code baseline before baseline source-alignment:
+  `3c9ef0806e5a454783140e1ac821b40edd5776cf`.
+- Earlier code/product baseline: `e7ce4f1c1a05b6e416b16234784f8694b83615bf`.
+- GitHub Actions run `26331102535` passed CI after adding the
+  `baseline:run` hosted-baseline orchestrator.
+- Previous verified code baseline before hosted baseline run orchestration:
+  `14030ddd9c88020c114a3e5fd3d32735f31557a6`.
+- GitHub Actions run `26330646504` passed CI after one-command canary evidence
+  packaging.
+- Previous verified code baseline before one-command canary evidence
+  packaging: `54f59ee18094d824e3696e13621ac4070e795a7b`.
+- GitHub Actions run `26330433491` passed CI after the post-baseline public
+  evidence guard.
+- Previous verified code baseline before post-baseline public evidence
+  enforcement: `c3e948735c1d91c1eacfbc1e7bebba22622bf993`.
+- GitHub Actions run `26330234781` passed CI after current canary handoff
+  packet identity coverage.
+- Previous verified code baseline before current canary handoff identity
+  coverage: `cdf4615de1e9e3c7fa161d70f40fe5bf3e4cea76`.
+- GitHub Actions run `26329828449` passed CI after matched baseline
+  counterpart-run hardening.
+- Previous verified code baseline before matched-counterpart hardening:
+  `c0036470512950fa77900221f08d0cbafeab6d7b`.
+- GitHub Actions run `26329521666` passed CI after hosted baseline query-set
+  authoring.
+- Previous verified code baseline before hosted baseline query-set authoring:
+  `94be156c52904e9379372023037cb7cccff8c7ad`.
+- GitHub Actions run `26329113469` passed CI after the hosted baseline
+  container selector.
+- Previous verified code baseline before hosted baseline container selection:
+  `e9a483af3a416c5d5db17ae511d25c40f52d4c12`.
+- GitHub Actions run `26328719263` passed CI after hosted baseline next-run
+  readiness gating.
+- Previous verified code baseline before hosted baseline next-run readiness:
+  `c19e4dc7be0f45d9d1b29a6e5381cd48fc82c1eb`.
+- GitHub Actions run `26328477985` passed CI after refreshing release-state
+  and PR-body evidence for the one-agent handoff hardening baseline.
+- Previous verified code baseline before the release-state refresh:
+  `07cd61b009e85c071d2a54dc9de1b53db5525e6c`.
+- GitHub Actions run `26328348834` passed CI after the one-agent next-agent
+  handoff hardening.
+- Previous verified code baseline before one-agent next-agent handoff
+  hardening: `dd31fcb293fc8d591aa572fe5c77d4012a5fe630`.
+- GitHub Actions run `26327680816` passed CI after public-safe live hosted
+  discovery evidence for hashed candidates.
+- Previous verified code baseline before live hosted discovery evidence:
+  `2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a`.
+- GitHub Actions run `26327367386` passed CI after public-safe query-set
+  inspection.
+- Previous verified code baseline before the query-set inspector:
+  `c9c655049c036ca773a62e1c6498bc3438198986`.
+- GitHub Actions run `26327102787` passed CI after labeled query-set gating.
+- Previous verified code baseline before labeled query-set gating:
+  `a5d300ad1986e166d214e5c4dae537ad7f2f1bcb`.
+- GitHub Actions run `26326805194` passed CI after adding local-session batch
+  compaction audit to the formal goal audit and release gate.
+- Previous verified code baseline before the goal-audit batch compaction
+  extension: `8d49cf35af0aeeb34b37e913041c723035ff8cca`.
+- GitHub Actions run `26326589900` passed CI after the local-session batch
+  compaction audit gate.
+- Previous verified code baseline before local-session batch compaction:
+  `c01513ff37f17562b4fe9f9930332439d5404ec0`.
+- GitHub Actions run `26326199048` passed CI after hosted baseline discovery
+  and next-run planner extension.
+- Previous verified code baseline before hosted baseline discovery and
+  next-run planner extension: `00836ec3105c84814aa65885a1d6828aa298f6a6`.
+- GitHub Actions run `26325592308` passed CI after hosted baseline returned
+  packet intake.
+- Previous verified code baseline before hosted baseline returned packet
+  intake: `aedb81ab3a61ec7c70e3ac7cd07e8085637d5ea3`.
+- GitHub Actions run `26325210942` passed CI after returned canary packet
+  intake.
+- Previous verified code baseline before returned canary packet intake:
+  `7fdac2f287c589ba75731722edaee17cd154451c`.
+- GitHub Actions run `26324810035` passed CI after the canary next-agent
+  handoff packet.
+- Previous verified code baseline before the canary next-agent handoff packet:
+  `8f5910d49a6f1fe4d8967e014c5dd8e1df3e7b6e`.
+- GitHub Actions run `26324442965` passed CI after the real OpenClaw
+  next-agent handoff and CI read-permission fix.
+- Previous verified code baseline before the real OpenClaw next-agent handoff:
+  `1d8375a8dbcc9027d48d7e6821ff24d99fcdb916`.
+- GitHub Actions run `26324201679` passed CI after mixed canary diagnostic
+  batch triage.
+- Previous verified code baseline before mixed canary diagnostic batch triage:
+  `d7e2e13304cd81b9ae3b6013915f13d727f88ebe`.
+- GitHub Actions run `26323991060` passed CI after package-script-safe
+  evidence output.
+- Previous verified code baseline before package-script-safe evidence output:
+  `6c44714e5af4bc578f50070c51d40201303ad6c4`.
+- GitHub Actions run `26323533153` passed CI after release blocker doctor
+  real-canary blocker gate.
+- Previous verified code baseline before release blocker doctor real-canary
+  blocker gate: `4aa363dcb6e95e3f3a3e94d9b5297bca639211e8`.
+- GitHub Actions run `26323255585` passed CI after hosted baseline next-run
+  planner gate.
+- Previous verified code baseline before hosted baseline next-run planner:
+  `0c881257923eb813e904ff11f364648c94823080`.
+- GitHub Actions run `26322830311` passed CI after the canary next-agent
+  planner gate.
+- Previous verified code baseline before the canary next-agent planner gate:
+  `b5ad1b8f9e25832cbdc9afcaa6ad6c71685e7e68`.
+- GitHub Actions run `26322521697` passed CI after the canary diagnostic batch
+  audit gate.
+- Previous verified code baseline before the canary diagnostic batch audit gate:
+  `4ed6c006ac8e69f55bd91f5541dc127b7f0b272d`.
+- GitHub Actions run `26322155069` passed CI after the canary packet review
+  gate.
+- Previous verified code baseline before the canary packet review gate:
+  `c278419cee62520513a66a06e7e0ecaad27096c5`.
+- Previous code/product baseline before the strict adapter canary contract:
+  `7fc3be269e5e26d0fb0fb58fdcebcabb6b4f1744`.
+- GitHub Actions run `26320492619` passed CI after the RecallWeave response
+  export gate.
+- Previous code/product baseline before the RecallWeave response export:
+  `3b1870eb71fe406b77eabd380d9d786886b60236`.
+- GitHub Actions run `26320054524` passed CI after the RecallWeave baseline
+  collector gate after rerun attempt 2.
+- Previous code/product baseline before the RecallWeave baseline collector:
+  `8520140bfcb4cb08bed16ee3c34bcb6705fd9310`.
+- GitHub Actions run `26319551404` passed CI after the baseline comparison
+  gate.
+- Previous code/product baseline before the baseline comparison gate:
+  `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
+- GitHub Actions run `26319050876` passed CI after the hosted baseline
+  collector gate.
+- Previous code/product baseline before the hosted baseline collector:
+  `adfd4352d63810daecfa72a58ccb2c2641b89580`.
+- GitHub Actions run `26318710488` passed CI after the hosted baseline
+  operator packet evidence refresh.
+- Previous code/product baseline before the hosted baseline operator packet
+  evidence refresh: `39feae5f825c045e681aa93f6e71b02ebf4b32c1`.
+- GitHub Actions run `26318633036` passed CI after the hosted baseline
+  operator packet gate.
+- Previous code/product baseline before the hosted baseline operator packet:
+  `2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b`.
+- GitHub Actions run `26318177698` passed CI after the fresh canary window
+  isolation gate.
+- Previous code/product baseline before the fresh canary window isolation gate:
+  `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
+- GitHub Actions run `26317637761` passed CI after the adapter store latency
+  trace gate.
+- Previous code/product baseline before the adapter store latency trace gate:
+  `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
+- GitHub Actions run `26317344140` passed CI after the strict-real canary
+  operator packet.
+- Previous code/product baseline before the strict-real canary operator packet:
+  `4b2ec839cddbce73540d3aea02b4b81f2a474e6a`.
+- GitHub Actions run `26316961518` passed CI after the strict-real update
+  guard.
+- Earlier code/product baseline before the strict-real update guard:
+  `6a8bbf09ef6e24ed12c30e0fcff1fe185100e907`.
+- GitHub Actions run `26316450928` passed CI after the Brain UI lifecycle
+  trail evidence refresh.
+- Previous code/product baseline before the latest lifecycle trail evidence
+  refresh: `8777290169f598ff9172e889e927858b3956f764`.
+- GitHub Actions run `26316074705` passed CI after the Brain UI lifecycle
+  trail and current-head browser evidence refresh.
+- Earlier code/product baseline before the lifecycle trail browser evidence
+  refresh: `b5c1e025db072fca750dc6730741c23e1b981eca`.
+- GitHub Actions run `26313942262` passed CI after the GitHub live sync
+  release gate.
+- Previous code/product baseline before the live sync release gate:
+  `e765e8ff331475c6f91565f4e68577b011e4781a`.
+- GitHub Actions run `26313358962` passed CI after the Hermes and OpenClaw
+  bounded read-through latency patch.
+- Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
+  evidence intake, canary report generation, and canary diagnosis all passed in
+  their safe fixture or metrics-only modes.
+- Baseline source-alignment now separates a matching hosted/local container
+  label from matching benchmark content. The current OpenClaw attempt found
+  label alignment, but content alignment failed safely with 0 of 3
+  source-matched queries, 0 of 3 collectable queries, and no privacy leaks.
+- Baseline source-match now also has a metrics-only real local Codex selfmem
+  smoke: 1081 parsed memories, 709 private path redactions, zero unsafe id
+  redactions, zero privacy leaks, and a correctly blocked source-mismatch
+  verdict against the fixture hosted query set. No raw memory text, private
+  paths, expected refs, or key-shaped secrets were added to public evidence.
+- The hosted baseline operator packet, next-run planner, and `baseline:run`
+  orchestrator now repeat the source-match and source-alignment gates and write
+  a source-gap ready-or-repair plan before hosted collection. Live runs require
+  both a local container map and the private hosted map, but only public-safe
+  source-match, source-alignment, and source-gap reports may be attached. Blocked
+  source-gap reports include a hashed per-query repair queue so private
+  operators can repair exact source gaps without attaching raw memory text,
+  query text, expected refs, or container labels.
+- Blocked source-gap reports can now be reloaded into
+  `baseline:operator-packet -- --source-gap <report> --format markdown`,
+  producing a paste-ready repair handoff with hashed query ids, match counts,
+  status labels, and repair actions only.
+- Hosted baseline operator packet now gives agents a public-safe collection
+  handoff for aggregate-only hosted Supermemory baseline evidence.
+- Hosted baseline collector now gives agents a read-only `baseline:collect`
+  path that emits metrics and hashes only when live credentials are provided
+  through the local environment.
+- RecallWeave response exporter now gives agents a `baseline:export:recallweave`
+  path that turns a local memory container into a metrics-only response export
+  without raw memory text.
+- RecallWeave baseline collector now gives agents a
+  `baseline:collect:recallweave` path that converts local metrics-only
+  search-response exports into matched result files and rejects raw response
+  text by default.
+- Baseline comparison now gives agents a `baseline:compare` gate that compares
+  only aggregate hosted and RecallWeave result files, requires matched
+  source-lock hashes, and blocks fixture inputs from public benchmark claims.
+- Fresh canary window isolation now requires post-update `--since` evidence so
+  old pre-patch trace history cannot prove or poison a patched one-agent canary.
+- `canary:drill` now gives the selected one-agent operator deterministic public
+  prompts for local write, local recall, hosted read-through, lifecycle/LCM
+  compression, rollback, and metrics-only packet collection.
+- Strict-real canary intake now exits nonzero while still printing sanitized
+  JSON for fixture or weak real evidence, so agents can run remediation from
+  failed metrics without attaching raw logs.
+- Strict v1 adapter contract markers and updater adapter digests now make stale
+  installed adapters visible before a one-agent canary report can count as real
+  rollout evidence.
+- Canary evidence packet packaging now gives agents one metrics-only zip for
+  report, intake, and optional diagnosis files, while blocking raw logs and
+  keeping fixture/failing packets from counting as rollout evidence.
+- Canary diagnostic batch audit now lets the controller process a folder of
+  redacted returned diagnostic bundles, rank the closest candidate, and keep
+  `--require-real-pass` blocked unless a non-fixture strict-real canary passes.
+- Canary next-agent planning now converts the batch result into one OpenClaw or
+  Hermes fresh-window update plan with placeholder commands and metrics-only
+  attachment rules, while fixture evidence and fleet rollout remain blocked.
+- Adapter smokes now assert bounded read-through policy plus positive total,
+  local, and remote recall timings.
+- Secret and private-name scans found no actual credential or private memory
+  exposure in the changed evidence files.
+
+## Remaining Blockers
+
+- Claude/Opus review completed with `CONCERNS`; it supports alpha PR review
+  but does not approve public launch.
+- Human approval is required before merge, visibility changes, or public live
+  update copy.
+- Hosted Supermemory comparison claims require a fresh metrics-only baseline.
+  The current hosted-baseline preflight deliberately calls no hosted provider
+  and blocks public benchmark claims. The current OpenClaw source-alignment
+  attempt also blocks a full hosted/local benchmark because the hosted label and
+  local mapping match, but the local RecallWeave source lacks the reviewed
+  expected refs needed for a fair comparison.
+- One real-container production canary remains incomplete. Fixture UI and
+  report tooling are not a production rollout.
+- The available redacted real diagnostic bundle set was evaluated and rejected
+  by strict rollout intake. The closest privacy-clean candidate was under the
+  recall p95 threshold, but still lacked current adapter-contract and store
+  latency evidence. The next canary must use a fresh patched runtime window,
+  follow `canary:drill`, and pass strict intake.
+- Current one-agent handoff packet:
+  `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip`, SHA256
+  `a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2`.
+  Send it with `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
+  and `recallweave-SEND-THIS-ONE-checksum.txt` so the selected agent can
+  verify the exact packet before running it.
+  Packet generated from controller commit
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`; approved adapter/report
+  commit `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+  Returned canary reports must name commit
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+  If a newer adapter commit should count, regenerate the packet first.
+  It was regenerated from the postwatch batch report with
+  `--batch ... --require-ready`. The underlying batch used
+  `--allow-failed-inputs`, so one bad sibling archive does not block the
+  selected privacy-clean OpenClaw handoff.
+  It is ready only for one fresh OpenClaw canary window, not fleet rollout.
+
+## Acceptance Criteria
+
+- The owner accepts the Claude `CONCERNS` review as alpha-PR evidence.
+- The selected operator follows `canary:drill` during the fresh window so local
+  write, recall, hosted read-through, lifecycle/LCM, rollback, and packaging are
+  deliberately exercised.
+- A real one-agent canary report is collected through the sanitized canary
+  report/intake path and passes privacy, lifecycle, hybrid search, latency,
+  rollback, and write/read checks.
+- The returned packet is converted with `canary:returned-workspace` into
+  public-safe markdown findings for maintainer review.
+- Any hosted comparison claim is backed by a fresh metrics-only baseline using
+  the same source-aligned query set, dataset, judge, settings, and scoring code.
+- The owner approves merge and public release wording.
+- Public evidence contains no raw memories, transcripts, diagnostics,
+  credentials, agent logs, private paths, or private container names.

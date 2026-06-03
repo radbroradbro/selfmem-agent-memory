@@ -1,0 +1,49 @@
+{
+  "agent_identity": "fixture-agent",
+  "adapter_contract": {
+    "name": "recallweave-selfmem-canary",
+    "version": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": true,
+    "storeLatencyInstrumentation": true
+  },
+  "checks": {
+    "hybrid_search_observed": true,
+    "lcm_pre_compress_hook_traced": true,
+    "no_supermemory_readthrough_errors": true,
+    "no_unknown_agent_writes": true,
+    "prefetch_auto_recall_traced": true,
+    "session_end_hook_traced": true,
+    "supermemory_write_avoided": true
+  },
+  "counts": {
+    "memories": 1,
+    "trace": 6
+  },
+  "event_counts": {
+    "initialize": 1,
+    "pre_compress": 1,
+    "prefetch": 1,
+    "search": 1,
+    "session_end": 1,
+    "store": 1
+  },
+  "fixture_only": true,
+  "generated_at": "2026-05-22T19:20:00.000Z",
+  "issues": [],
+  "local_container": "selfmem_fixture_agent",
+  "mode": "hybrid: local selfmem writes + mapped Supermemory read-through history",
+  "ok": true,
+  "privacy_findings": [],
+  "privacy_leak_count": 0,
+  "reliability_metrics": {
+    "hybrid_local_plus_supermemory_search_count": 1,
+    "supermemory_readthrough_error_count": 0,
+    "unknown_agent_memory_write_count": 0,
+    "write_suppression_count": 0,
+    "zero_result_count": 0,
+    "zero_result_rate": 0
+  },
+  "source_supermemory_container": "fixture_source",
+  "warnings": []
+}

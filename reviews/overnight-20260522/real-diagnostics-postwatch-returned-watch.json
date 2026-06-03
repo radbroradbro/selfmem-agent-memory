@@ -1,0 +1,127 @@
+{
+  "ok": true,
+  "mode": "canary-returned-watch",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicLaunchAllowed": false,
+  "fleetRolloutAllowed": false,
+  "requireFound": false,
+  "sourceControl": {
+    "expectedCommit": null
+  },
+  "iterationsRequested": 1,
+  "iterationsCompleted": 1,
+  "intervalMs": 0,
+  "inputRootCount": 2,
+  "inputRootsHash": "ac42f650efe3265a41787e37ffbc0041327361fbcd401e445b8c4ed18b589bc7",
+  "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
+  "counts": {
+    "scanCount": 2,
+    "rootsWithProductionEvidence": 0,
+    "productionEvidencePackets": 0,
+    "returnedEvidencePackets": 0,
+    "handoffPackets": 1,
+    "diagnosticBundles": 11,
+    "unknownPackets": 25,
+    "unreadablePackets": 0
+  },
+  "latestScans": [
+    {
+      "iteration": 1,
+      "rootLabel": "Downloads",
+      "parseOk": true,
+      "inboxOk": false,
+      "status": "HANDOFF_PACKETS_ONLY",
+      "candidateCount": 23,
+      "scannedZipCount": 23,
+      "returnedEvidencePackets": 0,
+      "productionEvidencePackets": 0,
+      "handoffPackets": 1,
+      "diagnosticBundles": 7,
+      "unreadablePackets": 0,
+      "unknownPackets": 15,
+      "labelMode": "hash-redacted",
+      "triage": {
+        "labelMode": "hash-redacted",
+        "metricsOnly": true,
+        "unknown": {
+          "count": 15,
+          "statusCounts": {
+            "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 15
+          },
+          "failedCheckCounts": {
+            "not-canary-evidence-packet": 15
+          },
+          "reasonCounts": {
+            "zip does not contain the returned canary evidence packet contract": 15
+          },
+          "sampleIds": [
+            "zip-21bdd26b49f9",
+            "zip-1869e3224be4",
+            "zip-4d6b788b5ccf",
+            "zip-ae02256bbba1",
+            "zip-3616fe224f2b"
+          ]
+        },
+        "unreadable": {
+          "count": 0,
+          "statusCounts": {},
+          "failedCheckCounts": {},
+          "reasonCounts": {},
+          "sampleIds": []
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "rootLabel": "Telegram Desktop",
+      "parseOk": true,
+      "inboxOk": false,
+      "status": "NO_RETURNED_CANARY_EVIDENCE",
+      "candidateCount": 14,
+      "scannedZipCount": 14,
+      "returnedEvidencePackets": 0,
+      "productionEvidencePackets": 0,
+      "handoffPackets": 0,
+      "diagnosticBundles": 4,
+      "unreadablePackets": 0,
+      "unknownPackets": 10,
+      "labelMode": "hash-redacted",
+      "triage": {
+        "labelMode": "hash-redacted",
+        "metricsOnly": true,
+        "unknown": {
+          "count": 10,
+          "statusCounts": {
+            "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 10
+          },
+          "failedCheckCounts": {
+            "not-canary-evidence-packet": 10
+          },
+          "reasonCounts": {
+            "zip does not contain the returned canary evidence packet contract": 10
+          },
+          "sampleIds": [
+            "zip-a4d3fa80d0e4",
+            "zip-d120c87d7c2c",
+            "zip-fa7497ed4263",
+            "zip-f0e9fcbb747f",
+            "zip-ffc8b5d8b8c4"
+          ]
+        },
+        "unreadable": {
+          "count": 0,
+          "statusCounts": {},
+          "failedCheckCounts": {},
+          "reasonCounts": {},
+          "sampleIds": []
+        }
+      }
+    }
+  ],
+  "nextActions": [
+    "Keep waiting for a returned metrics-only canary evidence packet.",
+    "Do not count handoff packets, diagnostic bundles, or unknown zips as production canary evidence.",
+    "Use canary:returned-inbox with --expose-labels only for local operator-only review if a human needs to locate a file."
+  ]
+}

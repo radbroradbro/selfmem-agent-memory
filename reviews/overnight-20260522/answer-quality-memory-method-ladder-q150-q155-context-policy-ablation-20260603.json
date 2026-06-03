@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-context-policy-ablation",
+  "generatedAt": "2026-06-03T16:03:02.248Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "readsPrivateMaterializedInputs": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "queryShard": {
+    "sameRawQuerySelectionAcrossVariants": true,
+    "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754",
+    "variantCount": 3
+  },
+  "status": "READY_FOR_SOURCE_GRANULARITY_FIX_LOOP",
+  "blockers": [],
+  "conclusion": "Prompt and context packaging variants reduced repeated answer collapse, but did not improve answer-quality; the next bounded loop should target source granularity, answer-bearing span coverage, or expected-answer support selection.",
+  "variants": [
+    {
+      "label": "support-aware",
+      "evidence": {
+        "diagnosticPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-support-aware-context-synthesis-diagnostic-20260603.json",
+        "diagnosticHash": "sha256:a8a11548285830e941572a4766f80ab25eeb8c1c37eba3fd7bacb3f08c989d7c",
+        "answerQualityPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-support-aware-deepseek-flash-20260603.json",
+        "answerQualityHash": "sha256:fe400893983fd2d0e6209f0ff69142aba363c5e7361f186ba3198e41968ed384",
+        "resultGateStatus": "BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT",
+        "resultGateBlockers": [
+          "best-challenger-does-not-clear-baseline-delta",
+          "best-overall-method-is-still-baseline"
+        ]
+      },
+      "policy": {
+        "answerPromptPolicy": "support-aware-v1",
+        "contextPackagingPolicy": "ranked-prefix-v1"
+      },
+      "status": "READY_FOR_CONTEXT_SYNTHESIS_FIX_LOOP",
+      "queryShard": {
+        "sameRawQuerySelectionAcrossMethods": true,
+        "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+      },
+      "metrics": {
+        "retrievalHitRateLift": 0.2,
+        "answerQualityDelta": 0,
+        "baselineAnswerQuality": 20,
+        "challengerAnswerQuality": 20,
+        "baselineHitToCorrectRate": 0.333333,
+        "challengerHitToCorrectRate": 0.25,
+        "challengerOnlyHitConvertedCount": 0,
+        "challengerOnlyHitCount": 1
+      },
+      "collapse": {
+        "repeatedWrongHashCount": 2,
+        "repeatedWrongUseTotal": 8,
+        "unknownCollapseUseCount": 6,
+        "bareOneCollapseUseCount": 2
+      },
+      "failureClasses": {
+        "challenger-retrieved-support-but-answer-still-failed": 1,
+        "converted-to-correct": 1,
+        "retrieval-absence": 1,
+        "same-failed-answer-despite-retrieved-support": 2
+      }
+    },
+    {
+      "label": "query-window",
+      "evidence": {
+        "diagnosticPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-query-window-context-synthesis-diagnostic-20260603.json",
+        "diagnosticHash": "sha256:472f1d5ac2e89849735c3fb4c89536446beac4b8aba27e0f800bbafc51d9f02c",
+        "answerQualityPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-query-window-deepseek-flash-20260603.json",
+        "answerQualityHash": "sha256:08251dc3f0583e07a9118f2d38dd72b716b24a915f1c13390c2eb35b7d3ad544",
+        "resultGateStatus": "BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT",
+        "resultGateBlockers": [
+          "best-challenger-does-not-clear-baseline-delta",
+          "best-overall-method-is-still-baseline"
+        ]
+      },
+      "policy": {
+        "answerPromptPolicy": "support-aware-v1",
+        "contextPackagingPolicy": "query-overlap-window-v1"
+      },
+      "status": "READY_FOR_CONTEXT_SYNTHESIS_FIX_LOOP",
+      "queryShard": {
+        "sameRawQuerySelectionAcrossMethods": true,
+        "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+      },
+      "metrics": {
+        "retrievalHitRateLift": 0.2,
+        "answerQualityDelta": 0,
+        "baselineAnswerQuality": 20,
+        "challengerAnswerQuality": 20,
+        "baselineHitToCorrectRate": 0.333333,
+        "challengerHitToCorrectRate": 0.25,
+        "challengerOnlyHitConvertedCount": 0,
+        "challengerOnlyHitCount": 1
+      },
+      "collapse": {
+        "repeatedWrongHashCount": 2,
+        "repeatedWrongUseTotal": 7,
+        "unknownCollapseUseCount": 5,
+        "bareOneCollapseUseCount": 2
+      },
+      "failureClasses": {
+        "challenger-retrieved-support-but-answer-still-failed": 1,
+        "converted-to-correct": 1,
+        "retrieval-absence": 1,
+        "retrieved-support-not-converted": 1,
+        "same-failed-answer-despite-retrieved-support": 1
+      }
+    },
+    {
+      "label": "extractive-window",
+      "evidence": {
+        "diagnosticPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-extractive-query-window-context-synthesis-diagnostic-20260603.json",
+        "diagnosticHash": "sha256:4e4b27d64df8a25812ada5c98b56d28372cdd658777a5d0e8352a9f2595563cf",
+        "answerQualityPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-extractive-query-window-deepseek-flash-20260603.json",
+        "answerQualityHash": "sha256:f31c66c6ac67deb5bac343edaa6f2898d3b36fc7c6567b369acf0eb13d4582a5",
+        "resultGateStatus": "BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT",
+        "resultGateBlockers": [
+          "best-challenger-does-not-clear-baseline-delta",
+          "best-overall-method-is-still-baseline"
+        ]
+      },
+      "policy": {
+        "answerPromptPolicy": "extractive-support-v1",
+        "contextPackagingPolicy": "query-overlap-window-v1"
+      },
+      "status": "READY_FOR_CONTEXT_SYNTHESIS_FIX_LOOP",
+      "queryShard": {
+        "sameRawQuerySelectionAcrossMethods": true,
+        "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+      },
+      "metrics": {
+        "retrievalHitRateLift": 0.2,
+        "answerQualityDelta": 0,
+        "baselineAnswerQuality": 20,
+        "challengerAnswerQuality": 20,
+        "baselineHitToCorrectRate": 0.333333,
+        "challengerHitToCorrectRate": 0.25,
+        "challengerOnlyHitConvertedCount": 0,
+        "challengerOnlyHitCount": 1
+      },
+      "collapse": {
+        "repeatedWrongHashCount": 0,
+        "repeatedWrongUseTotal": 0,
+        "unknownCollapseUseCount": 0,
+        "bareOneCollapseUseCount": 0
+      },
+      "failureClasses": {
+        "challenger-retrieved-support-but-answer-still-failed": 1,
+        "converted-to-correct": 1,
+        "retrieval-absence": 1,
+        "retrieved-support-not-converted": 2
+      }
+    }
+  ],
+  "bestByAnswerQuality": {
+    "label": "extractive-window",
+    "challengerAnswerQuality": 20,
+    "challengerHitToCorrectRate": 0.25,
+    "repeatedWrongUseTotal": 0
+  },
+  "bestByCollapseReduction": {
+    "label": "extractive-window",
+    "challengerAnswerQuality": 20,
+    "challengerHitToCorrectRate": 0.25,
+    "repeatedWrongUseTotal": 0,
+    "unknownCollapseUseCount": 0,
+    "bareOneCollapseUseCount": 0
+  },
+  "nextActions": [
+    "Do not expand the benchmark or promote the challenger from prompt/context-policy changes alone.",
+    "Add a bounded public-safe source-granularity or answer-bearing-span diagnostic for the same q150-q155 shard.",
+    "Prioritize support selection: the challenger retrieves support but still fails answer-quality conversion."
+  ],
+  "countsAsAnswerQualityEvidence": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "countsAsProductionRolloutEvidence": false
+}

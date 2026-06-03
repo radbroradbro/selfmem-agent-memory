@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "fixtureOnly": true,
+  "responses": {
+    "local-first-policy": {
+      "timing": 148,
+      "total": 3,
+      "results": [
+        {
+          "id": "mem_local_first_policy",
+          "memory": "RecallWeave writes locally by default and uses hosted Supermemory as read-through only.",
+          "similarity": 0.94
+        },
+        {
+          "id": "mem_hosted_baseline",
+          "memory": "Hosted comparison claims require a fresh metrics-only baseline.",
+          "similarity": 0.71
+        },
+        {
+          "id": "mem_release_gate",
+          "memory": "Public launch remains blocked until owner approval.",
+          "similarity": 0.63
+        }
+      ]
+    },
+    "strict-real-canary": {
+      "timing": 231,
+      "total": 3,
+      "results": [
+        {
+          "id": "mem_release_gate",
+          "memory": "Public launch remains blocked until owner approval.",
+          "similarity": 0.79
+        },
+        {
+          "id": "mem_strict_real_canary",
+          "memory": "A strict real canary must prove lifecycle coverage, hybrid search, local writes, hosted read-through, latency, rollback, and zero privacy leaks.",
+          "similarity": 0.76
+        },
+        {
+          "id": "mem_local_first_policy",
+          "memory": "RecallWeave writes locally by default and uses hosted Supermemory as read-through only.",
+          "similarity": 0.61
+        }
+      ]
+    },
+    "brain-ui-proof": {
+      "timing": 180,
+      "total": 2,
+      "results": [
+        {
+          "id": "mem_brain_ui_fixture",
+          "memory": "The Brain UI preview is proven with sanitized fixture graph, lifecycle trail, context preview, and release readiness evidence.",
+          "similarity": 0.91
+        },
+        {
+          "id": "mem_strict_real_canary",
+          "memory": "A strict real canary must prove lifecycle coverage, hybrid search, local writes, hosted read-through, latency, rollback, and zero privacy leaks.",
+          "similarity": 0.58
+        }
+      ]
+    }
+  }
+}

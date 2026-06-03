@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-preflight",
+  "status": "BLOCKED_ANSWER_QUALITY_ENV",
+  "claimScope": "full-sota",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-26T06:25:22.651Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "answerModel": "gpt-4o",
+    "judgeModel": "gpt-4o"
+  },
+  "consent": {
+    "answerQualityCallsEnabled": false,
+    "publicDataConfirmed": false,
+    "noRawTextOutputConfirmed": false
+  },
+  "endpoint": {
+    "baseUrlPresent": false,
+    "endpointIsLocal": false,
+    "apiKeyPresent": false,
+    "valuePrinted": false
+  },
+  "models": {
+    "answerModelPresent": false,
+    "judgeModelPresent": false,
+    "answerModelMatchesTarget": false,
+    "judgeModelMatchesTarget": false,
+    "valuesPrinted": false
+  },
+  "scoringPolicy": {
+    "claimScope": "full-sota",
+    "modelMatchPolicy": "exact-target-required",
+    "exactTargetModelsRequired": true,
+    "localDiagnosticModelAllowed": false,
+    "localDiagnosticEndpointRequired": false,
+    "localDiagnosticEndpointSatisfied": false,
+    "modelMismatchAllowed": false,
+    "scoringModelPolicySatisfied": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsLocalFullBenchmarkEvidence": false
+  },
+  "privateInputs": {
+    "querySet": {
+      "role": "queryset",
+      "present": false,
+      "rawTextPrivate": true
+    },
+    "memories": {
+      "role": "memories",
+      "present": false,
+      "rawTextPrivate": true
+    },
+    "answerLabels": {
+      "role": "answer-labels",
+      "present": false,
+      "rawTextPrivate": true
+    }
+  },
+  "queryShard": null,
+  "arms": [],
+  "requiredStrategyCoverage": {
+    "hasBm25Lite": false,
+    "hasFullHybridRerank": false,
+    "hasChallenger": false
+  },
+  "readiness": {
+    "envReady": false,
+    "privateInputsReady": false,
+    "armsReady": false,
+    "responseArmsCoverSelectedShard": false,
+    "sameDataReady": false,
+    "liveAnswerQualityCanRun": false,
+    "readyForEndToEndMemoryScoreGate": false,
+    "countsAsFullMemorySotaEvidence": false
+  },
+  "blockers": [
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+    "answer-model-missing",
+    "judge-model-missing",
+    "openai-compatible-base-url-missing",
+    "private-queryset-missing",
+    "private-memories-missing",
+    "private-answer-labels-missing",
+    "response-arm-exports-missing",
+    "bm25-lite-arm-missing",
+    "full-hybrid-rerank-arm-missing",
+    "provider-or-local-challenger-arm-missing"
+  ],
+  "nextActions": [
+    "Materialize the source-locked target into an operator-private directory outside the repository.",
+    "Export one private RecallWeave response file per strategy with baseline:export:recallweave.",
+    "Set explicit answer-quality model-call, public-data, and no-raw-output consent flags before live scoring.",
+    "Include bm25-lite, full-hybrid-rerank, and at least one provider or local challenger arm."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota",
+    "RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
+    "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o",
+    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope full-sota --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
+  ]
+}

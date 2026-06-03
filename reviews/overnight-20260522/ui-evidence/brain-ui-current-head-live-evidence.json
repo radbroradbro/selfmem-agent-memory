@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "mode": "current-head-live-browser",
+  "generatedAt": "2026-05-31T02:56:02.739Z",
+  "head": "8ad7728d31d6b66cbd325b69ecedd49ede45e0cb",
+  "url": "http://127.0.0.1:4189/",
+  "title": "RecallWeave Brain",
+  "h1": "Nucleus",
+  "screenshot": "brain-ui-current-head-live.png",
+  "screenshotPixels": {
+    "width": 1280,
+    "height": 1223
+  },
+  "writesRealFiles": false,
+  "fixtureOnly": true,
+  "consoleErrorOrWarningCount": 0,
+  "privateLeakCount": 0,
+  "checks": {
+    "hasNucleus": true,
+    "hasWikiVault": true,
+    "hasVaultSync": true,
+    "hasModelMatrix": true,
+    "hasContextPreview": true,
+    "hasReleaseReadiness": true,
+    "hasCompactionAudit": true,
+    "hasBenchmarkDashboard": true,
+    "hasCanaryRollout": true,
+    "hasResearchSourceLock": true,
+    "hasLifecycleTrail": true,
+    "hasLifecycleEventCard": true,
+    "hasRetrievalTraceCard": true,
+    "hasPreCompressText": true,
+    "hasPublicFail": true,
+    "hasProductionFalse": true,
+    "hasPrivateOrKeyText": false
+  }
+}

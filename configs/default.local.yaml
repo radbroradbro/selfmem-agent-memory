@@ -1,4 +1,4 @@
-providerArm: local-qwen3-gte
+providerArm: local-apple-qwen3-0_6b
 storage:
   rawStore: sqlite
   vectorStore: sqlite-vec
@@ -30,6 +30,20 @@ queryExpansion:
   maxRewrites: 3
   onlySend: user_query
   fallbackEnabled: false
+providers:
+  localApple:
+    runtime: llama.cpp
+    acceleration: Metal
+    embedBaseUrlEnv: SELFMEM_LOCAL_EMBED_BASE_URL
+    rerankBaseUrlEnv: SELFMEM_LOCAL_RERANK_BASE_URL
+    embedModel: Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0
+    embedDimensions: 1024
+    rerankModel: recallweave-deterministic-rerank-proxy
+    plannedRerankModel: Qwen/Qwen3-Reranker-0.6B
+    qualityArms:
+      - local-apple-qwen3-4b
+      - local-qwen3-8b-qwen3rerank
+    rule: "Use the small Apple Silicon embedding arm first on 24GB Macs; benchmark the local reranker and 4B/8B arms before recommending them."
 privacy:
   redactPrivateTags: true
   redactKeyShapes: true

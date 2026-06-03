@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "evidence": {
+    "title": "RecallWeave Brain",
+    "hasResearchLineageHeading": true,
+    "lineageText": "Which GBrain patterns should RecallWeave source-lock before UI finalization?\n\nfixture-research-lineage | writesRealFiles: false\n\nQUERY: RESEARCH_QUERY\nWhich GBrain patterns should RecallWeave source-lock before UI finalization?\nANSWERS: HYPOTHESIS\nResearch lineage makes architecture decisions easier to audit\nINFORMS: DECISION\nBrain UI evidence must start with sanitized fixture data",
+    "cardCount": 1,
+    "stepCount": 3,
+    "hasQuery": true,
+    "hasHypothesis": true,
+    "hasDecision": true,
+    "fixtureModeVisible": true,
+    "writesRealFilesFalseVisible": true,
+    "visibleTextHasPrivate": false
+  },
+  "consoleMessages": []
+}

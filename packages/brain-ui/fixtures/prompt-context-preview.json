@@ -1,0 +1,120 @@
+{
+  "ok": true,
+  "mode": "prompt-context-preview",
+  "query": "native memory optimization",
+  "generatedAt": "2026-05-22T09:10:00.000Z",
+  "traceId": "trace:context-001",
+  "tokenBudget": 900,
+  "totalTokens": 642,
+  "selectedMemories": [
+    {
+      "id": "memory:hybrid-recall",
+      "kind": "memory",
+      "title": "Hybrid recall should expose dense, sparse, graph, and temporal channels",
+      "source": "local",
+      "tokens": 138,
+      "injected": true,
+      "rerankScore": 0.91,
+      "channelRanks": {
+        "dense": 1,
+        "sparse": 2,
+        "graph": 1,
+        "temporal": 4
+      },
+      "reason": "matches query and is linked to active retrieval trace",
+      "citationIds": ["source:fixture-design-note"]
+    },
+    {
+      "id": "doc:native-memory-plan",
+      "kind": "derived_doc",
+      "title": "Native Memory Optimization Plan",
+      "source": "wiki",
+      "tokens": 214,
+      "injected": true,
+      "rerankScore": 0.87,
+      "channelRanks": {
+        "dense": 3,
+        "sparse": 1,
+        "graph": 2,
+        "temporal": 3
+      },
+      "reason": "summarizes host lifecycle and wiki sync decision",
+      "citationIds": ["decision:ui-fixture-first"]
+    },
+    {
+      "id": "event:hermes-pre-compress",
+      "kind": "lifecycle_event",
+      "title": "Hermes pre-compression checkpoint preserved compact evidence",
+      "source": "session",
+      "tokens": 96,
+      "injected": true,
+      "rerankScore": 0.79,
+      "channelRanks": {
+        "dense": 5,
+        "sparse": 6,
+        "graph": 3,
+        "temporal": 1
+      },
+      "reason": "recent lifecycle evidence for compression safety",
+      "citationIds": ["trace:context-001"]
+    }
+  ],
+  "omittedCandidates": [
+    {
+      "id": "candidate:maintenance-noise",
+      "kind": "conversation",
+      "reason": "maintenance noise below salience threshold",
+      "tokens": 72,
+      "rerankScore": 0.18
+    },
+    {
+      "id": "research:gbrain-query",
+      "kind": "research_query",
+      "reason": "open research thread not needed for this turn",
+      "tokens": 104,
+      "rerankScore": 0.41
+    }
+  ],
+  "sections": [
+    {
+      "id": "section:active-context",
+      "title": "Active Recall",
+      "source": "local",
+      "tokens": 296,
+      "injected": true,
+      "citationIds": ["memory:hybrid-recall", "doc:native-memory-plan"],
+      "text": "RecallWeave should use local-only writes, hosted read-through as read-only context, and visible hybrid retrieval traces. Dense, sparse, graph, and temporal channels should stay inspectable so a production miss can be diagnosed."
+    },
+    {
+      "id": "section:lifecycle",
+      "title": "Lifecycle Note",
+      "source": "session",
+      "tokens": 126,
+      "injected": true,
+      "citationIds": ["event:hermes-pre-compress"],
+      "text": "Hermes and OpenClaw lifecycle hooks should recall before prompt build and preserve compact checkpoints before compression when enabled by policy."
+    },
+    {
+      "id": "section:guardrails",
+      "title": "Guardrails",
+      "source": "fixture",
+      "tokens": 220,
+      "injected": true,
+      "citationIds": ["decision:ui-fixture-first"],
+      "text": "Public UI evidence must use sanitized fixture data. Private spans, key-shaped text, raw agent logs, and real memories must not appear in screenshots, traces, or compiled prompt previews."
+    }
+  ],
+  "citations": [
+    "memory:hybrid-recall",
+    "doc:native-memory-plan",
+    "event:hermes-pre-compress",
+    "decision:ui-fixture-first"
+  ],
+  "safety": {
+    "privacyLeakCount": 0,
+    "redactionCount": 1,
+    "hostedReadThrough": "read-only",
+    "writeMode": "local-only"
+  },
+  "compiledContext": "<recallweave-context>\nActive Recall: RecallWeave should use local-only writes, hosted read-through as read-only context, and visible hybrid retrieval traces.\nLifecycle Note: Recall before prompt build and preserve compact checkpoints before compression when policy enables it.\nGuardrails: Public UI evidence must use sanitized fixture data only.\n</recallweave-context>"
+}

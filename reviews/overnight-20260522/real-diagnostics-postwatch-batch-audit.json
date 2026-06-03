@@ -1,0 +1,703 @@
+{
+  "ok": true,
+  "mode": "canary-diagnostic-batch-audit",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "requireRealPass": false,
+  "allowFailedInputs": true,
+  "publicLaunchAllowed": false,
+  "fleetRolloutAllowed": false,
+  "inputCount": 9,
+  "parsedInputCount": 8,
+  "failedInputCount": 1,
+  "strictRealPassCount": 0,
+  "countsAsRealRolloutEvidence": false,
+  "bestCandidate": {
+    "label": "bundle_8e90781bb060a889",
+    "inputKind": "diagnostic-zip",
+    "reportSha256": "1c100d99cd7b2500556a0aedfad309bc0dc383464c28759e385b0eea28679d32",
+    "fixtureOnly": false,
+    "canaryPass": false,
+    "countsAsRealRolloutEvidence": false,
+    "strictRealPassed": false,
+    "failedChecks": [
+      "adapter-contract",
+      "store-latency-instrumented",
+      "store-p95"
+    ],
+    "failedCheckCount": 3,
+    "target": {
+      "host": "openclaw",
+      "agentIdentityHash": "agent_a11b0876ce7f",
+      "localContainerHash": "container_4e9b74e116ef",
+      "sourceContainerHash": "source_bfc64a0cca8d",
+      "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+      "hostedSupermemoryMode": "read-through-only"
+    },
+    "lifecycle": {
+      "sessionStart": 7,
+      "beforePromptBuild": 5,
+      "preCompress": 4,
+      "agentEnd": 4,
+      "search": 18,
+      "store": 15,
+      "errors": 0
+    },
+    "latencyMs": {
+      "recallP50": 738.678,
+      "recallP95": 1567.346,
+      "storeP50": 0,
+      "storeP95": 0
+    },
+    "instrumentation": {
+      "searchLatencySampleCount": 18,
+      "storeLatencySampleCount": 0,
+      "missingSearchLatencyCount": 0,
+      "missingStoreLatencyCount": 15
+    },
+    "quality": {
+      "beforePromptHasContextRate": 1,
+      "zeroResultRate": 0,
+      "writeSuccessRate": 1,
+      "lcmHookObserved": true,
+      "lifecycleCovered": true,
+      "hybridSearchCovered": true,
+      "localWritesObserved": true,
+      "hostedReadThroughObserved": true
+    },
+    "privacy": {
+      "privacyLeakCount": 0,
+      "secretPatternHits": 0,
+      "rawMemoryIncluded": false,
+      "rawTranscriptIncluded": false,
+      "rawPromptIncluded": false,
+      "rawAnswerIncluded": false
+    },
+    "remediation": {
+      "severity": "blocked",
+      "actionCount": 3,
+      "categories": [
+        "installed-version",
+        "instrumentation"
+      ],
+      "needsFreshWindow": true
+    }
+  },
+  "results": [
+    {
+      "label": "bundle_0a92ae79fcc8af45",
+      "inputKind": "diagnostic-dir",
+      "reportSha256": "5766e437f8f88aa360eebe38ba72e4f6c2a3b4c5a3682a1fcb8a48c5176ec459",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "hosted-read-only",
+        "zero-errors",
+        "known-identity",
+        "search-latency-instrumented",
+        "store-latency-instrumented",
+        "recall-p95",
+        "store-p95",
+        "context-rate",
+        "hybrid-search-covered"
+      ],
+      "failedCheckCount": 10,
+      "target": {
+        "host": "hermes",
+        "agentIdentityHash": "agent_a8979145b8d7",
+        "localContainerHash": "container_c46df0dcb521",
+        "sourceContainerHash": "source_a39857423ee6",
+        "providerMode": "unknown",
+        "hostedSupermemoryMode": "disabled"
+      },
+      "lifecycle": {
+        "sessionStart": 20,
+        "beforePromptBuild": 160,
+        "preCompress": 13,
+        "agentEnd": 21,
+        "search": 178,
+        "store": 182,
+        "errors": 7
+      },
+      "latencyMs": {
+        "recallP50": 0,
+        "recallP95": 0,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 0,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 178,
+        "missingStoreLatencyCount": 182
+      },
+      "quality": {
+        "beforePromptHasContextRate": 0,
+        "zeroResultRate": 0,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": false,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": false
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 10,
+        "categories": [
+          "identity",
+          "installed-version",
+          "instrumentation",
+          "latency",
+          "retrieval",
+          "retrieval-quality",
+          "runtime-errors",
+          "supermemory-bridge"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_7931f8db4e297fb7",
+      "inputKind": "diagnostic-dir",
+      "reportSha256": "06fcdaf6137fa1eb7fcc7cc83a2d45cecdfc5128a7395d0195e7fb70744aebbd",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "recall-p95",
+        "store-p95"
+      ],
+      "failedCheckCount": 4,
+      "target": {
+        "host": "hermes",
+        "agentIdentityHash": "agent_3b7ae9a62430",
+        "localContainerHash": "container_6dfe2df63991",
+        "sourceContainerHash": "source_7398a707e495",
+        "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+        "hostedSupermemoryMode": "read-through-only"
+      },
+      "lifecycle": {
+        "sessionStart": 22,
+        "beforePromptBuild": 42,
+        "preCompress": 7,
+        "agentEnd": 11,
+        "search": 55,
+        "store": 54,
+        "errors": 0
+      },
+      "latencyMs": {
+        "recallP50": 1892.409,
+        "recallP95": 7281.754,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 11,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 44,
+        "missingStoreLatencyCount": 54
+      },
+      "quality": {
+        "beforePromptHasContextRate": 1,
+        "zeroResultRate": 0.061855670103092786,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": true,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": true
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 4,
+        "categories": [
+          "installed-version",
+          "instrumentation",
+          "latency"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_8e90781bb060a889",
+      "inputKind": "diagnostic-zip",
+      "reportSha256": "1c100d99cd7b2500556a0aedfad309bc0dc383464c28759e385b0eea28679d32",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "store-p95"
+      ],
+      "failedCheckCount": 3,
+      "target": {
+        "host": "openclaw",
+        "agentIdentityHash": "agent_a11b0876ce7f",
+        "localContainerHash": "container_4e9b74e116ef",
+        "sourceContainerHash": "source_bfc64a0cca8d",
+        "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+        "hostedSupermemoryMode": "read-through-only"
+      },
+      "lifecycle": {
+        "sessionStart": 7,
+        "beforePromptBuild": 5,
+        "preCompress": 4,
+        "agentEnd": 4,
+        "search": 18,
+        "store": 15,
+        "errors": 0
+      },
+      "latencyMs": {
+        "recallP50": 738.678,
+        "recallP95": 1567.346,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 18,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 0,
+        "missingStoreLatencyCount": 15
+      },
+      "quality": {
+        "beforePromptHasContextRate": 1,
+        "zeroResultRate": 0,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": true,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": true
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 3,
+        "categories": [
+          "installed-version",
+          "instrumentation"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_8f4d82c504bdb7b9",
+      "inputKind": "diagnostic-zip",
+      "reportSha256": "4e0f55fce4999c508691998c2ac9977932334220d00336d4c60f21e3418e5564",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "hosted-read-only",
+        "zero-errors",
+        "known-identity",
+        "search-latency-instrumented",
+        "store-latency-instrumented",
+        "recall-p95",
+        "store-p95",
+        "context-rate",
+        "hybrid-search-covered"
+      ],
+      "failedCheckCount": 10,
+      "target": {
+        "host": "hermes",
+        "agentIdentityHash": "agent_a8979145b8d7",
+        "localContainerHash": "container_c46df0dcb521",
+        "sourceContainerHash": "source_a39857423ee6",
+        "providerMode": "unknown",
+        "hostedSupermemoryMode": "disabled"
+      },
+      "lifecycle": {
+        "sessionStart": 20,
+        "beforePromptBuild": 160,
+        "preCompress": 13,
+        "agentEnd": 21,
+        "search": 178,
+        "store": 182,
+        "errors": 7
+      },
+      "latencyMs": {
+        "recallP50": 0,
+        "recallP95": 0,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 0,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 178,
+        "missingStoreLatencyCount": 182
+      },
+      "quality": {
+        "beforePromptHasContextRate": 0,
+        "zeroResultRate": 0,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": false,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": false
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 10,
+        "categories": [
+          "identity",
+          "installed-version",
+          "instrumentation",
+          "latency",
+          "retrieval",
+          "retrieval-quality",
+          "runtime-errors",
+          "supermemory-bridge"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_a391078b2bd892f9",
+      "inputKind": "diagnostic-dir",
+      "reportSha256": "2eaa69134cfc36a1ffc43afa5b780aa87101cdbee9f284e3d46f017afc5c7d47",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "store-p95"
+      ],
+      "failedCheckCount": 3,
+      "target": {
+        "host": "openclaw",
+        "agentIdentityHash": "agent_a11b0876ce7f",
+        "localContainerHash": "container_4e9b74e116ef",
+        "sourceContainerHash": "source_bfc64a0cca8d",
+        "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+        "hostedSupermemoryMode": "read-through-only"
+      },
+      "lifecycle": {
+        "sessionStart": 7,
+        "beforePromptBuild": 5,
+        "preCompress": 4,
+        "agentEnd": 4,
+        "search": 18,
+        "store": 15,
+        "errors": 0
+      },
+      "latencyMs": {
+        "recallP50": 738.678,
+        "recallP95": 1567.346,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 18,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 0,
+        "missingStoreLatencyCount": 15
+      },
+      "quality": {
+        "beforePromptHasContextRate": 1,
+        "zeroResultRate": 0,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": true,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": true
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 3,
+        "categories": [
+          "installed-version",
+          "instrumentation"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_cc4fd17f4df3848e",
+      "inputKind": "diagnostic-dir",
+      "reportSha256": "41950e339e6d24cbea627aa604df9bd341b55cea52c1534544eb52fba2f37613",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "recall-p95",
+        "store-p95"
+      ],
+      "failedCheckCount": 4,
+      "target": {
+        "host": "hermes",
+        "agentIdentityHash": "agent_6d95fa61c9e3",
+        "localContainerHash": "container_14d8f406c3f6",
+        "sourceContainerHash": "source_6d95fa61c9e3",
+        "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+        "hostedSupermemoryMode": "read-through-only"
+      },
+      "lifecycle": {
+        "sessionStart": 29,
+        "beforePromptBuild": 32,
+        "preCompress": 8,
+        "agentEnd": 17,
+        "search": 48,
+        "store": 50,
+        "errors": 0
+      },
+      "latencyMs": {
+        "recallP50": 817.122,
+        "recallP95": 3894.354,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 48,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 0,
+        "missingStoreLatencyCount": 50
+      },
+      "quality": {
+        "beforePromptHasContextRate": 1,
+        "zeroResultRate": 0.0375,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": true,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": true
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 4,
+        "categories": [
+          "installed-version",
+          "instrumentation",
+          "latency"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_e212855c99766cdb",
+      "inputKind": "diagnostic-zip",
+      "reportSha256": "7e8aa0a374dba25638dac9655ee1c26ff21aba52e9f7ad2eb2e094c5e13772d9",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "recall-p95",
+        "store-p95"
+      ],
+      "failedCheckCount": 4,
+      "target": {
+        "host": "hermes",
+        "agentIdentityHash": "agent_3b7ae9a62430",
+        "localContainerHash": "container_6dfe2df63991",
+        "sourceContainerHash": "source_7398a707e495",
+        "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+        "hostedSupermemoryMode": "read-through-only"
+      },
+      "lifecycle": {
+        "sessionStart": 22,
+        "beforePromptBuild": 42,
+        "preCompress": 7,
+        "agentEnd": 11,
+        "search": 55,
+        "store": 54,
+        "errors": 0
+      },
+      "latencyMs": {
+        "recallP50": 1892.409,
+        "recallP95": 7281.754,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 11,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 44,
+        "missingStoreLatencyCount": 54
+      },
+      "quality": {
+        "beforePromptHasContextRate": 1,
+        "zeroResultRate": 0.061855670103092786,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": true,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": true
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 4,
+        "categories": [
+          "installed-version",
+          "instrumentation",
+          "latency"
+        ],
+        "needsFreshWindow": true
+      }
+    },
+    {
+      "label": "bundle_f28b0dc81db7dcc4",
+      "inputKind": "diagnostic-zip",
+      "reportSha256": "6b207d742997ce018c4bbe376ff55c165cdf780199e3ff44bf91e99efe1be15b",
+      "fixtureOnly": false,
+      "canaryPass": false,
+      "countsAsRealRolloutEvidence": false,
+      "strictRealPassed": false,
+      "failedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "recall-p95",
+        "store-p95"
+      ],
+      "failedCheckCount": 4,
+      "target": {
+        "host": "hermes",
+        "agentIdentityHash": "agent_6d95fa61c9e3",
+        "localContainerHash": "container_14d8f406c3f6",
+        "sourceContainerHash": "source_6d95fa61c9e3",
+        "providerMode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+        "hostedSupermemoryMode": "read-through-only"
+      },
+      "lifecycle": {
+        "sessionStart": 29,
+        "beforePromptBuild": 32,
+        "preCompress": 8,
+        "agentEnd": 17,
+        "search": 48,
+        "store": 50,
+        "errors": 0
+      },
+      "latencyMs": {
+        "recallP50": 817.122,
+        "recallP95": 3894.354,
+        "storeP50": 0,
+        "storeP95": 0
+      },
+      "instrumentation": {
+        "searchLatencySampleCount": 48,
+        "storeLatencySampleCount": 0,
+        "missingSearchLatencyCount": 0,
+        "missingStoreLatencyCount": 50
+      },
+      "quality": {
+        "beforePromptHasContextRate": 1,
+        "zeroResultRate": 0.0375,
+        "writeSuccessRate": 1,
+        "lcmHookObserved": true,
+        "lifecycleCovered": true,
+        "hybridSearchCovered": true,
+        "localWritesObserved": true,
+        "hostedReadThroughObserved": true
+      },
+      "privacy": {
+        "privacyLeakCount": 0,
+        "secretPatternHits": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "remediation": {
+        "severity": "blocked",
+        "actionCount": 4,
+        "categories": [
+          "installed-version",
+          "instrumentation",
+          "latency"
+        ],
+        "needsFreshWindow": true
+      }
+    }
+  ],
+  "failedInputs": [
+    {
+      "label": "bundle_ff2bc781961daeb4",
+      "inputKind": "diagnostic-zip",
+      "status": "failed",
+      "failedStage": "report"
+    }
+  ],
+  "nextActions": [
+    "Do not promote any audited diagnostic to production canary evidence.",
+    "Pick the best candidate by failed-check count and collect a fresh post-update runtime window.",
+    "Run canary:diagnose on each failing report and attach only metrics-only output."
+  ]
+}

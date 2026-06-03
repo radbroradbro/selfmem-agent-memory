@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "evidence": {
+    "edgeCount": 9,
+    "editableCount": 2,
+    "hasLifecycleKind": true,
+    "hasNucleusSnapshotHeading": true,
+    "hasRetrievalTraceKind": true,
+    "mode": "fixture-nucleus-snapshot",
+    "nodeCount": 9,
+    "summaryText": "fixture\nMode\n9\nNodes\n9\nEdges\n2\nEditable",
+    "title": "RecallWeave Brain",
+    "visibleTextHasPrivate": false,
+    "writesRealFiles": false
+  },
+  "consoleMessages": []
+}

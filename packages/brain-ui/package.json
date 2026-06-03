@@ -1,0 +1,12 @@
+{
+  "name": "@recallweave/brain-ui",
+  "version": "0.1.0-alpha.0",
+  "description": "Fixture-safe local RecallWeave brain UI for Nucleus graph and wiki editing review.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "serve": "node server.mjs",
+    "smoke": "node smoke.mjs"
+  }
+}

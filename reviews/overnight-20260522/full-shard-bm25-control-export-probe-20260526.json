@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "mode": "full-shard-bm25-control-export-probe",
+  "status": "READY_FULL_SHARD_BM25_CONTROL_EXPORT_PROBE",
+  "generatedAt": "2026-05-26T02:34:15.704Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "writesPrivateResponseFiles": true,
+  "privateResponseFileCommitted": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "queryCount": 500,
+    "shardId": "shard-001",
+    "startIndex": 0,
+    "endIndexExclusive": 25,
+    "responseCount": 25,
+    "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+  },
+  "strategy": "bm25-lite",
+  "featureProfile": {
+    "metadata": false,
+    "tokens": true,
+    "tokenSet": true,
+    "bigramSet": false,
+    "semanticVector": false,
+    "topicTermSet": false,
+    "roleCoverage": false,
+    "dateMs": false
+  },
+  "inputStats": {
+    "maxMemoryBytes": 300000000,
+    "linesRead": 19195,
+    "parsed": 19195,
+    "candidates": 19195,
+    "skippedInvalid": 0,
+    "skippedFullyPrivate": 0,
+    "redactionCount": 0,
+    "keyRedactionCount": 0
+  },
+  "timingMs": {
+    "min": 1065,
+    "p50": 1118,
+    "max": 1182,
+    "average": 1118,
+    "observedWallSeconds": 36
+  },
+  "output": {
+    "privateResponseFileWritten": true,
+    "privateResponseFileHash": "sha256:8811024f5cb7fe98a3cbb856bf2af6af1bc404b2d03a2d63001d1ea0c0e5fe1a",
+    "privateResponseFileSizeBytes": 19346,
+    "pathPrinted": false
+  },
+  "safety": {
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPromptIncluded": false,
+    "rawAnswerIncluded": false
+  },
+  "nextActions": [
+    "Run the remaining shard-001 response arms with provider/local endpoints configured.",
+    "Run answer-quality preflight and scoring only after every private response arm exists for the shard.",
+    "Do not combine or claim SOTA until all twenty shard outputs pass intake and reviewer/result gates."
+  ]
+}

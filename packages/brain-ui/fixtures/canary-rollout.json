@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "mode": "one-agent-canary-rollout",
+  "generatedAt": "2026-05-22T17:45:00.000Z",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "target": {
+    "scope": "one-agent",
+    "host": "hermes-or-openclaw",
+    "containerPolicy": "agent-specific-local-container",
+    "hostedSupermemoryMode": "read-through-only",
+    "widerRollout": "blocked-until-canary-clean"
+  },
+  "readiness": {
+    "localChecks": "passed",
+    "githubActions": "passed",
+    "releaseGate": "passed",
+    "publicLaunchVerdict": "FAIL",
+    "ownerApproval": "required"
+  },
+  "prerequisites": [
+    {
+      "id": "current-head-ci",
+      "label": "Current PR head has green CI",
+      "status": "passed",
+      "evidence": "4e971b9 -> CI 26302525005"
+    },
+    {
+      "id": "dry-run-first",
+      "label": "Run selfmem_update dry-run before apply",
+      "status": "required",
+      "evidence": "selfmem_update is dry-run by default"
+    },
+    {
+      "id": "single-agent",
+      "label": "Apply to one agent before fleet rollout",
+      "status": "required",
+      "evidence": "update-flow one-agent canary rule"
+    },
+    {
+      "id": "sanitized-logs",
+      "label": "Collect sanitized event counts and errors only",
+      "status": "required",
+      "evidence": "no raw memories, transcripts, keys, or local paths"
+    }
+  ],
+  "steps": [
+    {
+      "id": "pull",
+      "label": "Pull or install the approved commit",
+      "command": "selfmem_update --host <host> --repo <agent-repo>",
+      "required": true
+    },
+    {
+      "id": "doctor",
+      "label": "Run doctor and adapter smoke",
+      "command": "selfmem_update --host <host> --repo <agent-repo> --run-canary",
+      "required": true
+    },
+    {
+      "id": "apply",
+      "label": "Apply only after dry-run review",
+      "command": "selfmem_update --host <host> --repo <agent-repo> --apply --run-canary",
+      "required": true
+    },
+    {
+      "id": "observe",
+      "label": "Observe one active session before wider rollout",
+      "command": "collect sanitized counts from trace and monitor outputs",
+      "required": true
+    },
+    {
+      "id": "rollback",
+      "label": "Rollback if lifecycle writes, recall, or privacy checks fail",
+      "command": "restore the pre-update adapter backup and disable the selfmem provider",
+      "required": true
+    }
+  ],
+  "metricsToCollect": [
+    "session_start_count",
+    "before_prompt_build_count",
+    "agent_end_count",
+    "store_success_count",
+    "search_result_count",
+    "redaction_count",
+    "privacy_leak_count",
+    "error_count",
+    "p50_recall_latency_ms",
+    "p95_recall_latency_ms",
+    "fallback_search_count"
+  ],
+  "blockers": [
+    "human-public-launch-approval-required",
+    "claude-reviewer-route-blocked",
+    "hosted-supermemory-baseline-not-current"
+  ],
+  "passCriteria": [
+    "privacy_leak_count equals 0",
+    "error_count equals 0 for the canary window",
+    "before_prompt_build recall appears in at least one real turn",
+    "agent_end or sync_turn writes produce distilled local memory",
+    "p95 recall latency remains acceptable for the host",
+    "rollback path is documented before wider rollout"
+  ],
+  "caveats": [
+    "This dashboard is fixture-only and does not touch a real agent.",
+    "A canary pass is not public launch approval.",
+    "Hosted Supermemory remains read-through only unless a later approved policy changes it."
+  ]
+}

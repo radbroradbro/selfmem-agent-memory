@@ -24,22 +24,45 @@ fallback path.
 
 RecallWeave is public alpha software.
 
-- Current native adapters: Hermes and OpenClaw.
+- Current native adapters: Hermes, OpenClaw, and the local Codex hook bridge.
 - Current runtime id: `selfmem_canary`, kept for compatibility with existing
   setup scripts and installed agents.
 - Current cloud-quality path: Voyage embeddings plus Voyage rerank when local
   credentials are configured.
-- Current fallback path: local lexical recall and metadata scoring.
+- Current local path: Apple Silicon-friendly Qwen3 0.6B embedding and rerank
+  arms through llama.cpp or a local OpenAI-compatible sidecar, with lexical
+  recall as the no-credential fallback.
 - Current hosted bridge: read-only Supermemory search and export-cache search.
+- Current Codex bridge status: controlled reset/dogfood mode. Automatic Codex
+  prompt injection should stay disabled until `codex:memory-reset-health`,
+  quiet-prompt context checks, explicit writes, and post-boundary recall stay
+  clean in real use.
+
+`selfmem_canary` is a legacy compatibility id, not the product name. New docs,
+UI surfaces, and operator instructions should call the system RecallWeave and
+reserve "canary" for a limited one-agent rollout test.
 
 Do not treat this release as a proven Supermemory replacement. The included
-benchmark notes are metrics-only engineering evidence. A fresh public benchmark
-must run before making quality claims.
+benchmark notes are metrics-only engineering evidence. A public score requires
+a matched, source-locked canary win with the same judge, answer model, queries,
+scoring code, privacy rules, and two reviewer approvals recorded through the
+metrics-only `baseline:reviewer-intake` gate. DeepSeek or any OpenAI-compatible
+reviewer can produce one of those approval files through
+`baseline:reviewer:openai-compatible`, but credentials must stay in environment
+variables and dry-run output never counts as approval.
+
+The latest private 2026-05-23 budgeted canary is ready for reviewer inspection:
+RecallWeave beat the selected hosted baseline on an 8-query source-matched
+slice with zero privacy failures and a 1600-token context budget. That is not a
+public benchmark claim until two independent reviewers approve the exact
+metrics-only packet.
 
 ## Features
 
 - Native Hermes memory provider surface.
 - Native OpenClaw memory slot plugin.
+- Local Codex hook bridge for prompt-time recall, stop-time flush, and explicit
+  durable writes.
 - Local-only writes for new memories.
 - Optional hosted Supermemory read-through for old history.
 - Optional export-cache read-through when hosted quota is exhausted.
@@ -47,6 +70,26 @@ must run before making quality claims.
   traces.
 - Hybrid local search with semantic, lexical, dedupe, rerank, and context
   compilation helpers.
+- Nucleus Index contracts for memory nodes, wiki pages, lifecycle events,
+  retrieval traces, and editable derived docs.
+- Research lineage contracts for source-backed hypotheses, pros, cons, tests,
+  decisions, and follow-up questions.
+- LLM-wiki compiler and explicit disk-sync rules for Obsidian-compatible vaults
+  and the self-hosted brain UI.
+- Self-hosted Brain UI scaffold for graph search, container health, wiki/vault
+  preview, Nucleus snapshots, research lineage, local audit preflight, and
+  selected local-container audit preview.
+- Read-only selected local-container audit route, disabled by default, with
+  read-only confirmation and redacted `.../container` path display.
+- Browser-local selected-audit history that stores only redacted labels, counts,
+  status, event name, and timestamp.
+- Fixture-safe session compaction benchmark for chronological durable memory
+  extraction, exact identifier preservation, stale/private suppression, and
+  duplicate merge behavior.
+- Metrics-only local-session compaction audit for private Codex, Claude,
+  Hermes, or OpenClaw exports without printing candidate memory text.
+- Metrics-only batch compaction audit for several private session exports at
+  once, with redacted file hashes, source counts, and aggregate quality flags.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
   and privacy counts.
 - Dry-run update command for deployed agents.
@@ -120,8 +163,13 @@ Runtime keys can enable:
 
 - Voyage `voyage-4-large` embeddings.
 - Voyage `rerank-2.5` reranking.
+- Gemini embedding benchmark arms.
+- NVIDIA hosted embedding, rerank, or query-expansion benchmark arms.
+- Local Apple Silicon embedding and rerank services.
 - Supermemory read-only history search.
-- Optional query expansion through a configured provider.
+- DeepSeek or another OpenAI-compatible reviewer for benchmark approval checks.
+- Optional query expansion through a configured provider, disabled by default
+  until a controlled canary proves it helps.
 
 The repository never ships bundled keys.
 
@@ -133,13 +181,47 @@ runtime's private config directory or process environment.
 Runtime updates should use the bundled updater. It is dry-run by default:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes --apply
+bin/selfmem_update --host hermes --repo /path/to/hermes
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply
 ```
+
+If the package is linked or installed, the same command is available as
+`selfmem_update`.
 
 Agents should branch from `main`, make a focused change, run the relevant smoke
 tests, and open a pull request. If a runtime issue cannot be fixed safely, open
 an issue with sanitized logs and no raw memory content.
+
+For one-agent canaries, generate a sanitized report, run strict intake, and
+diagnose failures before touching another agent:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host hermes --format markdown --output /tmp/recallweave-canary-drill.md
+npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
+npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
+npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
+```
+
+The drill uses public test prompts to force local write, recall, hosted
+read-through, lifecycle or compression coverage, and rollback evidence in the
+fresh window.
+
+For hosted-vs-local baseline work, use the one-command runner only after the
+private hosted env file, reviewed query set, and private hosted mirror or
+source-matched local container are ready:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
+```
+
+Fixture mode proves the chain. Live mode still requires explicit hosted
+credentials, no-raw-text mode, a reviewed query set, and local RecallWeave
+input, and it does not approve public claims by itself. For matched live runs,
+set `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET` or pass
+`--context-token-budget` so the local arm is judged on the context it would
+actually inject, not on full-memory token mass.
+Use `baseline:mirror-hosted` when hosted Supermemory history is the source. It
+writes redacted mirror files locally and emits only a metrics report.
 
 ## Safety Rules
 
@@ -155,15 +237,25 @@ auth state, browser state, or provider keys.
 
 - [User manual](docs/USER_MANUAL.md)
 - [Visual guide](docs/VISUAL_GUIDE.md)
+- [Brain UI](docs/BRAIN_UI.md)
 - [Compatibility notes](docs/COMPATIBILITY.md)
+- [Nucleus Index](docs/NUCLEUS_INDEX.md)
+- [Research lineage](docs/RESEARCH_LINEAGE.md)
+- [LLM-wiki sync](docs/LLM_WIKI_SYNC.md)
+- [Session compaction benchmark](docs/SESSION_COMPACTION_BENCHMARK.md)
 - [Lifecycle and LCM notes](docs/LIFECYCLE_AND_LCM.md)
 - [System flows](docs/FLOWS.md)
 - [Operations guide](docs/OPERATIONS.md)
 - [Agent live-build guide](docs/AGENT_LIVE_BUILD_GUIDE.md)
 - [Maintainer review guide](docs/MAINTAINER_REVIEW_GUIDE.md)
+- [Update flow](docs/UPDATE_FLOW.md)
+- [Codex memory reset](docs/CODEX_MEMORY_RESET.md)
 - [GitHub rules](docs/GITHUB_RULES.md)
 - [Security model](docs/SECURITY_MODEL.md)
+- [Production readiness](docs/PRODUCTION_READINESS.md)
 - [Benchmark summary](docs/BENCHMARK_SUMMARY.md)
+- [Autoresearch benchmark plan](docs/AUTORESEARCH_BENCHMARK_PLAN.md)
+- [Model matrix](docs/MODEL_MATRIX.md)
 - [Product roadmap](docs/PRODUCT_ROADMAP.md)
 - [Public release checklist](docs/PUBLIC_RELEASE_CHECKLIST.md)
 

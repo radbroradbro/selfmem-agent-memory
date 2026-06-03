@@ -9,7 +9,56 @@ Use this checklist before making the repository public.
 - [ ] README names RecallWeave and explains the legacy `selfmem_canary` id.
 - [ ] Docs do not expose private agent names, raw memories, raw diagnostics, or
   credentials.
-- [ ] Benchmark notes are metrics-only and include claim boundaries.
+- [ ] The public surface is compact: large review-evidence piles are collapsed,
+  moved out of the public tree, or represented by metrics-only summaries.
+- [ ] While the Codex bridge is in reset or rewired controlled dogfood, public
+  release remains blocked by `codex-memory-controlled-dogfood-active`;
+  `codex:memory-reset-health` may allow controlled dogfood, but it is not
+  launch approval.
+- [ ] Automatic Codex prompt injection is not re-enabled until controlled
+  dogfood proves unrelated prompts retrieve no memory, task prompts retrieve
+  directly relevant context only, explicit writes work, and post-boundary recall
+  is inspectable.
+- [ ] Benchmark notes are metrics-only and say public scores require a matched
+  source-locked canary win, same judge/settings, zero privacy failures, and
+  reviewer sign-off.
+- [ ] Benchmark notes distinguish retrieval-proxy evidence from end-to-end
+  answer-quality evidence and name `benchmark:answer-quality:arms`,
+  `benchmark:answer-quality:preflight`, `benchmark:answer-quality`, and
+  `benchmark:memory-score:reviewer-intake`, and
+  `benchmark:memory-score:result-gate --require-ready` as the required
+  conversion path before SOTA or MemoryBench-style language.
+- [ ] Live answer-quality results are labeled as incomplete SOTA evidence until
+  the same-data Voyage arm, exact-packet reviewer approvals, owner approval,
+  and real rollout gates all pass. Current reviewer approvals do not replace a
+  missing Voyage result.
+- [ ] If Voyage was previously rate-limited, rerun the minimum Voyage
+  answer-quality retry flow from the SOTA operator packet, combine it with the
+  existing same-data answer-quality reports, and rerun the provider-challenger,
+  memory-score, and SOTA-ladder gates before changing public wording.
+- [ ] Broad SOTA or production-replacement wording uses the full 500-query
+  LongMemEval answer-quality target, either as one run or as complete
+  non-overlapping `--query-offset` / `--max-queries` shards accepted by
+  `benchmark:answer-quality:shard-workorder`, accepted by
+  `benchmark:answer-quality:shard-intake`, and then merged with
+  `benchmark:answer-quality:combine -- --combine-mode shards`.
+- [ ] Local-full diagnostic wording uses either a complete 500-query combined
+  local-full result or clearly states the exact shard coverage. The first
+  checked-in local-full shard is 25 of 500 queries and remains blocked on
+  nineteen missing shards; shard 002 is a blocked runtime attempt, not
+  accepted evidence.
+- [ ] Local Apple local-full shard retries either reuse the current ready
+  `benchmark:local-embedding:runtime-doctor -- --require-ready` report while
+  the same endpoint is alive, or refresh it before response-arm export.
+- [ ] Local Apple local-full shard retries have a ready
+  `benchmark:local-embedding:durability -- --require-ready` report before
+  response-arm export; the report must stay synthetic-only and public-safe.
+  The shard workorder response export command must keep the local embedding
+  endpoint, local rerank endpoint, durability report, and required durability
+  flag placeholders in place.
+- [ ] `benchmark:memory-score:result-gate --require-ready` has an empty
+  `fullSotaBlockers` list, proving the result meets the selected source-locked
+  reported memory-system target under matching benchmark and judge semantics.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans
@@ -19,6 +68,7 @@ Use this checklist before making the repository public.
   diagnostics files.
 - [ ] `git diff --check` is clean.
 - [ ] Remote URL does not contain a token.
+- [ ] `pnpm release:check` passes.
 
 ## Tests
 
@@ -26,13 +76,32 @@ Use this checklist before making the repository public.
 - [ ] `pnpm typecheck`
 - [ ] `pnpm smoke:openclaw`
 - [ ] `pnpm smoke:hermes`
+- [ ] `pnpm smoke`
+- [ ] `pnpm compaction:benchmark` if compaction changed.
+- [ ] `pnpm wiki:sync:smoke` if vault sync changed.
 
 ## Review
 
 - [ ] Security review completed.
 - [ ] Docs clarity review completed.
 - [ ] Release claim review completed.
+- [ ] `pnpm release:doctor` shows
+  `codex-memory-controlled-dogfood-active`,
+  `full-memory-sota-benchmark-gate-incomplete`, and the real canary blocker
+  until controlled dogfood, the full same-data answer-quality shard ladder,
+  reviewer gate, owner approval, and real canary are complete. It must keep
+  `public-review-surface-collapse-required` absent only when `.gitattributes`
+  hides `reviews/` from release archives and `docs/PUBLIC_EVIDENCE_INDEX.md`
+  remains compact and public-safe.
 - [ ] Any `CONCERNS` decision has an explicit acceptance note.
+- [ ] Public live-update draft says whether the release is production ready or
+  alpha only.
+- [ ] Dummy-data demo storyboard exists and forbids private memory footage.
+- [ ] `docs/UPDATE_FLOW.md` documents the built-in update command,
+  public-safe verification, visibility criteria, and canary gate.
+- [ ] If GitHub automation cannot update the PR body or create blocker issues,
+  the owner has either completed the product update-flow steps or accepted the missing
+  GitHub updates in writing.
 
 ## Publish
 

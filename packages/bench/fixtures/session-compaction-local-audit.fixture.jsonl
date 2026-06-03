@@ -1,0 +1,6 @@
+{"id":"local-001","role":"user","timestamp":"2026-05-22T09:00:00.000Z","content":"Preference: keep local session compaction metrics-only by default and never print raw session text in public artifacts."}
+{"id":"local-002","role":"assistant","timestamp":"2026-05-22T09:01:00.000Z","content":"Decision: the local audit harness should emit candidate fingerprints, kind counts, chronological bounds, salience bands, and privacy counts without candidate text."}
+{"id":"local-003","role":"user","timestamp":"2026-05-22T09:02:00.000Z","content":"ok thanks"}
+{"id":"local-004","role":"assistant","timestamp":"2026-05-22T09:03:00.000Z","content":"Fix: exact identifier RW-AUDIT-20260522 is preserved in the private candidate stream while the public audit output keeps only metrics."}
+{"id":"local-005","role":"user","timestamp":"2026-05-22T09:04:00.000Z","content":"Procedure: run local-session compaction audit privately before converting real Codex or Claude sessions into durable memories."}
+{"id":"local-006","role":"assistant","timestamp":"2026-05-22T09:05:00.000Z","content":"Never print <private>fixture private session note</private> or <private>fixture private provider key</private> in public local-session audit output."}

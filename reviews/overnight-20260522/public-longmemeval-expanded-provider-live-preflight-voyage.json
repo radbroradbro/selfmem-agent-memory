@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "provider-benchmark-live-preflight",
+  "status": "BLOCKED_PROVIDER_ENV",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicSafe": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "printsCredentials": false,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:ff2d46f0d29aa8cb4345848c6c07c6af7f74365b72698872aaf6239bff5cdef4",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "querySelectionPolicyHash": "sha256:b24524da13771152c315c7890859c678fd1310b4d997abc000fb090e003c6b9b",
+    "answerLabelsHash": "sha256:d3c1473f98dba689c34f022ad0ed88097fc1ec097364e10749ff78714af242dc",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "memoryMethod": "session-v1",
+  "materializationContract": {
+    "enabled": false,
+    "ok": true,
+    "skipped": true,
+    "reason": "not-requested"
+  },
+  "strategies": [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "cloud-voyage4-voyage"
+  ],
+  "requiredProviders": [
+    "voyage"
+  ],
+  "providerCallsEnabled": false,
+  "publicDataConfirmed": false,
+  "providerBudget": {
+    "schemaVersion": 1,
+    "kind": "provider-budget-contract",
+    "benchmarkKind": "provider-benchmark-live-preflight",
+    "fixtureOnly": false,
+    "mode": "no-spend-free-tier",
+    "noSpendMode": true,
+    "maxPaidUsd": 0,
+    "maxPaidUsdSource": "default-zero",
+    "providerCallsEnabled": false,
+    "publicDataConfirmed": false,
+    "allowedProviders": [
+      "alibaba",
+      "deepseek",
+      "gemini",
+      "jina",
+      "local-apple",
+      "local-rerank",
+      "nvidia",
+      "openrouter",
+      "voyage"
+    ],
+    "disallowedIfPaid": [
+      "cohere",
+      "openai",
+      "pinecone",
+      "zeroentropy"
+    ],
+    "requiredProviders": [
+      "voyage"
+    ],
+    "requiredProvidersWithinAllowed": true,
+    "unknownProviderFamiliesRequested": [],
+    "paidProviderRequestedInNoSpendMode": false,
+    "paidProviderFamiliesRequested": [],
+    "keyRotation": {
+      "allowed": true,
+      "purpose": "cost isolation, reliability, and free-credit usage",
+      "sameProviderOnly": true,
+      "neverSwitchModelsWithinArm": true,
+      "doNotBypassProviderTermsOrPublishedLimits": true,
+      "stopOnRateLimitInsteadOfSwitchingArms": true
+    },
+    "cachePolicy": {
+      "cacheEmbeddings": true,
+      "cacheRerankScores": true,
+      "reuseCachedProviderOutputsBeforeFullWave": true,
+      "cacheKeyMustIncludeProviderModelDimensionsAndPayloadHash": true,
+      "rawProviderPayloadsMayNotBeWrittenToPublicEvidence": true
+    },
+    "fallbackPolicy": {
+      "crossProviderFallbackEnabled": false,
+      "failedProviderArmStaysFailedForThatRun": true,
+      "rerunAsSeparateArmOnly": true
+    },
+    "rateLimitPolicy": {
+      "sourceOfTruth": "provider dashboard, provider response headers, or explicit environment throttles",
+      "throttleScope": "provider",
+      "keyScopedThrottleEnabled": false,
+      "globalMinIntervalMs": 0,
+      "retryAttempts": 4,
+      "timeoutMs": 60000
+    },
+    "reportRules": {
+      "metricsOnly": true,
+      "publicSafeEvidenceOnly": true,
+      "providerValuesPrinted": false,
+      "rawQuestionsIncluded": false,
+      "rawAnswersIncluded": false,
+      "rawMemoryIncluded": false,
+      "rawTranscriptIncluded": false
+    },
+    "configHashes": {
+      "benchBudget": "sha256:2c38fa9e74119c599dcf85930420dafa55d88a09702e62740bab1ac847970813",
+      "providerMatrix": "sha256:45b195182407993e1f0efae856483e222371ac26bda83305a9d6ca94170da497",
+      "defaultCloud": "sha256:d460e2497b3939889effa8bdc598f91e4d632ab54752f024232ca108bb57e948",
+      "providerAdapterRegistry": "sha256:412f54fca3d8ce0fa4293b43a432933dfd299b9bbecb9f8c3066bf59b077a67c",
+      "benchmarkTargetLock": "sha256:7676a040930694899c0975ad3ed8d7a2a11517b990703793788b77dabcf261cc"
+    },
+    "blockers": []
+  },
+  "credentialPresence": {
+    "voyage": {
+      "present": false,
+      "keyCount": 0,
+      "envNames": [
+        "VOYAGE_API_KEY",
+        "VOYAGE_API_KEYS",
+        "VOYAGE_API_KEY_FILE",
+        "VOYAGE_API_KEYS_FILE"
+      ]
+    }
+  },
+  "providerExecutionPolicy": {
+    "throttleScope": "provider",
+    "keyScopedThrottleEnabled": false,
+    "retryAttempts": 4,
+    "timeoutMs": 60000,
+    "globalMinIntervalMs": 0,
+    "providers": {
+      "voyage": {
+        "minIntervalMs": 0,
+        "keyCount": 0
+      }
+    }
+  },
+  "missingCredentialProviders": [
+    "voyage"
+  ],
+  "singleProviderArmReady": true,
+  "liveRunAllowed": false,
+  "blockers": [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+    "voyage-credentials-missing"
+  ],
+  "nextActions": [
+    "Set provider credentials only in the shell environment, never in committed files.",
+    "Set RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 and RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 only for public benchmark slices.",
+    "Re-run this preflight before spending provider calls."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+    "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=key",
+    "RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS=<optional-provider-or-key-paced-ms>",
+    "VOYAGE_API_KEY=<env-only-voyage-key>",
+    "VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage"
+  ]
+}

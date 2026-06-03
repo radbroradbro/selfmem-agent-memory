@@ -1,0 +1,3 @@
+reviews/** export-ignore
+.goal-loop-review/** export-ignore
+.automation-worktrees/** export-ignore

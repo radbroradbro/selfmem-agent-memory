@@ -1,0 +1,395 @@
+{
+  "ok": true,
+  "mode": "brain-ui-current-head-live-browser-refresh",
+  "generatedAt": "2026-05-28T21:54:12.688Z",
+  "url": "http://127.0.0.1:4189/",
+  "screenshot": "reviews/overnight-20260522/ui-evidence/brain-ui-current-head-live-20260528-refresh.png",
+  "publicSafe": true,
+  "fixtureOnly": true,
+  "privateDataExpected": false,
+  "consoleIssueCount": 0,
+  "consoleIssues": [],
+  "uiState": {
+    "controlCount": 57,
+    "controls": [
+      {
+        "disabled": false,
+        "label": "Search Nucleus graph",
+        "tag": "input",
+        "type": "search"
+      },
+      {
+        "disabled": false,
+        "label": "All",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Memory",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Docs",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Trace",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Research",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Lifecycle",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "All",
+        "tag": "button",
+        "type": "button"
+      },
+      {
+        "disabled": false,
+        "label": "Neighborhood",
+        "tag": "button",
+        "type": "button"
+      },
+      {
+        "disabled": false,
+        "label": "Jump to Nucleus node",
+        "tag": "select",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Center",
+        "tag": "button",
+        "type": "button"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "number"
+      },
+      {
+        "disabled": false,
+        "label": "Low-confidence write action",
+        "tag": "select",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Stage policy",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local lifecycle policy path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local lifecycle policy confirmation phrase",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Apply policy",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Stage review",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local review queue path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local review queue confirmation phrase",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Apply review",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Compiled wiki vault file",
+        "tag": "select",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Selected local vault path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Preview sync",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local vault apply path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local vault apply confirmation phrase",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Apply sync",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local container browse path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local browse max items",
+        "tag": "input",
+        "type": "number"
+      },
+      {
+        "disabled": false,
+        "label": "Browse entries",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit source file",
+        "tag": "select",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit line",
+        "tag": "input",
+        "type": "number"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit source id",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit action",
+        "tag": "select",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit reason",
+        "tag": "select",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit replacement text",
+        "tag": "textarea",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory edit confirmation phrase",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Apply edit",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory materialize path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local memory materialize confirmation phrase",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "Materialize edits",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Selected local container path",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "disabled": false,
+        "label": "",
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "disabled": false,
+        "label": "Audit",
+        "tag": "button",
+        "type": "submit"
+      },
+      {
+        "disabled": false,
+        "label": "Derived document editor",
+        "tag": "textarea",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Save fixture edit",
+        "tag": "button",
+        "type": null
+      },
+      {
+        "disabled": false,
+        "label": "Reset",
+        "tag": "button",
+        "type": null
+      }
+    ],
+    "disabledControlCount": 0,
+    "hasBenchmarkDashboard": true,
+    "hasBrain": false,
+    "hasCompactionAudit": true,
+    "hasLocalAuditGuard": false,
+    "hasNucleus": true,
+    "hasRecallWeave": true,
+    "hasReleaseReadiness": true,
+    "hasWikiVault": true,
+    "headings": [
+      "Container",
+      "Update Flow",
+      "Nucleus",
+      "Timeline",
+      "Loading",
+      "Provenance",
+      "Lifecycle Trail",
+      "Nucleus Snapshot",
+      "Research Lineage",
+      "Research Source Lock",
+      "Model Matrix",
+      "Compaction Audit",
+      "Benchmark Dashboard",
+      "Canary Rollout",
+      "Context Preview",
+      "Release Readiness",
+      "Lifecycle Policy",
+      "Review Queue",
+      "Wiki Vault Preview",
+      "Vault Sync Report",
+      "Local Audit Preflight",
+      "Derived Doc Editor"
+    ],
+    "textLength": 1693,
+    "title": "RecallWeave Brain",
+    "url": "http://127.0.0.1:4189/"
+  }
+}

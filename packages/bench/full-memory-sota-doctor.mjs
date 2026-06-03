@@ -1,0 +1,2099 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("../..", import.meta.url));
+const args = parseArgs(process.argv.slice(2));
+const reviewDir = args.reviewDir ?? "reviews/overnight-20260522";
+const outputPath = args.output ? resolveInputPath(args.output) : null;
+const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
+const format = String(args.format ?? "json").toLowerCase();
+
+assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+
+const files = {
+  fullTarget: `${reviewDir}/public-longmemeval-full-run-target.json`,
+  fullMaterialize: `${reviewDir}/public-longmemeval-full-materialize-run.json`,
+  shardPlan: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
+  localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
+  localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
+  localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
+  localFullShardIntakeAfterShard020: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-020-20260529.json`,
+  localFullShardIntakeAfterShard019: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-019-20260529.json`,
+  localFullShardIntakeAfterShard018: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-018-20260529.json`,
+  localFullShardIntakeAfterShard017: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-017-20260529.json`,
+  localFullShardIntakeAfterShard016: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-016-20260529.json`,
+  localFullShardIntakeAfterShard015: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-015-20260529.json`,
+  localFullShardIntakeAfterShard014: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-014-20260528.json`,
+  localFullShardIntakeAfterShard013: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-013-20260528.json`,
+  localFullShardIntakeAfterShard012: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-012-20260528.json`,
+  localFullShardIntakeAfterShard011: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-011-20260528.json`,
+  localFullShardIntakeAfterShard010: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-010-20260528.json`,
+  localFullShardIntakeAfterShard009: preferReviewFile(
+    "answer-quality-local-full-shard-intake-after-shard-009-common-arm-20260528.json",
+    "answer-quality-local-full-shard-intake-after-shard-009-20260528.json",
+  ),
+  localFullShardIntakeAfterShard008: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-008-20260527.json`,
+  localFullShardIntakeAfterShard007: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-007-20260527.json`,
+  localFullShardIntakeAfterShard006: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-006-20260527.json`,
+  localFullShardIntakeAfterShard005: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-005-common-arm-20260527.json`,
+  localFullShardIntakeAfterShard004: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-004-20260527.json`,
+  localFullShardIntakeAfterShard003: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-003-20260527.json`,
+  localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
+  localFullShardIntakeAfterShard001: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
+  localFullPerformanceReport: preferReviewFile(
+    "local-full-shard-performance-report-after-shard-020-20260529.json",
+    "local-full-shard-performance-report-after-shard-019-20260529.json",
+    "local-full-shard-performance-report-after-shard-018-20260529.json",
+    "local-full-shard-performance-report-after-shard-017-20260529.json",
+    "local-full-shard-performance-report-after-shard-016-20260529.json",
+    "local-full-shard-performance-report-after-shard-015-20260529.json",
+    "local-full-shard-performance-report-after-shard-014-20260528.json",
+    "local-full-shard-performance-report-after-shard-013-20260528.json",
+    "local-full-shard-performance-report-after-shard-012-20260528.json",
+    "local-full-shard-performance-report-after-shard-011-20260528.json",
+    "local-full-shard-performance-report-after-shard-010-20260528.json",
+    "local-full-shard-performance-report-after-shard-009-common-arm-20260528.json",
+    "local-full-shard-performance-report-after-shard-009-20260528.json",
+    "local-full-shard-performance-report-20260527.json",
+    "local-full-shard-performance-report-20260526.json",
+  ),
+  localFullCombinedScore: preferReviewFile(
+    "end-to-end-memory-score-local-full-combined-20260531.json",
+    "end-to-end-memory-score-local-full-combined-20260529.json",
+    "end-to-end-memory-score-local-full-combined.json",
+  ),
+  localFullMemoryScoreGate: preferReviewFile(
+    "end-to-end-memory-score-local-full-gate-20260531.json",
+    "end-to-end-memory-score-local-full-combined-gate-20260529.json",
+    "end-to-end-memory-score-local-full-gate.json",
+  ),
+  localFullResumeEnvDoctor: preferReviewFile(
+    "local-full-shard-003-resume-env-doctor-20260527.json",
+    "local-full-shard-002-resume-env-doctor-20260526.json",
+  ),
+  localFullResumeCommandSecurity: `${reviewDir}/local-full-shard-003-resume-command-security-20260526.json`,
+  localFullResumeResultDoctor: `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
+  localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+  localFullShard003RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
+  localEmbeddingRuntimeDoctor: preferReviewFile(
+    "local-embedding-runtime-doctor-20260527.json",
+    "local-embedding-runtime-doctor-20260526.json",
+  ),
+  localEmbeddingDurabilitySmoke: preferReviewFile(
+    "local-embedding-durability-smoke-20260527.json",
+    "local-embedding-durability-smoke-20260526.json",
+  ),
+  localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
+  privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
+  acceptedLaneLaunchDoctor: preferReviewFile(
+    "full-shard-accepted-lane-launch-doctor-consented-provider-env-20260531.json",
+    "full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
+    "full-shard-accepted-lane-launch-doctor-20260526.json",
+  ),
+  acceptedLaneLaunchDoctorNoEnv: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
+  controlPreflight: `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
+  shardWorkorder: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
+  shardIntake: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
+  sotaLadder: `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
+  sotaOperatorPacket: `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.json`,
+  endToEndGate: `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
+  combinedCanary: `${reviewDir}/end-to-end-memory-score-combined-20260525.json`,
+  liveLocalCanary: `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
+  liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
+  providerWaveIntake: `${reviewDir}/provider-wave-intake-20260531.json`,
+  modelChallengerMemoryScoreGate: preferReviewFile(
+    "memory-score-model-challenger-contextual-source-shard-001-all-arms-local-deepseek-v4-flash-gate-20260603.json",
+    "memory-score-model-challenger-contextual-source-shard-001-with-dense-direct-deepseek-rerun-gate-20260603.json",
+    "memory-score-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-result-gate-20260603.json",
+    "memory-score-model-challenger-contextual-source-shard-001-deepseek-v4-flash-result-gate-20260603.json",
+  ),
+  modelChallengerAnswerQuality: preferReviewFile(
+    "answer-quality-model-challenger-contextual-source-shard-001-all-arms-local-deepseek-v4-flash-20260603.json",
+    "answer-quality-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-20260603.json",
+    "answer-quality-model-challenger-contextual-source-shard-001-deepseek-v4-flash-20260603.json",
+  ),
+  methodLadderResultGate: preferReviewFile(
+    "answer-quality-memory-method-ladder-150q-combined-tolerant-result-gate-20260603.json",
+    "answer-quality-memory-method-ladder-100q-combined-result-gate-20260603.json",
+    "answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
+    "answer-quality-memory-method-ladder-60q-result-gate-20260531.json",
+    "answer-quality-memory-method-ladder-30q-result-gate-20260531.json",
+  ),
+  voyageRateLimit: `${reviewDir}/voyage-provider-rate-limit-20260525.json`,
+  reviewerIntake: `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
+  uiEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
+  releaseNotes: `${reviewDir}/pr-body-update-draft.md`,
+  benchmarkDocs: "docs/BENCHMARK_SUMMARY.md",
+  targetDocs: "docs/PUBLIC_BENCHMARK_TARGETS.md",
+  updateFlow: "docs/UPDATE_FLOW.md",
+};
+
+const evidence = Object.fromEntries(Object.entries(files).map(([key, file]) => [key, loadFile(file)]));
+const goalAudit = runJson(["packages/bench/goal-completion-audit.mjs"]);
+
+const fullTarget = evidence.fullTarget.json;
+const fullMaterialize = evidence.fullMaterialize.json;
+const shardPlan = evidence.shardPlan.json;
+const localFullShardPlan = evidence.localFullShardPlan.json;
+const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
+const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
+  evidence.localFullShardIntake,
+  evidence.localFullShardIntakeAfterShard020,
+  evidence.localFullShardIntakeAfterShard019,
+  evidence.localFullShardIntakeAfterShard018,
+  evidence.localFullShardIntakeAfterShard017,
+  evidence.localFullShardIntakeAfterShard016,
+  evidence.localFullShardIntakeAfterShard015,
+  evidence.localFullShardIntakeAfterShard014,
+  evidence.localFullShardIntakeAfterShard013,
+  evidence.localFullShardIntakeAfterShard012,
+  evidence.localFullShardIntakeAfterShard011,
+  evidence.localFullShardIntakeAfterShard010,
+  evidence.localFullShardIntakeAfterShard009,
+  evidence.localFullShardIntakeAfterShard008,
+  evidence.localFullShardIntakeAfterShard007,
+  evidence.localFullShardIntakeAfterShard006,
+  evidence.localFullShardIntakeAfterShard005,
+  evidence.localFullShardIntakeAfterShard004,
+  evidence.localFullShardIntakeAfterShard003,
+  evidence.localFullShardIntakeLatest,
+  evidence.localFullShardIntakeAfterShard001,
+]);
+const localFullShardIntake = localFullShardIntakeSelection.json;
+const localFullPerformanceReport = evidence.localFullPerformanceReport.json;
+const localFullCombinedScoreEvidence = evidence.localFullCombinedScore;
+const localFullMemoryScoreGateEvidence = evidence.localFullMemoryScoreGate;
+const localFullResumeEnvDoctor = evidence.localFullResumeEnvDoctor.json;
+const localFullResumeCommandSecurity = evidence.localFullResumeCommandSecurity.json;
+const localFullResumeResultDoctor = evidence.localFullResumeResultDoctor.json;
+const localFullShard002RuntimeBlocker = evidence.localFullShard002RuntimeBlocker.json;
+const localFullShard003RuntimeBlocker = evidence.localFullShard003RuntimeBlocker.json;
+const localEmbeddingRuntimeDoctor = evidence.localEmbeddingRuntimeDoctor.json;
+const localEmbeddingDurabilitySmoke = evidence.localEmbeddingDurabilitySmoke.json;
+const localFullAcceptedLaneLaunchDoctor = evidence.localFullAcceptedLaneLaunchDoctor.json;
+const privateInputDoctor = evidence.privateInputDoctor.json;
+const acceptedLaneLaunchDoctor = evidence.acceptedLaneLaunchDoctor.json;
+const acceptedLaneLaunchDoctorNoEnv = evidence.acceptedLaneLaunchDoctorNoEnv.json;
+const controlPreflight = evidence.controlPreflight.json;
+const shardWorkorder = evidence.shardWorkorder.json;
+const shardIntake = evidence.shardIntake.json;
+const sotaLadder = evidence.sotaLadder.json;
+const sotaOperatorPacket = evidence.sotaOperatorPacket.json;
+const endToEndGate = evidence.endToEndGate.json;
+const combinedCanary = evidence.combinedCanary.json;
+const providerWaveIntake = evidence.providerWaveIntake.json;
+const voyageRateLimit = evidence.voyageRateLimit.json;
+const reviewerIntake = evidence.reviewerIntake.json;
+const uiEvidence = evidence.uiEvidence.json;
+
+const rawRetention = inspectRawSourceRetention(fullMaterialize);
+const controlPreflightState = inspectControlPreflightState(controlPreflight);
+const acceptedLaneLaunchState = inspectAcceptedLaneLaunchState(acceptedLaneLaunchDoctor, {
+  evidencePath: evidence.acceptedLaneLaunchDoctor.path,
+  noEnvReport: acceptedLaneLaunchDoctorNoEnv,
+  noEnvPath: evidence.acceptedLaneLaunchDoctorNoEnv.path,
+});
+const shardState = inspectShardState({ shardPlan, shardWorkorder, shardIntake, acceptedLaneLaunchState });
+const localFullLaneState = inspectLocalFullLaneState({
+  localFullShardPlan,
+  localFullShardWorkorder,
+  localFullShardIntake,
+  localFullShardIntakePath: localFullShardIntakeSelection.path,
+  localFullPerformanceReport,
+  localFullCombinedScoreEvidence,
+  localFullMemoryScoreGateEvidence,
+  localFullResumeEnvDoctor,
+  localFullResumeCommandSecurity,
+  localFullResumeResultDoctor,
+  localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker, localFullShard003RuntimeBlocker],
+  localEmbeddingRuntimeDoctor,
+  localEmbeddingDurabilitySmoke,
+  localFullAcceptedLaneLaunchDoctor,
+  acceptedLaneLaunchState,
+});
+const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
+const providerWaveState = inspectProviderWaveIntake(providerWaveIntake);
+const modelChallengerState = inspectModelChallengerMemoryScore(
+  evidence.modelChallengerMemoryScoreGate,
+  evidence.modelChallengerAnswerQuality,
+);
+const methodLadderState = inspectMethodLadderResultGate(evidence.methodLadderResultGate);
+const reviewerState = inspectReviewerState(reviewerIntake);
+const docState = inspectDocs(evidence);
+const sotaOperatorPacketBlockers = filterSupersededProviderCredentialBlockers(
+  arrayOf(sotaOperatorPacket?.blockers),
+  acceptedLaneLaunchState,
+);
+
+const gates = [
+  gate("source-locked-full-target", fullTarget?.fixtureOnly === false && Number(fullMaterialize?.selection?.queryCount ?? 0) === 500, [
+    "missing-or-non-live-full-target",
+    "full-target-query-count-not-500",
+  ]),
+  gate("raw-source-retention", rawRetention.retainsRawSourcesPrivately && rawRetention.publicReportIsSafe, [
+    "raw-sources-not-retained-privately",
+    "raw-source-public-report-not-safe",
+  ]),
+  gate("full-shard-private-inputs", privateInputDoctor?.readyForAnswerQualityShardRun === true, privateInputDoctor?.blockers ?? [
+    "full-shard-private-input-doctor-not-ready",
+  ]),
+  gate("accepted-sota-lane-launch-readiness", acceptedLaneLaunchDoctor?.launchGate?.readyForFirstAcceptedShardRun === true, acceptedLaneLaunchDoctor?.blockers ?? [
+    "accepted-sota-lane-launch-doctor-not-ready",
+  ]),
+  gate(
+    "accepted-lane-cloud-provider-env",
+    acceptedLaneLaunchState.providerCredentialEvidenceReady,
+    acceptedLaneLaunchState.providerCredentialEvidenceBlockers,
+  ),
+  gate("full-shard-control-preflight", controlPreflightState.sameDataShardReady, controlPreflightState.blockers),
+  gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
+    "bm25-control-contract-missing",
+  ]),
+  gate("local-full-benchmark-lane", localFullLaneState.readyForLocalFullBenchmarkPlan, localFullLaneState.blockers),
+  gate("local-full-launch-readiness", localFullLaneState.readyForFirstShardRun, localFullLaneState.launchBlockers),
+  gate("local-embedding-runtime", localFullLaneState.localEmbeddingRuntimeReady, localFullLaneState.localEmbeddingRuntimeBlockers),
+  gate("local-embedding-durability", localFullLaneState.localEmbeddingDurabilityReady, localFullLaneState.localEmbeddingDurabilityBlockers),
+  gate("local-full-shard-intake", localFullLaneState.readyForShardCombine, localFullLaneState.shardIntakeBlockers),
+  gate(
+    "local-full-performance-snapshot",
+    localFullLaneState.performanceReport.evidenceReady,
+    localFullLaneState.performanceReport.evidenceBlockers,
+  ),
+  gate(
+    "local-full-combined-memory-score",
+    localFullLaneState.memoryScoreGate.evidenceReady,
+    localFullLaneState.memoryScoreGate.evidenceBlockers,
+  ),
+  gate(
+    "local-full-resume-env",
+    localFullLaneState.resumeEnv.evidenceReady,
+    localFullLaneState.resumeEnv.evidenceBlockers,
+  ),
+  gate(
+    "local-full-resume-command-security",
+    localFullLaneState.resumeCommandSecurity.evidenceReady,
+    localFullLaneState.resumeCommandSecurity.evidenceBlockers,
+  ),
+  gate(
+    "local-full-resume-result",
+    localFullLaneState.resumeResult.evidenceGateReady,
+    localFullLaneState.resumeResult.evidenceBlockers,
+  ),
+  gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
+  gate("provider-wave-intake", providerWaveState.evidenceReady, providerWaveState.evidenceBlockers),
+  gate("method-ladder-result-gate", methodLadderState.evidenceReady, methodLadderState.evidenceBlockers),
+  gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
+    "missing-voyage-answer-quality-same-data-result",
+  ]),
+  gate("full-score-result-gate", endToEndGate?.countsAsFullMemorySotaEvidence === true, endToEndGate?.fullSotaBlockers ?? endToEndGate?.blockers ?? []),
+  gate("reported-target-beaten", sotaLadder?.reportedTargetComparison?.meetsPrimaryReportedTarget === true, [
+    "best-end-to-end-score-below-reported-supermemory-target",
+  ]),
+  gate("independent-reviewers", reviewerState.ready, reviewerState.blockers),
+  gate("ui-docs-release-refresh", docState.readyAfterBenchmarkResult, docState.blockers),
+  gate("owner-and-real-canary", goalAudit.goalComplete === true, [
+    ...goalAudit.requirements?.filter((item) => item.status !== "proven").map((item) => item.id) ?? [],
+  ]),
+];
+
+const blockers = [
+  ...new Set([
+    ...gates.flatMap((item) => (item.status === "pass" ? [] : item.blockers)),
+    ...sotaOperatorPacketBlockers.activeBlockers,
+  ]),
+].filter(Boolean);
+
+const report = {
+  schemaVersion: 1,
+  ok: true,
+  mode: "full-memory-sota-doctor",
+  status: blockers.length === 0 ? "READY_FOR_REVIEWED_FULL_MEMORY_SOTA_CLAIM" : "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
+  generatedAt: new Date().toISOString(),
+  reviewDir,
+  metricsOnly: true,
+  publicSafe: true,
+  writesRealFiles: Boolean(outputPath || markdownOutputPath),
+  callsProviderApis: false,
+  sendsBenchmarkTextToProvider: false,
+  rawQuestionIdsIncluded: false,
+  rawQuestionsIncluded: false,
+  rawAnswersIncluded: false,
+  rawMemoryIncluded: false,
+  rawTranscriptIncluded: false,
+  rawPrivateOutputPathIncluded: false,
+  publicBenchmarkClaimsAllowed: blockers.length === 0,
+  countsAsFullMemorySotaEvidence: blockers.length === 0,
+  benchmarkContract: {
+    primaryScoreName: "whole-harness-agent-memory-answer-quality",
+    primaryScoreRequiresPluginActor: true,
+    primaryScoreRequiresExplicitMemoryWrites: true,
+    primaryScoreRequiresPostBoundaryRecall: true,
+    primaryScoreRequiresSessionWikiTopicMaps: true,
+    benchmarkContainersMustBeIsolatedFromLiveResearch: true,
+    privateWorkspaceRequiredForRawResearchState: true,
+    supermemoryComparisonSurface: "plugin-to-plugin-agent-memory-layer",
+    diagnosticsAreNotAlternateScoreboards: true,
+    bm25IsLexicalFloorOnly: true,
+    retrievalProxyOnlyIsNotEnough: true,
+    componentBenchmarksAreModelSelectionOnly: true,
+    benchmarkHarnessSourceOnlyIsNotAScore: true,
+    providerWavesAreRetrievalGateOnly: true,
+    fullMemoryAnswerQualityRequired: true,
+    sameDataExternalTargetRequired: true,
+    sameAnswerAndJudgeModelRequired: true,
+    reviewerApprovalRequired: true,
+    uiDocsOwnerAndRealCanaryStillRequired: true,
+  },
+  evidenceFiles: summarizeEvidence(evidence),
+  goalAudit: {
+    mode: goalAudit.mode,
+    goalComplete: goalAudit.goalComplete,
+    mayCallUpdateGoalComplete: goalAudit.mayCallUpdateGoalComplete,
+    counts: goalAudit.counts,
+    openRequirements: goalAudit.requirements?.filter((item) => item.status !== "proven").map((item) => ({
+      id: item.id,
+      status: item.status,
+      requirement: item.requirement,
+    })),
+  },
+  fullTarget: {
+    path: files.fullTarget,
+    hash: evidence.fullTarget.hash,
+    fixtureOnly: fullTarget?.fixtureOnly ?? null,
+    claimTier: fullTarget?.claimTier ?? null,
+    benchmarkFamily: fullTarget?.benchmark?.family ?? fullTarget?.benchmark?.name ?? null,
+    split: fullTarget?.benchmark?.split ?? null,
+    answerModel: fullTarget?.answerModel ?? fullTarget?.target?.answerModel ?? fullMaterialize?.target?.answerModel ?? null,
+    judgeModel: fullTarget?.judgeModel ?? fullTarget?.target?.judgeModel ?? fullMaterialize?.target?.judgeModel ?? null,
+    queryCount: Number(fullMaterialize?.selection?.queryCount ?? shardPlan?.runPlan?.queryCount ?? 0),
+    haystackSessionCount: Number(fullMaterialize?.selection?.haystackSessionCount ?? 0),
+    expectedReferenceCount: Number(fullMaterialize?.selection?.expectedResultRefCount ?? 0),
+  },
+  reportedTargets: inspectReportedTargets(sotaLadder),
+  rawSourceRetention: rawRetention,
+  privateInputState: inspectPrivateInputState(privateInputDoctor),
+  acceptedLaneLaunchState,
+  sotaOperatorPacketState: {
+    path: files.sotaOperatorPacket,
+    originalBlockerCount: sotaOperatorPacketBlockers.originalBlockerCount,
+    activeBlockerCount: sotaOperatorPacketBlockers.activeBlockers.length,
+    supersededProviderCredentialBlockers: sotaOperatorPacketBlockers.supersededProviderCredentialBlockers,
+  },
+  controlPreflightState,
+  shardState,
+  localFullLaneState,
+  currentCanary,
+  providerWaveState,
+  modelChallengerState,
+  methodLadderState,
+  reviewerState,
+  docState,
+  gates,
+  blockers,
+  nextRunPlan: buildNextRunPlan({ shardPlan, sotaOperatorPacket }),
+};
+
+const jsonText = `${JSON.stringify(report, null, 2)}\n`;
+const markdownText = `${renderMarkdown(report)}\n`;
+assertSafePublicText(jsonText, "full memory SOTA doctor report");
+assertSafePublicText(markdownText, "full memory SOTA doctor markdown");
+
+if (outputPath) writeOutput(outputPath, jsonText);
+if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
+process.stdout.write(format === "markdown" ? markdownText : jsonText);
+
+function inspectRawSourceRetention(materializeReport) {
+  const retention = materializeReport?.sourceRetention ?? {};
+  const privateFiles = materializeReport?.privateOutputs?.files ?? [];
+  const roles = privateFiles.map((item) => ({
+    role: item.role,
+    name: item.name,
+    hash: item.hash,
+    rawTextPrivate: Boolean(item.rawTextPrivate),
+  }));
+  const requiredRoles = ["queryset", "memories", "answer-labels", "raw-dataset", "selected-raw-rows", "source-manifest"];
+  const presentRoles = new Set(roles.map((item) => item.role));
+  const missingRoles = requiredRoles.filter((role) => !presentRoles.has(role));
+  return {
+    retainsRawSourcesPrivately:
+      retention.rawDatasetRetainedPrivate === true &&
+      retention.selectedRawRowsRetainedPrivate === true &&
+      retention.sourceManifestRetainedPrivate === true &&
+      missingRoles.length === 0,
+    publicReportIsSafe:
+      materializeReport?.rawQuestionsIncluded === false &&
+      materializeReport?.rawAnswersIncluded === false &&
+      materializeReport?.rawMemoryIncluded === false &&
+      materializeReport?.rawPrivateOutputPathIncluded === false &&
+      retention.rawTextPubliclyIncluded === false &&
+      retention.privateOutputPathIncluded === false,
+    privateOutputDirectoryLabel: materializeReport?.privateOutputs?.directoryLabel ?? null,
+    directoryInsideRepository: Boolean(materializeReport?.privateOutputs?.directoryInsideRepository),
+    requiredRoles,
+    missingRoles,
+    roles,
+    rawDatasetItemCount: Number(retention.rawDatasetItemCount ?? 0),
+    selectedRawRowsCount: Number(retention.selectedRawRowsCount ?? 0),
+    rawDatasetHash: retention.rawDatasetHash ?? null,
+    selectedRawRowsHash: retention.selectedRawRowsHash ?? null,
+    sourceManifestHash: retention.sourceManifestHash ?? null,
+    uiMayUseCompressedDefaultButAuditRetainsRawSource: true,
+  };
+}
+
+function inspectReportedTargets(sotaLadderReport) {
+  return {
+    sourceEvidenceCheckedAt: sotaLadderReport?.reportedTargetsEvidence?.sourceEvidenceCheckedAt ?? null,
+    status: sotaLadderReport?.reportedTargetsEvidence?.status ?? null,
+    primaryReportedMemoryTarget: sotaLadderReport?.reportedTargetsEvidence?.primaryReportedMemoryTarget ?? null,
+    memoryTargetCount: Number(sotaLadderReport?.reportedTargetsEvidence?.memoryTargetCount ?? 0),
+    componentTargetCount: Number(sotaLadderReport?.reportedTargetsEvidence?.componentTargetCount ?? 0),
+    benchmarkHarnessTargetCount: Number(sotaLadderReport?.reportedTargetsEvidence?.benchmarkHarnessTargetCount ?? 0),
+    componentBenchmarksAreModelSelectionOnly: Boolean(sotaLadderReport?.componentBenchmarksAreModelSelectionOnly),
+    benchmarkHarnessTargetsSourceLocked: Boolean(sotaLadderReport?.checks?.benchmarkHarnessTargetsSourceLocked),
+    benchmarkHarnessEvidence: arrayOf(sotaLadderReport?.benchmarkHarnessEvidence).map((target) => ({
+      id: target.id,
+      harnessName: target.harnessName,
+      claimUse: target.claimUse,
+      benchmarkFamilies: target.benchmarkFamilies ?? [],
+      supportedProviders: target.supportedProviders ?? [],
+    })),
+  };
+}
+
+function inspectShardState({ shardPlan, shardWorkorder, shardIntake, acceptedLaneLaunchState }) {
+  const executionLaneReadiness = arrayOf(shardWorkorder?.executionLaneReadiness);
+  const fullSotaLane = executionLaneReadiness.find((lane) => lane.laneId === "full-sota-accepted-shards");
+  const rawFullSotaLaneEnvironmentBlockers = arrayOf(fullSotaLane?.blockers);
+  const fullSotaLaneEnvironmentBlockers = filterSupersededProviderCredentialBlockers(
+    rawFullSotaLaneEnvironmentBlockers,
+    acceptedLaneLaunchState,
+  );
+  const shardBlockers = filterSupersededProviderCredentialBlockers(
+    [
+      ...arrayOf(shardWorkorder?.blockers),
+      ...arrayOf(shardIntake?.blockers),
+      ...rawFullSotaLaneEnvironmentBlockers,
+    ],
+    acceptedLaneLaunchState,
+  );
+  return {
+    planStatus: shardPlan?.status ?? null,
+    workorderStatus: shardWorkorder?.status ?? null,
+    intakeStatus: shardIntake?.status ?? null,
+    queryCount: Number(shardPlan?.runPlan?.queryCount ?? 0),
+    shardSize: Number(shardPlan?.runPlan?.shardSize ?? 0),
+    shardCount: Number(shardPlan?.runPlan?.shardCount ?? 0),
+    strategies: shardPlan?.runPlan?.strategies ?? [],
+    acceptedShardCount: Number(shardIntake?.intake?.acceptedShardCount ?? shardWorkorder?.progress?.acceptedShardCount ?? 0),
+    missingShardCount: Number(shardIntake?.intake?.missingShardCount ?? shardWorkorder?.progress?.pendingShardCount ?? 0),
+    rejectedShardCount: Number(shardIntake?.intake?.rejectedShardCount ?? shardWorkorder?.progress?.rejectedResultCount ?? 0),
+    duplicateShardCount: Number(shardIntake?.intake?.duplicateShardCount ?? shardWorkorder?.progress?.duplicateResultCount ?? 0),
+    completeCoverage: Boolean(shardIntake?.intake?.completeCoverage),
+    readyForShardCombine: Boolean(shardIntake?.readyForShardCombine),
+    executionLaneReadiness: executionLaneReadiness.map((lane) => ({
+      laneId: lane.laneId,
+      acceptedByFullShardIntake: Boolean(lane.acceptedByFullShardIntake),
+      readyForResponseArmExport: Boolean(lane.readyForResponseArmExport),
+      readyForAnswerQualityScoring: Boolean(lane.readyForAnswerQualityScoring),
+      blockerCount: Number(lane.blockers?.length ?? 0),
+    })),
+    fullSotaLaneReadyForResponseArmExport: Boolean(fullSotaLane?.readyForResponseArmExport),
+    fullSotaLaneReadyForAnswerQualityScoring: Boolean(fullSotaLane?.readyForAnswerQualityScoring),
+    fullSotaLaneEnvironmentBlockers: fullSotaLaneEnvironmentBlockers.activeBlockers,
+    supersededProviderCredentialBlockers: shardBlockers.supersededProviderCredentialBlockers,
+    supersededAcceptedLaneBlockers: shardBlockers.supersededAcceptedLaneBlockers,
+    blockers: shardBlockers.activeBlockers,
+  };
+}
+
+function inspectLocalFullLaneState({
+  localFullShardPlan,
+  localFullShardWorkorder,
+  localFullShardIntake,
+  localFullShardIntakePath,
+  localFullPerformanceReport,
+  localFullCombinedScoreEvidence,
+  localFullMemoryScoreGateEvidence,
+  localFullResumeEnvDoctor,
+  localFullResumeCommandSecurity,
+  localFullResumeResultDoctor,
+  localFullShardRuntimeBlockers,
+  localEmbeddingRuntimeDoctor,
+  localEmbeddingDurabilitySmoke,
+  localFullAcceptedLaneLaunchDoctor,
+  acceptedLaneLaunchState,
+}) {
+  const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
+  const rawEnvBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
+  const envBlockerFilter = filterSupersededProviderCredentialBlockers(rawEnvBlockers, acceptedLaneLaunchState);
+  const envBlockers = envBlockerFilter.activeBlockers;
+  const launchBlockerFilter = filterSupersededProviderCredentialBlockers(
+    arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
+    acceptedLaneLaunchState,
+  );
+  const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
+  const localFullCompleteCoverage = Boolean(localFullShardIntake?.intake?.completeCoverage);
+  const acceptedShardIds = new Set(arrayOf(localFullShardIntake?.acceptedShards).map((shard) => String(shard?.shardId ?? "")));
+  const performanceReportState = inspectLocalFullPerformanceReport(localFullPerformanceReport, {
+    localFullShardPlan,
+    localFullShardIntake,
+    localFullAcceptedLaneLaunchDoctor,
+  });
+  const combinedScoreState = inspectLocalFullCombinedScore(localFullCombinedScoreEvidence, {
+    localFullShardPlan,
+    localFullShardIntake,
+  });
+  const memoryScoreGateState = inspectLocalFullMemoryScoreGate(localFullMemoryScoreGateEvidence, combinedScoreState);
+  const nextPendingShardId = localFullCompleteCoverage
+    ? null
+    : (performanceReportState.nextPendingShardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null);
+  const nextPendingShardRange = localFullCompleteCoverage
+    ? null
+    : (performanceReportState.nextPendingShardRange ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null);
+  const recoveredRuntimeShardIds = new Set(
+    performanceReportState.runtimeRecoveryRetrievalRecovered && performanceReportState.runtimeRecoveryShardId
+      ? [performanceReportState.runtimeRecoveryShardId]
+      : [],
+  );
+  const recoveredRuntimeBlockerReports = runtimeBlockerReports.filter((report) => {
+    const shardId = String(report?.queryShard?.shardId ?? "");
+    return acceptedShardIds.has(shardId) || recoveredRuntimeShardIds.has(shardId);
+  });
+  const activeRuntimeBlockerReports = runtimeBlockerReports.filter((report) => {
+    const shardId = String(report?.queryShard?.shardId ?? "");
+    return !acceptedShardIds.has(shardId) && !recoveredRuntimeShardIds.has(shardId);
+  });
+  const activeRuntimeBlockerIds = [...new Set(activeRuntimeBlockerReports.flatMap((report) => arrayOf(report?.blockers)))];
+  const historicalNextPendingShardResumeMissingStrategies =
+    localFullShardWorkorder?.workorders?.[0]?.runtimeResume?.missingStrategies ?? [];
+  const nextPendingShardResumeMissingStrategies =
+    localFullCompleteCoverage ||
+    performanceReportState.runtimeRecoveryRetrievalRecovered === true ||
+    performanceReportState.runtimeRecoveryShardId !== nextPendingShardId
+      ? []
+      : historicalNextPendingShardResumeMissingStrategies;
+  const localEmbeddingRuntimeReady =
+    localEmbeddingRuntimeDoctor?.mode === "local-embedding-runtime-doctor" &&
+    localEmbeddingRuntimeDoctor?.status === "READY_LOCAL_EMBEDDING_RUNTIME" &&
+    localEmbeddingRuntimeDoctor?.readyForLocalEmbeddingDurabilitySmoke === true &&
+    localEmbeddingRuntimeDoctor?.readyForLocalAppleArmExport === true &&
+    localEmbeddingRuntimeDoctor?.privatePathPrinted === false &&
+    localEmbeddingRuntimeDoctor?.endpointPrinted === false &&
+    localEmbeddingRuntimeDoctor?.rawConfigIncluded === false;
+  const localEmbeddingRuntimeBlockers = localEmbeddingRuntimeReady
+    ? []
+    : [...new Set(["local-embedding-runtime-not-ready", ...arrayOf(localEmbeddingRuntimeDoctor?.blockers)])];
+  const localEmbeddingDurabilityReady =
+    localEmbeddingDurabilitySmoke?.mode === "local-embedding-durability-smoke" &&
+    localEmbeddingDurabilitySmoke?.status === "READY_LOCAL_EMBEDDING_DURABILITY" &&
+    localEmbeddingDurabilitySmoke?.readyForLocalAppleArmExport === true &&
+    localEmbeddingDurabilitySmoke?.rawSyntheticInputIncluded === false &&
+    localEmbeddingDurabilitySmoke?.baseUrlPrinted === false &&
+    localEmbeddingDurabilitySmoke?.endpointPrinted === false;
+  const localEmbeddingDurabilityBlockers = localEmbeddingDurabilityReady
+    ? []
+    : [...new Set(["local-embedding-durability-smoke-not-ready", ...arrayOf(localEmbeddingDurabilitySmoke?.blockers)])];
+  const cloudProviderBlockers = envBlockers.filter((item) =>
+    ["voyage-credentials-missing", "nvidia-credentials-missing", "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled", "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"].includes(item),
+  );
+  const blockers = [
+    localFullShardPlan?.claimScope !== "local-full" ? "local-full-claim-scope-missing" : null,
+    localFullShardPlan?.readyForAnswerQualityShardRun !== true ? "local-full-shard-plan-not-ready" : null,
+    acceptedLane?.laneId !== "local-full-accepted-shards" ? "local-full-accepted-lane-missing" : null,
+    acceptedLane?.canReachFullSotaGateAfterShardIntake !== false ? "local-full-lane-should-not-claim-sota" : null,
+    cloudProviderBlockers.length > 0 ? "local-full-lane-has-cloud-provider-blockers" : null,
+  ].filter(Boolean);
+  const resumeResult = inspectLocalFullResumeResultDoctor(localFullResumeResultDoctor);
+  const resumeResultGateSatisfied = resumeResult.evidenceReady || acceptedShardIds.has("shard-002");
+  const resumeResultEvidenceBlockers = resumeResultGateSatisfied
+    ? []
+    : resumeResult.evidenceBlockers;
+  return {
+    planPath: files.localFullShardPlan,
+    workorderPath: files.localFullShardWorkorder,
+    intakePath: localFullShardIntakePath ?? files.localFullShardIntake,
+    status: blockers.length === 0 ? "READY_LOCAL_FULL_BENCHMARK_PLAN" : "BLOCKED_LOCAL_FULL_BENCHMARK_PLAN",
+    readyForLocalFullBenchmarkPlan: blockers.length === 0,
+    readyForResponseArmExport: Boolean(localFullShardWorkorder?.acceptedLaneReadyForResponseArmExport),
+    readyForAnswerQualityScoring: Boolean(localFullShardWorkorder?.acceptedLaneReadyForAnswerQualityScoring),
+    intakeStatus: localFullShardIntake?.status ?? null,
+    readyForShardCombine: Boolean(localFullShardIntake?.readyForShardCombine),
+    acceptedShardCount: Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0),
+    acceptedShardIds: [...acceptedShardIds].filter(Boolean).sort(),
+    missingShardCount: Number(localFullShardIntake?.intake?.missingShardCount ?? 0),
+    completeCoverage: localFullCompleteCoverage,
+    launchDoctorStatus: localFullAcceptedLaneLaunchDoctor?.status ?? null,
+    readyForFirstShardRun: localFullAcceptedLaneLaunchDoctor?.launchGate?.readyForFirstAcceptedShardRun === true,
+    readyForLocalFullBenchmarkResult: localFullAcceptedLaneLaunchDoctor?.launchGate?.readyForLocalFullBenchmarkResult === true,
+    claimScope: localFullShardPlan?.claimScope ?? null,
+    queryCount: Number(localFullShardPlan?.runPlan?.queryCount ?? 0),
+    shardCount: Number(localFullShardPlan?.runPlan?.shardCount ?? 0),
+    strategies: localFullShardPlan?.runPlan?.strategies ?? [],
+    acceptedLaneId: acceptedLane?.laneId ?? null,
+    canReachFullSotaGateAfterShardIntake: Boolean(acceptedLane?.canReachFullSotaGateAfterShardIntake),
+    cloudProviderBlockerCount: cloudProviderBlockers.length,
+    runtimeBlockedShardCount: activeRuntimeBlockerReports.length,
+    historicalRuntimeBlockedShardCount: runtimeBlockerReports.length,
+    recoveredRuntimeBlockedShardCount: recoveredRuntimeBlockerReports.length,
+    latestRuntimeBlockedShard: activeRuntimeBlockerReports.at(-1)?.queryShard?.shardId ?? null,
+    latestRuntimeBlockedArm: activeRuntimeBlockerReports.at(-1)?.failedArm?.strategy ?? null,
+    runtimeRecoveryStatus: performanceReportState.runtimeRecoveryStatus,
+    runtimeRecoveryRetrievalRecovered: performanceReportState.runtimeRecoveryRetrievalRecovered,
+    runtimeRecoveryAnswerQualityEnvReady: performanceReportState.runtimeRecoveryAnswerQualityEnvReady,
+    runtimeRecoveryBlockers: performanceReportState.runtimeRecoveryBlockers,
+    runtimeBlockerWorkorderInputCount: Number(localFullShardWorkorder?.runtimeBlockers?.inputCount ?? 0),
+    runtimeBlockerResumeAvailableCount: Number(localFullShardWorkorder?.runtimeBlockers?.resumeAvailableCount ?? 0),
+    nextPendingShardResumeMissingStrategies,
+    historicalNextPendingShardResumeMissingStrategies,
+    launchProgressSource: localFullAcceptedLaneLaunchDoctor?.shardProgress?.progressSource ?? null,
+    launchProgressInputCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.progressInputCount ?? 0),
+    launchAcceptedShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.acceptedShardCount ?? 0),
+    launchPendingShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.pendingShardCount ?? 0),
+    performanceReport: performanceReportState,
+    combinedScore: combinedScoreState,
+    memoryScoreGate: memoryScoreGateState,
+    resumeEnv: inspectLocalFullResumeEnvDoctor(localFullResumeEnvDoctor),
+    resumeCommandSecurity: inspectLocalFullResumeCommandSecurity(localFullResumeCommandSecurity),
+    resumeResult: {
+      ...resumeResult,
+      gateSatisfiedByAcceptedShardIntake: acceptedShardIds.has("shard-002"),
+      evidenceGateReady: resumeResultGateSatisfied,
+      evidenceBlockers: resumeResultEvidenceBlockers,
+    },
+    nextPendingShardId,
+    nextPendingShardRange,
+    localEmbeddingRuntimeStatus: localEmbeddingRuntimeDoctor?.status ?? null,
+    localEmbeddingRuntimeReady,
+    localEmbeddingRuntimeBlockers,
+    localEmbeddingRuntimeModelLooksDedicated: Boolean(localEmbeddingRuntimeDoctor?.modelArtifact?.likelyDedicatedEmbedding),
+    localEmbeddingRuntimeEndpointReachable: Boolean(localEmbeddingRuntimeDoctor?.localEndpoint?.modelsEndpointReachable),
+    localEmbeddingDurabilityStatus: localEmbeddingDurabilitySmoke?.status ?? null,
+    localEmbeddingDurabilityReady,
+    localEmbeddingDurabilityProbeCount: Number(localEmbeddingDurabilitySmoke?.probes?.length ?? 0),
+    localEmbeddingDurabilityBlockers,
+    runtimeBlockers: runtimeBlockerReports.map((report) => ({
+      status: report.status ?? null,
+      shardId: report.queryShard?.shardId ?? null,
+      failedArm: report.failedArm?.strategy ?? null,
+      failureClass: report.failedArm?.failureClass ?? null,
+      publicSyntheticReproduced: Boolean(report.publicSyntheticReproduction?.reproduced),
+      acceptedShard: acceptedShardIds.has(String(report.queryShard?.shardId ?? "")),
+      recoveredByCurrentEvidence: recoveredRuntimeShardIds.has(String(report.queryShard?.shardId ?? "")),
+      activeRuntimeBlocker:
+        !acceptedShardIds.has(String(report.queryShard?.shardId ?? "")) &&
+        !recoveredRuntimeShardIds.has(String(report.queryShard?.shardId ?? "")),
+      completedArmCount: Number(report.partialAttempt?.completedArmCount ?? 0),
+      missingArmCount: Number(report.partialAttempt?.missingArmCount ?? 0),
+    })),
+    operatorInputCount: arrayOf(localFullAcceptedLaneLaunchDoctor?.operatorInputsNeeded).length,
+    pendingShardCount: Number(localFullShardWorkorder?.progress?.pendingShardCount ?? 0),
+    countsAsFullMemorySotaEvidence: false,
+    publicBenchmarkClaimsAllowed: false,
+    envBlockers,
+    supersededProviderCredentialBlockers: envBlockerFilter.supersededProviderCredentialBlockers,
+    supersededAcceptedLaneBlockers: [...new Set([
+      ...envBlockerFilter.supersededAcceptedLaneBlockers,
+      ...launchBlockerFilter.supersededAcceptedLaneBlockers,
+    ])],
+    blockers,
+    shardIntakeBlockers: [
+      ...arrayOf(localFullShardIntake?.blockers),
+      ...activeRuntimeBlockerIds,
+      ...performanceReportState.blockers,
+      ...combinedScoreState.blockers,
+      ...memoryScoreGateState.blockers,
+      ...localEmbeddingRuntimeBlockers,
+      ...localEmbeddingDurabilityBlockers,
+    ],
+    launchBlockers: launchBlockerFilter.activeBlockers,
+  };
+}
+
+function inspectLocalFullPerformanceReport(
+  performanceReport,
+  { localFullShardPlan, localFullShardIntake, localFullAcceptedLaneLaunchDoctor },
+) {
+  const expectedAcceptedShardCount = Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0);
+  const expectedMissingShardCount = Number(localFullShardIntake?.intake?.missingShardCount ?? 0);
+  const expectedAcceptedQueryCount = arrayOf(localFullShardIntake?.acceptedShards).reduce(
+    (total, shard) => total + Number(shard?.scoredQueryCount ?? 0),
+    0,
+  );
+  const expectedQueryCount = Number(localFullShardPlan?.runPlan?.queryCount ?? 0);
+  const expectedCoveragePercent = expectedQueryCount > 0 ? roundTo((expectedAcceptedQueryCount / expectedQueryCount) * 100, 4) : 0;
+  const expectedNextPendingShard = arrayOf(localFullShardIntake?.missingShards).at(0);
+  const completeCoverage = Boolean(localFullShardIntake?.intake?.completeCoverage);
+  const expectedNextPendingShardId = completeCoverage
+    ? null
+    : (expectedNextPendingShard?.shardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null);
+  const expectedNextPendingShardRange =
+    completeCoverage
+      ? null
+      : expectedNextPendingShard && Number.isInteger(Number(expectedNextPendingShard.startIndex)) && Number.isInteger(Number(expectedNextPendingShard.endIndexExclusive))
+        ? `${expectedNextPendingShard.startIndex}-${expectedNextPendingShard.endIndexExclusive}`
+        : (localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null);
+  const generatedAtMs = Date.parse(performanceReport?.generatedAt ?? "");
+  const intakeGeneratedAtMs = Date.parse(localFullShardIntake?.generatedAt ?? "");
+  const freshForIntake =
+    Number.isFinite(generatedAtMs) &&
+    Number.isFinite(intakeGeneratedAtMs) &&
+    generatedAtMs >= intakeGeneratedAtMs;
+  const safe =
+    performanceReport?.mode === "local-full-shard-performance-report" &&
+    performanceReport?.publicSafe === true &&
+    performanceReport?.metricsOnly === true &&
+    performanceReport?.callsProviderApis === false &&
+    performanceReport?.callsHostedSupermemory === false &&
+    performanceReport?.callsLocalEndpoint === false &&
+    performanceReport?.sendsBenchmarkTextToProvider === false &&
+    performanceReport?.rawQuestionIdsIncluded === false &&
+    performanceReport?.rawQuestionsIncluded === false &&
+    performanceReport?.rawAnswersIncluded === false &&
+    performanceReport?.rawMemoryIncluded === false &&
+    performanceReport?.rawTranscriptIncluded === false &&
+    performanceReport?.rawPromptIncluded === false &&
+    performanceReport?.rawPrivateOutputPathIncluded === false &&
+    performanceReport?.printsPrivatePaths === false &&
+    performanceReport?.printsEnvValues === false &&
+    performanceReport?.countsAsLocalFullBenchmarkEvidence === false &&
+    performanceReport?.countsAsFullMemorySotaEvidence === false &&
+    performanceReport?.publicBenchmarkClaimsAllowed === false &&
+    performanceReport?.readyForShardCombine === false &&
+    performanceReport?.readyForEndToEndMemoryScoreGate === false;
+  const countsMatch =
+    Number(performanceReport?.coverage?.acceptedShardCount ?? -1) === expectedAcceptedShardCount &&
+    Number(performanceReport?.coverage?.missingShardCount ?? -1) === expectedMissingShardCount &&
+    Number(performanceReport?.coverage?.acceptedQueryCount ?? -1) === expectedAcceptedQueryCount &&
+    Number(performanceReport?.coverage?.queryCount ?? -1) === expectedQueryCount &&
+    Number(performanceReport?.coverage?.coveragePercent ?? -1) === expectedCoveragePercent;
+  const nextShardMatches =
+    expectedNextPendingShardId == null ||
+    performanceReport?.coverage?.nextPendingShardId === expectedNextPendingShardId;
+  const evidenceBlockers = [
+    !performanceReport ? "local-full-performance-report-missing" : null,
+    performanceReport?.mode !== "local-full-shard-performance-report" ? "local-full-performance-report-mode-mismatch" : null,
+    !["PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT", "COMPLETE_LOCAL_FULL_PERFORMANCE_SNAPSHOT"].includes(performanceReport?.status)
+      ? "local-full-performance-report-status-invalid"
+      : null,
+    !safe ? "local-full-performance-report-unsafe" : null,
+    performanceReport?.countsAsLocalFullBenchmarkEvidence !== false ||
+    performanceReport?.countsAsFullMemorySotaEvidence !== false ||
+    performanceReport?.publicBenchmarkClaimsAllowed !== false
+      ? "local-full-performance-report-claim-enabled"
+      : null,
+    !freshForIntake ? "local-full-performance-report-stale" : null,
+    !countsMatch ? "local-full-performance-report-intake-mismatch" : null,
+    !nextShardMatches ? "local-full-performance-report-next-shard-mismatch" : null,
+  ].filter(Boolean);
+  return {
+    path: files.localFullPerformanceReport,
+    status: performanceReport?.status ?? null,
+    publicSafe: Boolean(performanceReport?.publicSafe),
+    metricsOnly: Boolean(performanceReport?.metricsOnly),
+    safe,
+    evidenceReady: evidenceBlockers.length === 0,
+    evidenceBlockers,
+    generatedAt: performanceReport?.generatedAt ?? null,
+    intakeGeneratedAt: localFullShardIntake?.generatedAt ?? null,
+    freshForIntake,
+    expectedAcceptedShardCount,
+    expectedAcceptedQueryCount,
+    expectedCoveragePercent,
+    expectedNextPendingShardId,
+    expectedNextPendingShardRange,
+    acceptedShardCount: Number(performanceReport?.coverage?.acceptedShardCount ?? 0),
+    acceptedQueryCount: Number(performanceReport?.coverage?.acceptedQueryCount ?? 0),
+    queryCount: Number(performanceReport?.coverage?.queryCount ?? 0),
+    coveragePercent: Number(performanceReport?.coverage?.coveragePercent ?? 0),
+    nextPendingShardId: performanceReport?.coverage?.nextPendingShardId ?? null,
+    nextPendingShardRange: performanceReport?.coverage?.nextPendingShardRange ?? null,
+    bestStrategy: performanceReport?.bestAnswerQuality?.strategy ?? null,
+    bestAnswerQuality: performanceReport?.bestAnswerQuality?.answerQuality ?? null,
+    bestDeltaVsBm25: performanceReport?.bestAnswerQuality?.deltaVsBm25?.answerQuality ?? null,
+    localAppleBaseAnswerQuality: performanceReport?.localApple?.base?.answerQuality ?? null,
+    localAppleRerankAnswerQuality: performanceReport?.localApple?.rerank?.answerQuality ?? null,
+    localAppleRerankDeltaVsBase: performanceReport?.localApple?.rerankDeltaVsBase?.answerQuality ?? null,
+    runtimeBlockerStatus: performanceReport?.runtime?.runtimeBlockerStatus ?? null,
+    runtimeFailedArm: performanceReport?.runtime?.failedArm ?? null,
+    runtimeRecoveryStatus: performanceReport?.runtime?.runtimeRecoveryStatus ?? null,
+    runtimeRecoveryShardId: performanceReport?.runtime?.recovery?.shardId ?? null,
+    runtimeRecoveryFailedArm: performanceReport?.runtime?.recovery?.failedArm ?? null,
+    runtimeRecoveryRetrievalRecovered: Boolean(performanceReport?.runtime?.recovery?.retrievalRecovered),
+    runtimeRecoveryAnswerQualityPreflightReady: Boolean(performanceReport?.runtime?.recovery?.answerQualityPreflightReady),
+    runtimeRecoveryAnswerQualityEnvReady: Boolean(performanceReport?.runtime?.recovery?.answerQualityEnvReady),
+    runtimeRecoveryBlockers: arrayOf(performanceReport?.runtime?.recovery?.blockers),
+    activeRuntimeBlockedShardCount: Number(performanceReport?.runtime?.runtimeBlockedShardCount ?? 0),
+    historicalRuntimeBlockedShardCount: Number(performanceReport?.runtime?.historicalRuntimeBlockedShardCount ?? 0),
+    countsAsFullMemorySotaEvidence: Boolean(performanceReport?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(performanceReport?.publicBenchmarkClaimsAllowed),
+    blockers: arrayOf(performanceReport?.blockers),
+  };
+}
+
+function inspectLocalFullCombinedScore(combinedScoreEvidence, { localFullShardPlan, localFullShardIntake }) {
+  const combinedScore = combinedScoreEvidence?.json;
+  const expectedAcceptedShardCount = Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0);
+  const expectedAcceptedQueryCount = arrayOf(localFullShardIntake?.acceptedShards).reduce(
+    (total, shard) => total + Number(shard?.scoredQueryCount ?? 0),
+    0,
+  );
+  const expectedQueryCount = Number(localFullShardPlan?.runPlan?.queryCount ?? 0);
+  const coverage = combinedScore?.input?.queryShard ?? combinedScore?.sourceLock?.queryShardCoverage ?? {};
+  const strategies = arrayOf(combinedScore?.strategies).map((item) => item.strategy).filter(Boolean);
+  const safe =
+    combinedScore?.mode === "public-benchmark-answer-quality" &&
+    combinedScore?.combineMode === "query-shard-answer-quality-union" &&
+    combinedScore?.fixtureOnly === false &&
+    combinedScore?.metricsOnly === true &&
+    combinedScore?.publicSafe === true &&
+    combinedScore?.retrievalProxyOnly === false &&
+    combinedScore?.memoryBenchAnswerQuality === true &&
+    combinedScore?.publicBenchmarkClaimsAllowed === false &&
+    combinedScore?.rawQuestionIdsIncluded === false &&
+    combinedScore?.rawQuestionsIncluded === false &&
+    combinedScore?.rawAnswersIncluded === false &&
+    combinedScore?.rawMemoryIncluded === false &&
+    combinedScore?.rawTranscriptIncluded === false &&
+    combinedScore?.rawPromptIncluded === false &&
+    combinedScore?.scoringPolicy?.claimScope === "local-full" &&
+    combinedScore?.scoringPolicy?.countsAsLocalFullBenchmarkEvidence === true &&
+    combinedScore?.scoringPolicy?.countsAsFullMemorySotaEvidence === false;
+  const coverageReady =
+    coverage?.complete === true &&
+    coverage?.completeDataset === true &&
+    Number(coverage?.inputShardCount ?? 0) === expectedAcceptedShardCount &&
+    Number(coverage?.scoredQueryCount ?? 0) === expectedAcceptedQueryCount &&
+    Number(coverage?.totalQueryCount ?? 0) === expectedQueryCount;
+  const requiredStrategies = [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
+  ];
+  const missingStrategies = requiredStrategies.filter((strategy) => !strategies.includes(strategy));
+  const blockers = [
+    !combinedScore ? "local-full-combined-score-missing" : null,
+    !safe ? "local-full-combined-score-unsafe-or-wrong-mode" : null,
+    !coverageReady ? "local-full-combined-score-coverage-mismatch" : null,
+    missingStrategies.length ? "local-full-combined-score-missing-required-strategies" : null,
+    combinedScore?.winner?.strategy !== "local-apple-qwen3-0_6b-local-rerank"
+      ? "local-full-combined-score-winner-unexpected"
+      : null,
+  ].filter(Boolean);
+  return {
+    path: combinedScoreEvidence?.path ?? files.localFullCombinedScore,
+    hash: combinedScoreEvidence?.hash ?? null,
+    status: blockers.length === 0 ? "READY_LOCAL_FULL_COMBINED_SCORE" : "BLOCKED_LOCAL_FULL_COMBINED_SCORE",
+    evidenceReady: blockers.length === 0,
+    evidenceBlockers: blockers,
+    safe,
+    coverageReady,
+    combineMode: combinedScore?.combineMode ?? null,
+    claimScope: combinedScore?.scoringPolicy?.claimScope ?? null,
+    acceptedShardCount: Number(coverage?.inputShardCount ?? 0),
+    scoredQueryCount: Number(coverage?.scoredQueryCount ?? 0),
+    totalQueryCount: Number(coverage?.totalQueryCount ?? 0),
+    winnerStrategy: combinedScore?.winner?.strategy ?? null,
+    winnerAnswerQuality: combinedScore?.winner?.answerQuality ?? null,
+    bm25AnswerQuality: strategyMetric(combinedScore, "bm25-lite", "answerQuality"),
+    fullHybridAnswerQuality: strategyMetric(combinedScore, "full-hybrid-rerank", "answerQuality"),
+    queryExpandedAnswerQuality: strategyMetric(combinedScore, "query-expanded-full-hybrid-rerank", "answerQuality"),
+    localAppleBaseAnswerQuality: strategyMetric(combinedScore, "local-apple-qwen3-0_6b", "answerQuality"),
+    localAppleRerankAnswerQuality: strategyMetric(combinedScore, "local-apple-qwen3-0_6b-local-rerank", "answerQuality"),
+    strategies,
+    missingStrategies,
+    blockers,
+  };
+}
+
+function inspectLocalFullMemoryScoreGate(memoryScoreGateEvidence, combinedScoreState) {
+  const gateReport = memoryScoreGateEvidence?.json;
+  const resultHashMatches =
+    !combinedScoreState.hash ||
+    !gateReport?.result?.hash ||
+    gateReport.result.hash === combinedScoreState.hash;
+  const safe =
+    gateReport?.mode === "end-to-end-memory-score-gate" &&
+    gateReport?.status === "READY_LOCAL_FULL_MEMORY_SCORE" &&
+    gateReport?.claimScope === "local-full" &&
+    gateReport?.metricsOnly === true &&
+    gateReport?.publicSafe === true &&
+    gateReport?.callsProviderApis === false &&
+    gateReport?.sendsBenchmarkTextToProvider === false &&
+    gateReport?.publicBenchmarkClaimsAllowed === false &&
+    gateReport?.countsAsEndToEndMemoryBenchmark === true &&
+    gateReport?.countsAsLocalFullBenchmarkEvidence === true &&
+    gateReport?.countsAsFullMemorySotaEvidence === false &&
+    gateReport?.checks?.sourceLockedTarget === true &&
+    gateReport?.checks?.privacyLeakCountersClear === true &&
+    gateReport?.blockers?.length === 0;
+  const blockers = [
+    !gateReport ? "local-full-memory-score-gate-missing" : null,
+    !safe ? "local-full-memory-score-gate-not-ready" : null,
+    !resultHashMatches ? "local-full-memory-score-gate-result-hash-mismatch" : null,
+  ].filter(Boolean);
+  return {
+    path: memoryScoreGateEvidence?.path ?? files.localFullMemoryScoreGate,
+    hash: memoryScoreGateEvidence?.hash ?? null,
+    status: gateReport?.status ?? null,
+    evidenceReady: blockers.length === 0,
+    evidenceBlockers: blockers,
+    safe,
+    resultHashMatches,
+    countsAsEndToEndMemoryBenchmark: Boolean(gateReport?.countsAsEndToEndMemoryBenchmark),
+    countsAsLocalFullBenchmarkEvidence: Boolean(gateReport?.countsAsLocalFullBenchmarkEvidence),
+    countsAsFullMemorySotaEvidence: Boolean(gateReport?.countsAsFullMemorySotaEvidence),
+    reason: gateReport?.reason ?? null,
+    observedScore: gateReport?.reportedTargetComparison?.observed?.score ?? null,
+    reportedTargetScore: gateReport?.reportedTargetComparison?.primaryTarget?.score ?? null,
+    scoreDelta: gateReport?.reportedTargetComparison?.scoreDelta ?? null,
+    answerModel: gateReport?.result?.answerModel ?? null,
+    judgeModel: gateReport?.result?.judgeModel ?? null,
+    blockers,
+  };
+}
+
+function strategyMetric(report, strategy, metric) {
+  const row = arrayOf(report?.strategies).find((item) => item.strategy === strategy);
+  const value = row?.metrics?.[metric];
+  return Number.isFinite(Number(value)) ? Number(value) : null;
+}
+
+function inspectLocalFullResumeEnvDoctor(envDoctor) {
+  const publicSafe =
+    envDoctor?.mode === "local-full-shard-resume-env-doctor" &&
+    envDoctor?.publicSafe === true &&
+    envDoctor?.metricsOnly === true &&
+    envDoctor?.callsProviderApis === false &&
+    envDoctor?.callsHostedSupermemory === false &&
+    envDoctor?.sendsBenchmarkTextToProvider === false &&
+    envDoctor?.rawQuestionIdsIncluded === false &&
+    envDoctor?.rawQuestionsIncluded === false &&
+    envDoctor?.rawAnswersIncluded === false &&
+    envDoctor?.rawMemoryIncluded === false &&
+    envDoctor?.rawTranscriptIncluded === false &&
+    envDoctor?.rawPromptIncluded === false &&
+    envDoctor?.rawPrivateOutputPathIncluded === false &&
+    envDoctor?.printsEnvValues === false &&
+    envDoctor?.printsPrivatePaths === false &&
+    envDoctor?.countsAsLocalFullBenchmarkEvidence === false &&
+    envDoctor?.countsAsFullMemorySotaEvidence === false &&
+    envDoctor?.publicBenchmarkClaimsAllowed === false;
+  const sourceRetentionReady =
+    envDoctor?.sourceRetention?.contractReady === true &&
+    envDoctor?.sourceRetention?.rawSourcesRetainedPrivately === true &&
+    envDoctor?.sourceRetention?.publicReportIsSafe === true &&
+    envDoctor?.sourceRetention?.compressedDefaultRetrievalAllowed === true &&
+    envDoctor?.sourceRetention?.uiMayUseCompressedDefaultButAuditRetainsRawSource === true;
+  const durabilityReady =
+    envDoctor?.localEmbeddingDurability?.reportReady === true &&
+    envDoctor?.localEmbeddingDurability?.longProbeReady === true &&
+    envDoctor?.localEmbeddingDurability?.generatedAfterRuntimeBlocker === true &&
+    envDoctor?.localEmbeddingDurability?.readyForLocalFullResume === true;
+  const evidenceReady =
+    publicSafe &&
+    sourceRetentionReady &&
+    durabilityReady &&
+    envDoctor?.status === "READY_LOCAL_FULL_SHARD_RESUME_ENV" &&
+    envDoctor?.readyForMissingArmExport === true &&
+    envDoctor?.readyForAnswerQualityPreflight === true &&
+    envDoctor?.readyForShardAnswerQuality === true &&
+    envDoctor?.readyForLocalShardIntake === true &&
+    envDoctor?.readyForCommandMaterialization === true;
+  const evidenceBlockers = [
+    !envDoctor ? "local-full-resume-env-doctor-missing" : null,
+    envDoctor?.mode !== "local-full-shard-resume-env-doctor" ? "local-full-resume-env-mode-mismatch" : null,
+    !publicSafe ? "local-full-resume-env-public-report-unsafe" : null,
+    !sourceRetentionReady ? "local-full-resume-env-source-retention-not-ready" : null,
+    !durabilityReady ? "local-full-resume-env-durability-not-ready" : null,
+    envDoctor?.status !== "READY_LOCAL_FULL_SHARD_RESUME_ENV" ? "local-full-resume-env-not-ready" : null,
+    envDoctor?.readyForMissingArmExport !== true ? "local-full-resume-missing-arm-export-not-ready" : null,
+    envDoctor?.readyForAnswerQualityPreflight !== true ? "local-full-resume-answer-quality-preflight-not-ready" : null,
+    envDoctor?.readyForShardAnswerQuality !== true ? "local-full-resume-shard-answer-quality-not-ready" : null,
+    envDoctor?.readyForLocalShardIntake !== true ? "local-full-resume-local-shard-intake-not-ready" : null,
+    envDoctor?.readyForCommandMaterialization !== true ? "local-full-resume-command-materialization-not-ready" : null,
+    ...arrayOf(envDoctor?.blockers),
+  ].filter(Boolean);
+  return {
+    path: files.localFullResumeEnvDoctor,
+    status: envDoctor?.status ?? null,
+    publicSafe,
+    evidenceReady,
+    evidenceBlockers,
+    readyForMissingArmExport: Boolean(envDoctor?.readyForMissingArmExport),
+    readyForAnswerQualityPreflight: Boolean(envDoctor?.readyForAnswerQualityPreflight),
+    readyForShardAnswerQuality: Boolean(envDoctor?.readyForShardAnswerQuality),
+    readyForLocalShardIntake: Boolean(envDoctor?.readyForLocalShardIntake),
+    readyForCommandMaterialization: Boolean(envDoctor?.readyForCommandMaterialization),
+    privateInputFilesReady: Boolean(envDoctor?.privateInputFilesReady),
+    completedPrivateArmFilesReady: Boolean(envDoctor?.completedPrivateArmFilesReady),
+    readyForMissingArmExportExceptEnv: Boolean(envDoctor?.readyForMissingArmExportExceptEnv),
+    localResumeExecutionEnvReady: Boolean(envDoctor?.localResumeExecutionEnvReady),
+    privateDirectoryProvided: Boolean(envDoctor?.privateDir?.provided),
+    privateDirectoryPresent: Boolean(envDoctor?.privateDir?.present),
+    privateDirectoryOutsideRepository: Boolean(envDoctor?.privateDir?.outsideRepository),
+    rawSourceRetentionContractReady: Boolean(envDoctor?.sourceRetention?.contractReady),
+    rawSourcesRetainedPrivately: Boolean(envDoctor?.sourceRetention?.rawSourcesRetainedPrivately),
+    rawSourcePrivateAuditReady: Boolean(envDoctor?.sourceRetention?.readyForPrivateAudit),
+    compressedDefaultRetrievalAllowed: Boolean(envDoctor?.sourceRetention?.compressedDefaultRetrievalAllowed),
+    uiMayUseCompressedDefaultButAuditRetainsRawSource: Boolean(
+      envDoctor?.sourceRetention?.uiMayUseCompressedDefaultButAuditRetainsRawSource,
+    ),
+    localEmbeddingDurabilityReady: durabilityReady,
+    localEmbeddingEnvReady: Boolean(envDoctor?.env?.localEmbedding?.ready),
+    localRerankEnvReady: Boolean(envDoctor?.env?.localRerank?.ready),
+    localSafetyEnvReady: Boolean(envDoctor?.env?.localSafety?.ready),
+    answerQualityEnvReady: Boolean(envDoctor?.env?.answerQuality?.ready),
+    missingEnvironmentNameCount:
+      arrayOf(envDoctor?.env?.localEmbedding?.missingNames).length +
+      arrayOf(envDoctor?.env?.localRerank?.missingNames).length +
+      arrayOf(envDoctor?.env?.localSafety?.missingNames).length +
+      arrayOf(envDoctor?.env?.answerQuality?.missingNames).length,
+    requiredPrivateInputFileCount: arrayOf(envDoctor?.requiredInputFiles).length,
+    presentPrivateInputFileCount: arrayOf(envDoctor?.requiredInputFiles).filter((file) => file.present === true).length,
+    completedArmFileCount: arrayOf(envDoctor?.completedArmFiles).length,
+    presentCompletedArmFileCount: arrayOf(envDoctor?.completedArmFiles).filter((file) => file.present === true).length,
+    blockers: arrayOf(envDoctor?.blockers),
+    countsAsFullMemorySotaEvidence: Boolean(envDoctor?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(envDoctor?.publicBenchmarkClaimsAllowed),
+  };
+}
+
+function inspectLocalFullResumeCommandSecurity(securityReport) {
+  const publicSafe =
+    securityReport?.mode === "local-full-shard-resume-command-security-doctor" &&
+    securityReport?.status === "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY" &&
+    securityReport?.securityReady === true &&
+    securityReport?.publicSafe === true &&
+    securityReport?.metricsOnly === true &&
+    securityReport?.writesRealPrivateCommandFile === false &&
+    securityReport?.callsProviderApis === false &&
+    securityReport?.callsHostedSupermemory === false &&
+    securityReport?.callsLocalEndpoint === false &&
+    securityReport?.sendsBenchmarkTextToProvider === false &&
+    securityReport?.rawQuestionIdsIncluded === false &&
+    securityReport?.rawQuestionsIncluded === false &&
+    securityReport?.rawAnswersIncluded === false &&
+    securityReport?.rawMemoryIncluded === false &&
+    securityReport?.rawTranscriptIncluded === false &&
+    securityReport?.rawPromptIncluded === false &&
+    securityReport?.rawPrivateOutputPathIncluded === false &&
+    securityReport?.printsMaterializedCommands === false &&
+    securityReport?.printsEnvValues === false &&
+    securityReport?.printsPrivatePaths === false &&
+    securityReport?.privateCommandPathPrinted === false &&
+    securityReport?.privateScriptContentPrinted === false &&
+    securityReport?.countsAsLocalFullBenchmarkEvidence === false &&
+    securityReport?.countsAsFullMemorySotaEvidence === false &&
+    securityReport?.publicBenchmarkClaimsAllowed === false;
+  const fixtureSafe =
+    securityReport?.fixtureProbe?.ready === true &&
+    securityReport?.fixtureProbe?.publicOutputSafe === true &&
+    securityReport?.fixtureProbe?.privateCommandFileWritten === true &&
+    securityReport?.fixtureProbe?.privateCommandFileOutsideRepository === true &&
+    securityReport?.fixtureProbe?.privateCommandFileMode === "0700" &&
+    securityReport?.fixtureProbe?.privateCommandFilePathPrinted === false &&
+    securityReport?.fixtureProbe?.privateScriptContentPrinted === false &&
+    securityReport?.fixtureProbe?.privateScriptPlaceholderCount === 0 &&
+    securityReport?.fixtureProbe?.privateScriptOrderReady === true &&
+    securityReport?.fixtureProbe?.firstCommandId === "rerunRuntimeDoctor" &&
+    securityReport?.fixtureProbe?.secondCommandId === "rerunDurabilitySmoke" &&
+    securityReport?.fixtureProbe?.thirdCommandId === "rerunLocalRerankDurabilitySmoke" &&
+    securityReport?.fixtureProbe?.guardedCommandId === "missingArmResponseExport" &&
+    securityReport?.fixtureProbe?.materializedCommandCount === 10 &&
+    securityReport?.fixtureProbe?.printsMaterializedCommands === false &&
+    securityReport?.fixtureProbe?.printsPrivatePaths === false &&
+    securityReport?.fixtureProbe?.printsEnvValues === false;
+  const materializerReportSafe =
+    securityReport?.materializerReport?.publicReportSafe === true &&
+    securityReport?.materializerReport?.commandsPrinted === false &&
+    securityReport?.materializerReport?.guardPlan?.ready === true;
+  const evidenceBlockers = [
+    !securityReport ? "local-full-resume-command-security-report-missing" : null,
+    securityReport?.mode !== "local-full-shard-resume-command-security-doctor"
+      ? "local-full-resume-command-security-mode-mismatch"
+      : null,
+    securityReport?.status !== "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
+      ? "local-full-resume-command-security-not-ready"
+      : null,
+    !publicSafe ? "local-full-resume-command-security-public-report-unsafe" : null,
+    !fixtureSafe ? "local-full-resume-command-security-fixture-unsafe" : null,
+    !materializerReportSafe ? "local-full-resume-command-materializer-report-unsafe" : null,
+    ...arrayOf(securityReport?.blockers),
+  ].filter(Boolean);
+  return {
+    path: files.localFullResumeCommandSecurity,
+    status: securityReport?.status ?? null,
+    publicSafe,
+    fixtureSafe,
+    materializerReportSafe,
+    evidenceReady: evidenceBlockers.length === 0,
+    evidenceBlockers,
+    privateCommandFileMode: securityReport?.fixtureProbe?.privateCommandFileMode ?? null,
+    privateCommandFileOutsideRepository: Boolean(securityReport?.fixtureProbe?.privateCommandFileOutsideRepository),
+    privateScriptPlaceholderCount: Number(securityReport?.fixtureProbe?.privateScriptPlaceholderCount ?? 0),
+    privateScriptOrderReady: Boolean(securityReport?.fixtureProbe?.privateScriptOrderReady),
+    firstCommandId: securityReport?.fixtureProbe?.firstCommandId ?? null,
+    secondCommandId: securityReport?.fixtureProbe?.secondCommandId ?? null,
+    thirdCommandId: securityReport?.fixtureProbe?.thirdCommandId ?? null,
+    guardedCommandId: securityReport?.fixtureProbe?.guardedCommandId ?? null,
+    materializedCommandCount: Number(securityReport?.fixtureProbe?.materializedCommandCount ?? 0),
+    printsMaterializedCommands: Boolean(securityReport?.fixtureProbe?.printsMaterializedCommands),
+    printsPrivatePaths: Boolean(securityReport?.fixtureProbe?.printsPrivatePaths),
+    printsEnvValues: Boolean(securityReport?.fixtureProbe?.printsEnvValues),
+    countsAsFullMemorySotaEvidence: Boolean(securityReport?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(securityReport?.publicBenchmarkClaimsAllowed),
+    blockers: arrayOf(securityReport?.blockers),
+  };
+}
+
+function inspectLocalFullResumeResultDoctor(resultDoctor) {
+  const publicSafe =
+    resultDoctor?.mode === "local-full-shard-resume-result-doctor" &&
+    resultDoctor?.publicSafe === true &&
+    resultDoctor?.metricsOnly === true &&
+    resultDoctor?.callsProviderApis === false &&
+    resultDoctor?.callsHostedSupermemory === false &&
+    resultDoctor?.callsLocalEndpoint === false &&
+    resultDoctor?.sendsBenchmarkTextToProvider === false &&
+    resultDoctor?.rawQuestionIdsIncluded === false &&
+    resultDoctor?.rawQuestionsIncluded === false &&
+    resultDoctor?.rawAnswersIncluded === false &&
+    resultDoctor?.rawMemoryIncluded === false &&
+    resultDoctor?.rawTranscriptIncluded === false &&
+    resultDoctor?.rawPromptIncluded === false &&
+    resultDoctor?.rawPrivateOutputPathIncluded === false &&
+    resultDoctor?.printsPrivatePaths === false &&
+    resultDoctor?.printsEnvValues === false &&
+    resultDoctor?.printsMaterializedCommands === false &&
+    resultDoctor?.countsAsLocalFullBenchmarkEvidence === false &&
+    resultDoctor?.countsAsFullMemorySotaEvidence === false &&
+    resultDoctor?.publicBenchmarkClaimsAllowed === false;
+  const evidenceReady =
+    publicSafe &&
+    resultDoctor?.status === "READY_LOCAL_FULL_SHARD_002_RESULT_FOR_INTAKE" &&
+    resultDoctor?.readyForLocalShardIntake === true &&
+    resultDoctor?.previousShard?.accepted === true &&
+    resultDoctor?.shardResult?.accepted === true;
+  const evidenceBlockers = [
+    !resultDoctor ? "local-full-resume-result-doctor-missing" : null,
+    resultDoctor?.mode !== "local-full-shard-resume-result-doctor" ? "local-full-resume-result-mode-mismatch" : null,
+    !publicSafe ? "local-full-resume-result-public-report-unsafe" : null,
+    resultDoctor?.status !== "READY_LOCAL_FULL_SHARD_002_RESULT_FOR_INTAKE" ? "local-full-resume-result-not-ready" : null,
+    resultDoctor?.readyForLocalShardIntake !== true ? "local-full-resume-result-not-ready-for-intake" : null,
+    resultDoctor?.previousShard?.accepted !== true ? "local-full-previous-shard-not-accepted" : null,
+    resultDoctor?.shardResult?.accepted !== true ? "local-full-shard-002-result-not-accepted" : null,
+    ...arrayOf(resultDoctor?.blockers),
+  ].filter(Boolean);
+  return {
+    path: files.localFullResumeResultDoctor,
+    status: resultDoctor?.status ?? null,
+    publicSafe,
+    evidenceReady,
+    evidenceBlockers,
+    readyForLocalShardIntake: Boolean(resultDoctor?.readyForLocalShardIntake),
+    previousShardAccepted: Boolean(resultDoctor?.previousShard?.accepted),
+    shard002ResultPresent: Boolean(resultDoctor?.shardResult?.present),
+    shard002ResultAccepted: Boolean(resultDoctor?.shardResult?.accepted),
+    shard002ScoredQueryCount: Number(resultDoctor?.shardResult?.scoredQueryCount ?? 0),
+    shard002StrategyCount: Number(resultDoctor?.shardResult?.strategyCount ?? 0),
+    commandMaterializerReady: Boolean(resultDoctor?.commandMaterializer?.ready),
+    commandMaterializerWrotePrivateCommandFile: Boolean(resultDoctor?.commandMaterializer?.writesPrivateCommandFile),
+    blockers: arrayOf(resultDoctor?.blockers),
+    countsAsFullMemorySotaEvidence: Boolean(resultDoctor?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(resultDoctor?.publicBenchmarkClaimsAllowed),
+  };
+}
+
+function selectPreferredLocalFullShardIntake(candidates) {
+  const present = candidates.filter((candidate) => candidate?.json);
+  assert.ok(present.length > 0, "required local-full shard intake evidence missing");
+  return present.sort((left, right) => {
+    const rightAccepted = Number(right.json?.intake?.acceptedShardCount ?? 0);
+    const leftAccepted = Number(left.json?.intake?.acceptedShardCount ?? 0);
+    if (rightAccepted !== leftAccepted) return rightAccepted - leftAccepted;
+    const rightGeneratedAt = Date.parse(right.json?.generatedAt ?? "") || 0;
+    const leftGeneratedAt = Date.parse(left.json?.generatedAt ?? "") || 0;
+    return rightGeneratedAt - leftGeneratedAt;
+  })[0];
+}
+
+function inspectPrivateInputState(privateInputDoctorReport) {
+  return {
+    path: files.privateInputDoctor,
+    status: privateInputDoctorReport?.status ?? null,
+    readyForAnswerQualityShardRun: Boolean(privateInputDoctorReport?.readyForAnswerQualityShardRun),
+    privateDirectoryPresent: Boolean(privateInputDoctorReport?.privateInput?.directoryPresent),
+    privateDirectoryInsideRepository: Boolean(privateInputDoctorReport?.privateInput?.directoryInsideRepository),
+    maxMemoryBytes: privateInputDoctorReport?.plan?.maxMemoryBytes ?? null,
+    filesPresent: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.present).length),
+    filesHashMatched: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.hashMatches).length),
+    blockers: privateInputDoctorReport?.blockers ?? [],
+  };
+}
+
+function inspectAcceptedLaneLaunchState(launchDoctorReport, options = {}) {
+  const evidencePath = options.evidencePath ?? files.acceptedLaneLaunchDoctor;
+  const providerReadiness = launchDoctorReport?.acceptedLane?.providerReadiness ?? {};
+  const providerFamilies = ["gemini", "nvidia", "voyage"];
+  const providerCredentialFamiliesReady = providerFamilies.filter((provider) => providerReadiness?.[provider]?.ready === true);
+  const providerCredentialFamiliesBlocked = providerFamilies.filter((provider) => providerReadiness?.[provider]?.ready !== true);
+  const providerKeyCounts = Object.fromEntries(
+    providerFamilies.map((provider) => [provider, Number(providerReadiness?.[provider]?.keyCount ?? 0)]),
+  );
+  const noEnvBlockers = arrayOf(options.noEnvReport?.blockers);
+  const envBlockers = arrayOf(launchDoctorReport?.blockers);
+  const selectedProviderEnvEvidence = String(evidencePath).includes("provider-env");
+  const providerEnvEvidenceUsed = selectedProviderEnvEvidence && Object.keys(providerReadiness).length > 0;
+  const envProviderCredentialBlockers = envBlockers.filter((item) =>
+    ["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"].includes(item),
+  );
+  const providerCredentialEvidenceBlockers = [
+    !providerEnvEvidenceUsed ? "accepted-lane-provider-env-evidence-not-selected" : null,
+    ...providerCredentialFamiliesBlocked.map((provider) => `${provider}-credentials-missing`),
+    ...envProviderCredentialBlockers,
+  ].filter(Boolean);
+  return {
+    path: evidencePath,
+    noEnvPath: options.noEnvPath ?? null,
+    status: launchDoctorReport?.status ?? null,
+    readyForFirstAcceptedShardRun: Boolean(launchDoctorReport?.launchGate?.readyForFirstAcceptedShardRun),
+    readyForAcceptedShardIntake: Boolean(launchDoctorReport?.launchGate?.readyForAcceptedShardIntake),
+    readyForPublicSotaClaim: Boolean(launchDoctorReport?.launchGate?.readyForPublicSotaClaim),
+    acceptedLaneId: launchDoctorReport?.acceptedLane?.laneId ?? null,
+    selectedProviderEnvEvidence,
+    providerEnvEvidenceUsed,
+    providerCredentialFamiliesReady,
+    providerCredentialFamiliesBlocked,
+    providerKeyCounts,
+    providerCredentialEvidenceReady: providerCredentialEvidenceBlockers.length === 0,
+    providerCredentialEvidenceBlockers,
+    noEnvProviderCredentialBlockers: noEnvBlockers.filter((item) =>
+      ["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"].includes(item),
+    ),
+    envProviderCredentialBlockers,
+    queryExpansionRequirement: launchDoctorReport?.acceptedLane?.queryExpansion?.evidenceRequirement ?? null,
+    queryExpansionModelBacked: Boolean(launchDoctorReport?.acceptedLane?.queryExpansion?.modelBackedReady),
+    queryExpansionSotaEligible: Boolean(launchDoctorReport?.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence),
+    responseExportReady: Boolean(launchDoctorReport?.launchGate?.acceptedLaneReadyForResponseArmExport),
+    answerQualityScoringReady: Boolean(launchDoctorReport?.launchGate?.acceptedLaneReadyForAnswerQualityScoring),
+    privateInputsReady: Boolean(launchDoctorReport?.launchGate?.privateInputsReady),
+    operatorInputCount: Number(launchDoctorReport?.operatorInputsNeeded?.length ?? 0),
+    pendingShardCount: Number(launchDoctorReport?.shardProgress?.pendingShardCount ?? 0),
+    firstPendingShardId: launchDoctorReport?.shardProgress?.firstPendingShardId ?? null,
+    blockers: launchDoctorReport?.blockers ?? [],
+  };
+}
+
+function filterSupersededProviderCredentialBlockers(blockers, acceptedLaneLaunchState) {
+  const readyFamilies = new Set(arrayOf(acceptedLaneLaunchState?.providerCredentialFamiliesReady));
+  const cloudCredentialBlockers = new Set(["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"]);
+  const currentAcceptedLaneBlockers = new Set(arrayOf(acceptedLaneLaunchState?.blockers));
+  const acceptedLaneRefreshBlockers = new Set([
+    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+    "query-expansion-local-endpoint-or-cloud-consent-missing",
+  ]);
+  const supersededProviderCredentialBlockers = [];
+  const supersededAcceptedLaneBlockers = [];
+  const activeBlockers = [];
+  for (const blocker of blockers) {
+    const value = String(blocker ?? "");
+    const provider = value.replace("-credentials-missing", "");
+    const providerCredentialSuperseded =
+      acceptedLaneLaunchState?.providerCredentialEvidenceReady === true &&
+      cloudCredentialBlockers.has(value) &&
+      readyFamilies.has(provider);
+    const acceptedLaneRefreshSuperseded =
+      acceptedLaneRefreshBlockers.has(value) && acceptedLaneLaunchState?.status && !currentAcceptedLaneBlockers.has(value);
+    if (providerCredentialSuperseded) {
+      supersededProviderCredentialBlockers.push(value);
+    } else if (acceptedLaneRefreshSuperseded) {
+      supersededAcceptedLaneBlockers.push(value);
+    } else if (value) {
+      activeBlockers.push(value);
+    }
+  }
+  return {
+    originalBlockerCount: blockers.length,
+    activeBlockers,
+    supersededProviderCredentialBlockers,
+    supersededAcceptedLaneBlockers,
+  };
+}
+
+function inspectControlPreflightState(controlPreflightReport) {
+  const arms = arrayOf(controlPreflightReport?.arms);
+  const blockers = [
+    controlPreflightReport?.mode !== "public-benchmark-answer-quality-preflight" ? "control-preflight-mode-mismatch" : null,
+    controlPreflightReport?.status !== "BLOCKED_ANSWER_QUALITY_ENV" ? "control-preflight-status-should-remain-env-blocked" : null,
+    controlPreflightReport?.readiness?.privateInputsReady !== true ? "control-preflight-private-inputs-not-ready" : null,
+    controlPreflightReport?.readiness?.armsReady !== true ? "control-preflight-arms-not-ready" : null,
+    controlPreflightReport?.readiness?.responseArmsCoverSelectedShard !== true ? "control-preflight-shard-coverage-not-ready" : null,
+    controlPreflightReport?.readiness?.sameDataReady !== true ? "control-preflight-same-data-not-ready" : null,
+    controlPreflightReport?.readiness?.liveAnswerQualityCanRun !== false ? "control-preflight-should-not-enable-live-scoring" : null,
+    controlPreflightReport?.readiness?.readyForEndToEndMemoryScoreGate !== false ? "control-preflight-should-not-count-for-score-gate" : null,
+    controlPreflightReport?.readiness?.countsAsFullMemorySotaEvidence !== false ? "control-preflight-should-not-count-as-sota" : null,
+    controlPreflightReport?.callsProviderApis !== false ? "control-preflight-provider-calls-not-zero" : null,
+    controlPreflightReport?.sendsBenchmarkTextToProvider !== false ? "control-preflight-sent-benchmark-text" : null,
+    controlPreflightReport?.queryShard?.startIndex !== 0 || controlPreflightReport?.queryShard?.endIndexExclusive !== 25
+      ? "control-preflight-shard-range-mismatch"
+      : null,
+    arms.length !== 3 ? "control-preflight-arm-count-mismatch" : null,
+    ...["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"].map((strategy) =>
+      arms.some(
+        (arm) =>
+          arm.strategy === strategy &&
+          arm.selectedShardCoverage?.ready === true &&
+          arm.querySetMatches === true &&
+          arm.selectedShardCoverage?.selectedQueryIdHashMatches === true,
+      )
+        ? null
+        : `control-preflight-${strategy}-not-ready`,
+    ),
+  ].filter(Boolean);
+  return {
+    path: files.controlPreflight,
+    status: controlPreflightReport?.status ?? null,
+    sameDataShardReady: blockers.length === 0,
+    liveAnswerQualityCanRun: Boolean(controlPreflightReport?.readiness?.liveAnswerQualityCanRun),
+    countsAsFullMemorySotaEvidence: Boolean(controlPreflightReport?.readiness?.countsAsFullMemorySotaEvidence),
+    privateInputsReady: Boolean(controlPreflightReport?.readiness?.privateInputsReady),
+    armsReady: Boolean(controlPreflightReport?.readiness?.armsReady),
+    responseArmsCoverSelectedShard: Boolean(controlPreflightReport?.readiness?.responseArmsCoverSelectedShard),
+    sameDataReady: Boolean(controlPreflightReport?.readiness?.sameDataReady),
+    queryShard: controlPreflightReport?.queryShard ?? null,
+    arms: arms.map((arm) => ({
+      strategy: arm.strategy,
+      responseCount: Number(arm.responseCount ?? 0),
+      querySetMatches: Boolean(arm.querySetMatches),
+      selectedShardCoverageReady: Boolean(arm.selectedShardCoverage?.ready),
+      selectedQueryIdHashMatches: Boolean(arm.selectedShardCoverage?.selectedQueryIdHashMatches),
+    })),
+    envBlockers: controlPreflightReport?.blockers ?? [],
+    blockers,
+  };
+}
+
+function inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit }) {
+  return {
+    resultPath: files.combinedCanary,
+    gatePath: files.endToEndGate,
+    queryCount: Number(combinedCanary?.input?.scoredQueryCount ?? combinedCanary?.input?.queryCount ?? 0),
+    winner: combinedCanary?.winner ?? null,
+    answerModel: endToEndGate?.result?.answerModel ?? combinedCanary?.provider?.answerModel ?? null,
+    judgeModel: endToEndGate?.result?.judgeModel ?? combinedCanary?.provider?.judgeModel ?? null,
+    targetAnswerModel: endToEndGate?.target?.answerModel ?? null,
+    targetJudgeModel: endToEndGate?.target?.judgeModel ?? null,
+    score: endToEndGate?.result?.answerQualityMetric?.value ?? combinedCanary?.winner?.answerQuality ?? null,
+    primaryReportedTarget: endToEndGate?.reportedTargetComparison?.primaryTarget ?? null,
+    scoreDelta: endToEndGate?.reportedTargetComparison?.scoreDelta ?? null,
+    countsAsEndToEndMemoryBenchmark: Boolean(endToEndGate?.countsAsEndToEndMemoryBenchmark),
+    countsAsFullMemorySotaEvidence: Boolean(endToEndGate?.countsAsFullMemorySotaEvidence),
+    fullSotaBlockers: endToEndGate?.fullSotaBlockers ?? [],
+    gateBlockers: endToEndGate?.blockers ?? [],
+    reviewerApprovalCount: Number(reviewerIntake?.reviewerApprovalCount ?? 0),
+    voyageStatus: voyageRateLimit?.status ?? null,
+    voyageHttpStatus: voyageRateLimit?.httpStatus ?? null,
+  };
+}
+
+function inspectProviderWaveIntake(providerWaveIntake) {
+  const rows = arrayOf(providerWaveIntake?.providers?.rows);
+  const completedFamilies = arrayOf(providerWaveIntake?.providers?.completedProviderFamilies);
+  const controlsReady =
+    providerWaveIntake?.controls?.allHaveBm25 === true &&
+    providerWaveIntake?.controls?.allHaveFullHybrid === true;
+  const coreFamiliesReady = ["gemini", "nvidia", "voyage"].every((provider) => completedFamilies.includes(provider));
+  const publicSafe =
+    providerWaveIntake?.metricsOnly === true &&
+    providerWaveIntake?.publicSafe === true &&
+    providerWaveIntake?.callsProviderApis === false &&
+    providerWaveIntake?.publicBenchmarkClaimsAllowed === false &&
+    providerWaveIntake?.countsAsFullMemorySotaEvidence === false &&
+    providerWaveIntake?.countsAsEndToEndMemoryBenchmark === false &&
+    providerWaveIntake?.rawQuestionsIncluded === false &&
+    providerWaveIntake?.rawAnswersIncluded === false &&
+    providerWaveIntake?.rawMemoryIncluded === false &&
+    providerWaveIntake?.rawTranscriptIncluded === false &&
+    providerWaveIntake?.rawPrivateOutputPathIncluded === false;
+  const evidenceBlockers = [
+    providerWaveIntake?.mode !== "provider-wave-intake" ? "provider-wave-intake-mode-mismatch" : null,
+    providerWaveIntake?.status !== "READY_PROVIDER_WAVE_INTAKE" ? "provider-wave-intake-not-ready" : null,
+    !publicSafe ? "provider-wave-intake-not-public-safe" : null,
+    !controlsReady ? "provider-wave-intake-missing-bm25-or-full-hybrid-control" : null,
+    !coreFamiliesReady ? "provider-wave-intake-missing-core-provider-family" : null,
+  ].filter(Boolean);
+  return {
+    path: files.providerWaveIntake,
+    status: providerWaveIntake?.status ?? null,
+    evidenceReady: evidenceBlockers.length === 0,
+    metricsOnly: Boolean(providerWaveIntake?.metricsOnly),
+    publicSafe,
+    callsProviderApis: Boolean(providerWaveIntake?.callsProviderApis),
+    sendsBenchmarkTextToProvider: Boolean(providerWaveIntake?.sendsBenchmarkTextToProvider),
+    publicBenchmarkClaimsAllowed: Boolean(providerWaveIntake?.publicBenchmarkClaimsAllowed),
+    countsAsFullMemorySotaEvidence: Boolean(providerWaveIntake?.countsAsFullMemorySotaEvidence),
+    countsAsEndToEndMemoryBenchmark: Boolean(providerWaveIntake?.countsAsEndToEndMemoryBenchmark),
+    reportCount: Number(providerWaveIntake?.input?.reportCount ?? 0),
+    completedReportCount: Number(providerWaveIntake?.input?.completedReportCount ?? 0),
+    partialReportCount: Number(providerWaveIntake?.input?.partialReportCount ?? 0),
+    allHaveBm25: Boolean(providerWaveIntake?.controls?.allHaveBm25),
+    allHaveFullHybrid: Boolean(providerWaveIntake?.controls?.allHaveFullHybrid),
+    completedProviderFamilies: completedFamilies,
+    retryableProviderLimitObserved: arrayOf(providerWaveIntake?.blockers).includes("retryable-provider-limit-or-timeout-observed"),
+    nextRunPlan: {
+      status: providerWaveIntake?.nextRunPlan?.status ?? null,
+      recommendedExecution: providerWaveIntake?.nextRunPlan?.recommendedExecution ?? null,
+      avoidConcurrentProviderArms: Boolean(providerWaveIntake?.nextRunPlan?.avoidConcurrentProviderArms),
+      repairSliceCount: arrayOf(providerWaveIntake?.nextRunPlan?.repairSlices).length,
+      providerPriorities: arrayOf(providerWaveIntake?.nextRunPlan?.providerPlans).map((plan) => ({
+        provider: plan.provider,
+        retryPriority: plan.retryPriority,
+        recommendedWaveSize: Number(plan.recommendedWaveSize ?? 0),
+      })),
+    },
+    bestProviderRows: rows.map((row) => ({
+      provider: row.provider,
+      completedArmCount: Number(row.completedArmCount ?? 0),
+      failedArmCount: Number(row.failedArmCount ?? 0),
+      bestStrategy: row.bestStrategy ?? null,
+      bestQuality: row.bestQuality ?? null,
+    })),
+    evidenceBlockers,
+    claimBoundary: providerWaveIntake?.claimBoundary ?? null,
+  };
+}
+
+function inspectReviewerState(reviewerIntake) {
+  const blockers = reviewerIntake?.blockers ?? ["memory-score-reviewer-intake-missing"];
+  return {
+    path: files.reviewerIntake,
+    status: reviewerIntake?.status ?? null,
+    ready: reviewerIntake?.publicBenchmarkApprovalReady === true && reviewerIntake?.countsAsFullMemorySotaReview === true,
+    reviewerApprovalCount: Number(reviewerIntake?.reviewerApprovalCount ?? 0),
+    independentReviewerCount: Number(reviewerIntake?.independentReviewerCount ?? 0),
+    countsAsFullMemorySotaReview: Boolean(reviewerIntake?.countsAsFullMemorySotaReview),
+    blockers,
+    acceptableRoutes: ["Gemini", "Claude", "NVIDIA/DeepSeek-style external critic", "Codex reviewer not involved in implementation"],
+  };
+}
+
+function inspectModelChallengerMemoryScore(gateEvidence, answerQualityEvidence) {
+  const gateReport = gateEvidence?.json;
+  const answerQuality = answerQualityEvidence?.json;
+  const result = gateReport?.result ?? {};
+  const resultArms = arrayOf(result.arms);
+  const answerQualityRows = arrayOf(answerQuality?.strategies)
+    .map((row) => ({
+      strategy: row.strategy ?? null,
+      answerQuality: row.metrics?.answerQuality ?? null,
+      judgeCorrectRate: row.metrics?.judgeCorrectRate ?? null,
+      answerFailures: Number(row.provider?.answerFailures ?? 0),
+      judgeFailures: Number(row.provider?.judgeFailures ?? 0),
+      scoredQueryCount: Number(row.scoredQueryCount ?? 0),
+    }))
+    .filter((row) => row.strategy)
+    .sort((left, right) => Number(right.answerQuality ?? -1) - Number(left.answerQuality ?? -1));
+  const requiredArms = [
+    "bm25-lite",
+    "dense-proxy",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
+  ];
+  const missingRequiredArms = requiredArms.filter((arm) => !resultArms.includes(arm));
+  const safeBenchmarkEvidence =
+    gateReport?.mode === "end-to-end-memory-score-gate" &&
+    gateReport?.status === "READY_MODEL_CHALLENGER_MEMORY_SCORE" &&
+    gateReport?.claimScope === "model-challenger" &&
+    gateReport?.publicSafe === true &&
+    gateReport?.metricsOnly === true &&
+    gateReport?.callsProviderApis === false &&
+    gateReport?.sendsBenchmarkTextToProvider === false &&
+    gateReport?.publicBenchmarkClaimsAllowed === false &&
+    gateReport?.countsAsEndToEndMemoryBenchmark === true &&
+    gateReport?.countsAsLocalFullBenchmarkEvidence === false &&
+    gateReport?.countsAsFullMemorySotaEvidence === false &&
+    gateReport?.checks?.sourceLockedTarget === true &&
+    gateReport?.checks?.privacyLeakCountersClear === true &&
+    gateReport?.checks?.challengerModelScoringSatisfied === true &&
+    gateReport?.checks?.answerQualityMetricPresent === true &&
+    gateReport?.checks?.answerQualityMetricInRange === true &&
+    Number(result.scoredQueryCount ?? 0) > 0 &&
+    Number(result.totalQueryCount ?? 0) > 0 &&
+    missingRequiredArms.length === 0;
+  const evidenceBlockers = [
+    !gateReport ? "model-challenger-memory-score-gate-missing" : null,
+    gateReport?.mode !== "end-to-end-memory-score-gate" ? "model-challenger-gate-mode-unrecognized" : null,
+    gateReport?.status !== "READY_MODEL_CHALLENGER_MEMORY_SCORE" ? "model-challenger-gate-not-ready" : null,
+    gateReport?.claimScope !== "model-challenger" ? "model-challenger-claim-scope-mismatch" : null,
+    gateReport?.publicSafe !== true ? "model-challenger-gate-not-public-safe" : null,
+    gateReport?.metricsOnly !== true ? "model-challenger-gate-not-metrics-only" : null,
+    gateReport?.publicBenchmarkClaimsAllowed !== false ? "model-challenger-public-claims-not-disabled" : null,
+    gateReport?.countsAsEndToEndMemoryBenchmark !== true ? "model-challenger-not-end-to-end-memory-benchmark" : null,
+    gateReport?.countsAsFullMemorySotaEvidence !== false ? "model-challenger-counts-as-full-sota" : null,
+    gateReport?.checks?.sourceLockedTarget !== true ? "model-challenger-source-lock-not-proven" : null,
+    gateReport?.checks?.privacyLeakCountersClear !== true ? "model-challenger-privacy-counters-not-clear" : null,
+    gateReport?.checks?.challengerModelScoringSatisfied !== true ? "model-challenger-scoring-policy-not-satisfied" : null,
+    Number(result.scoredQueryCount ?? 0) <= 0 ? "model-challenger-scored-query-count-missing" : null,
+    missingRequiredArms.length > 0 ? `model-challenger-missing-arms:${missingRequiredArms.join(",")}` : null,
+  ].filter(Boolean);
+  const bestArm = answerQualityRows[0] ?? null;
+  return {
+    path: gateEvidence?.path ?? files.modelChallengerMemoryScoreGate,
+    hash: gateEvidence?.hash ?? null,
+    answerQualityPath: answerQualityEvidence?.path ?? files.modelChallengerAnswerQuality,
+    answerQualityHash: answerQualityEvidence?.hash ?? null,
+    status: gateReport?.status ?? null,
+    claimScope: gateReport?.claimScope ?? null,
+    benchmarkEvidenceReady: evidenceBlockers.length === 0 && safeBenchmarkEvidence,
+    evidenceReady: evidenceBlockers.length === 0 && safeBenchmarkEvidence,
+    evidenceBlockers,
+    publicSafe: Boolean(gateReport?.publicSafe),
+    metricsOnly: Boolean(gateReport?.metricsOnly),
+    publicBenchmarkClaimsAllowed: Boolean(gateReport?.publicBenchmarkClaimsAllowed),
+    countsAsEndToEndMemoryBenchmark: Boolean(gateReport?.countsAsEndToEndMemoryBenchmark),
+    countsAsModelChallengerReportedScoreEvidence: Boolean(gateReport?.countsAsModelChallengerReportedScoreEvidence),
+    countsAsLocalFullBenchmarkEvidence: Boolean(gateReport?.countsAsLocalFullBenchmarkEvidence),
+    countsAsFullMemorySotaEvidence: Boolean(gateReport?.countsAsFullMemorySotaEvidence),
+    benchmark: result.benchmark ?? null,
+    answerModel: result.answerModel ?? answerQuality?.provider?.answerModel ?? null,
+    judgeModel: result.judgeModel ?? answerQuality?.provider?.judgeModel ?? null,
+    endpointLabel: answerQuality?.provider?.endpointLabel ?? null,
+    directDeepSeekScoring: Boolean(answerQuality?.provider?.endpointLabel === "https://api.deepseek.com"),
+    answerQualityCalls: Number(answerQuality?.provider?.callsMade ?? 0),
+    scoredQueryCount: Number(result.scoredQueryCount ?? answerQuality?.input?.scoredQueryCount ?? 0),
+    totalQueryCount: Number(result.totalQueryCount ?? answerQuality?.input?.totalQueryCount ?? 0),
+    armCount: resultArms.length,
+    arms: resultArms,
+    bestArmStrategy: bestArm?.strategy ?? answerQuality?.winner?.strategy ?? null,
+    bestArmAnswerQuality: bestArm?.answerQuality ?? answerQuality?.winner?.answerQuality ?? result.answerQualityMetric?.value ?? null,
+    bm25AnswerQuality: answerQualityRows.find((row) => row.strategy === "bm25-lite")?.answerQuality ?? null,
+    fullHybridAnswerQuality: answerQualityRows.find((row) => row.strategy === "full-hybrid-rerank")?.answerQuality ?? null,
+    localDenseAnswerQuality: answerQualityRows.find((row) => row.strategy === "local-apple-qwen3-0_6b")?.answerQuality ?? null,
+    localRerankAnswerQuality: answerQualityRows.find((row) => row.strategy === "local-apple-qwen3-0_6b-local-rerank")?.answerQuality ?? null,
+    reportedScoreClaimReady: Boolean(gateReport?.modelChallengerClaim?.ready),
+    modelChallengerBlockers: arrayOf(gateReport?.modelChallengerBlockers),
+    fullSotaBlockers: arrayOf(gateReport?.fullSotaBlockers),
+    reportedTargetComparison: gateReport?.reportedTargetComparison ?? null,
+    claimStatement: gateReport?.modelChallengerClaim?.statement ?? null,
+    rows: answerQualityRows.map((row) => ({
+      strategy: row.strategy,
+      answerQuality: row.answerQuality,
+      judgeCorrectRate: row.judgeCorrectRate,
+      answerFailures: row.answerFailures,
+      judgeFailures: row.judgeFailures,
+      scoredQueryCount: row.scoredQueryCount,
+    })),
+  };
+}
+
+function inspectDocs(loadedEvidence) {
+  const requiredPhrases = [
+    [loadedEvidence.benchmarkDocs.text, /This is an execution\s+plan and harness upgrade, not a completed full-SOTA result/i],
+    [loadedEvidence.targetDocs.text, /The full LongMemEval-S run-only target is now authored|full 500-row public set/i],
+    [loadedEvidence.updateFlow.text, /same-data benchmark gates/i],
+    [loadedEvidence.releaseNotes.text, /full-memory|SOTA|answer-quality/i],
+  ];
+  const missing = requiredPhrases
+    .map(([text, pattern], index) => (!pattern.test(text ?? "") ? `doc-phrase-${index + 1}-missing` : null))
+    .filter(Boolean);
+  return {
+    docsCurrentForBlockedState: missing.length === 0,
+    readyAfterBenchmarkResult: false,
+    blockers: [
+      ...missing,
+      "docs-release-notes-and-ui-evidence-must-refresh-after-full-result",
+    ],
+    uiEvidencePath: files.uiEvidence,
+    uiFixtureOnly: Boolean(uiEvidence?.fixtureOnly),
+    uiPrivateLeakCount: Number(uiEvidence?.privateLeakCount ?? 0),
+  };
+}
+
+function inspectMethodLadderResultGate(loadedEvidence) {
+  const gateReport = loadedEvidence?.json;
+  const rows = arrayOf(gateReport?.rows);
+  const bestChallengerWinningArm = arrayOf(gateReport?.bestChallenger?.strategies).find(
+    (item) => item.strategy === gateReport?.bestChallenger?.winnerStrategy,
+  );
+  const promotion = gateReport?.promotion ?? {};
+  const pairedBootstrap = gateReport?.comparison?.pairedBootstrap ?? {};
+  const safe =
+    gateReport?.mode === "answer-quality-method-ladder-result-gate" &&
+    gateReport?.status === "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER" &&
+    gateReport?.publicSafe === true &&
+    gateReport?.metricsOnly === true &&
+    gateReport?.callsProviderApis === false &&
+    gateReport?.sendsBenchmarkTextToProvider === false &&
+    gateReport?.publicBenchmarkClaimsAllowed === false &&
+    gateReport?.countsAsMethodLadderEvidence === true &&
+    gateReport?.countsAsFullMemorySotaEvidence === false &&
+    gateReport?.result?.fixtureOnly === false &&
+    gateReport?.result?.benchmark === "longmemeval" &&
+    gateReport?.result?.claimScope === "model-challenger" &&
+    gateReport?.result?.queryShard?.sameRawQuerySelectionAcrossMethods === true &&
+    typeof gateReport?.result?.queryShard?.selectedQuestionIdsHash === "string" &&
+    gateReport?.checks?.rawQuestionsExcluded === true &&
+    gateReport?.checks?.rawAnswersExcluded === true &&
+    gateReport?.checks?.rawMemoryExcluded === true &&
+    gateReport?.checks?.rawTranscriptExcluded === true &&
+    gateReport?.checks?.challengerBeatsBaseline === true &&
+    gateReport?.checks?.bestOverallIsChallenger === true &&
+    gateReport?.checks?.winnerArmFailureLimit === true &&
+    gateReport?.checks?.totalFailureRateLimit === true &&
+    gateReport?.checks?.privacyLeakCountersClear === true &&
+    promotion.readyForNextLargerSlice === true &&
+    promotion.productionDefaultAllowed === false &&
+    promotion.publicSotaClaimAllowed === false &&
+    promotion.scope === "next-larger-slice-challenger-only" &&
+    promotion.pairedBootstrap?.requiredForPromotion === true &&
+    pairedBootstrap.available === true;
+  const winnerArmFailureCount = Number(gateReport?.comparison?.winnerArmFailures ?? 0);
+  const totalFailureRate = Number(gateReport?.result?.totalFailureRate ?? 1);
+  const evidenceBlockers = [
+    !gateReport ? "method-ladder-result-gate-missing" : null,
+    !safe ? "method-ladder-result-gate-unsafe-or-not-ready" : null,
+    gateReport?.baseline?.method !== gateReport?.thresholds?.baselineMethod ? "method-ladder-baseline-mismatch" : null,
+    gateReport?.bestChallenger?.method === gateReport?.baseline?.method ? "method-ladder-challenger-not-distinct" : null,
+    Number(gateReport?.comparison?.deltaVsBaseline ?? 0) < Number(gateReport?.thresholds?.minDelta ?? 1)
+      ? "method-ladder-delta-below-threshold"
+      : null,
+    winnerArmFailureCount > Number(gateReport?.thresholds?.maxWinnerArmFailures ?? 0)
+      ? "method-ladder-winner-arm-failures"
+      : null,
+    totalFailureRate > Number(gateReport?.thresholds?.maxTotalFailureRate ?? 0.01)
+      ? "method-ladder-total-failure-rate-too-high"
+      : null,
+    promotion.readyForNextLargerSlice !== true ? "method-ladder-next-slice-promotion-not-ready" : null,
+    promotion.productionDefaultAllowed !== false ? "method-ladder-production-default-not-blocked" : null,
+    promotion.publicSotaClaimAllowed !== false ? "method-ladder-sota-claim-not-blocked" : null,
+    promotion.pairedBootstrap?.requiredForPromotion !== true ? "method-ladder-paired-bootstrap-not-required-for-promotion" : null,
+    pairedBootstrap.available !== true ? "method-ladder-paired-bootstrap-missing" : null,
+    rows.length < 2 ? "method-ladder-too-few-methods" : null,
+  ].filter(Boolean);
+  return {
+    path: loadedEvidence?.path ?? files.methodLadderResultGate,
+    hash: loadedEvidence?.hash ?? null,
+    status: gateReport?.status ?? null,
+    evidenceReady: evidenceBlockers.length === 0,
+    evidenceBlockers,
+    publicSafe: Boolean(gateReport?.publicSafe),
+    metricsOnly: Boolean(gateReport?.metricsOnly),
+    countsAsMethodLadderEvidence: Boolean(gateReport?.countsAsMethodLadderEvidence),
+    countsAsFullMemorySotaEvidence: Boolean(gateReport?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(gateReport?.publicBenchmarkClaimsAllowed),
+    benchmark: gateReport?.result?.benchmark ?? null,
+    claimScope: gateReport?.result?.claimScope ?? null,
+    queryCount: Number(gateReport?.result?.queryShard?.endIndexExclusive ?? 0) - Number(gateReport?.result?.queryShard?.startIndex ?? 0),
+    methodCount: Number(gateReport?.result?.methodCount ?? rows.length),
+    totalCalls: Number(gateReport?.result?.totalCalls ?? 0),
+    totalFailures: Number(gateReport?.result?.totalFailures ?? 0),
+    totalFailureRate,
+    baselineMethod: gateReport?.baseline?.method ?? null,
+    baselineWinnerStrategy: gateReport?.baseline?.winnerStrategy ?? null,
+    baselineAnswerQuality: gateReport?.baseline?.answerQuality ?? null,
+    bestChallengerMethod: gateReport?.bestChallenger?.method ?? null,
+    bestChallengerWinnerStrategy: gateReport?.bestChallenger?.winnerStrategy ?? null,
+    bestChallengerAnswerQuality: gateReport?.bestChallenger?.answerQuality ?? null,
+    deltaVsBaseline: gateReport?.comparison?.deltaVsBaseline ?? null,
+    pairedBootstrapAvailable: Boolean(pairedBootstrap.available),
+    pairedBootstrapCommonQueryCount: Number(pairedBootstrap.commonQueryCount ?? 0),
+    pairedBootstrapMeanDelta: pairedBootstrap.meanDelta ?? null,
+    pairedBootstrapLowerBound95: pairedBootstrap.lowerBound95 ?? null,
+    pairedBootstrapUpperBound95: pairedBootstrap.upperBound95 ?? null,
+    winningArmFailureCount: winnerArmFailureCount,
+    winningArmAnswerFailures: Number(bestChallengerWinningArm?.answerFailures ?? 0),
+    winningArmJudgeFailures: Number(bestChallengerWinningArm?.judgeFailures ?? 0),
+    nextLargerSlicePromotionReady: Boolean(promotion.readyForNextLargerSlice),
+    promotionStatus: promotion.status ?? null,
+    promotionScope: promotion.scope ?? null,
+    promotionWarnings: arrayOf(promotion.warnings),
+    promotionBlockers: arrayOf(promotion.blockers),
+    productionDefaultAllowed: Boolean(promotion.productionDefaultAllowed),
+    publicSotaClaimAllowedByMethodLadder: Boolean(promotion.publicSotaClaimAllowed),
+    nextLargerSliceChallenger: gateReport?.bestChallenger?.method && gateReport?.bestChallenger?.winnerStrategy
+      ? `${gateReport.bestChallenger.method}:${gateReport.bestChallenger.winnerStrategy}`
+      : null,
+    nextActions: arrayOf(gateReport?.nextActions),
+    rows: rows.map((row) => ({
+      method: row.method ?? null,
+      winnerStrategy: row.winnerStrategy ?? null,
+      answerQuality: row.answerQuality ?? null,
+      answerFailures: Number(row.answerFailures ?? 0),
+      judgeFailures: Number(row.judgeFailures ?? 0),
+    })),
+  };
+}
+
+function gate(id, passed, blockers) {
+  return {
+    id,
+    status: passed ? "pass" : "blocked",
+    blockers: passed ? [] : arrayOf(blockers),
+  };
+}
+
+function roundTo(value, digits) {
+  const multiplier = 10 ** digits;
+  return Math.round(value * multiplier) / multiplier;
+}
+
+function buildNextRunPlan({ shardPlan, sotaOperatorPacket }) {
+  const fullShardFlow = arrayOf(sotaOperatorPacket?.operatorFlow).find((item) => item.id === "full-longmemeval-answer-quality-shards");
+  return {
+    primaryStage: "full-longmemeval-answer-quality-shards",
+    privateOutputRequired: true,
+    rawSourcesStayOutsideRepo: true,
+    queryCount: Number(shardPlan?.runPlan?.queryCount ?? 500),
+    shardCount: Number(shardPlan?.runPlan?.shardCount ?? 20),
+    shardSize: Number(shardPlan?.runPlan?.shardSize ?? 25),
+    strategySet: shardPlan?.runPlan?.strategies ?? [],
+    executionLanes: shardPlan?.executionLanes ?? [],
+    acceptedShardIntakeLaneIds: arrayOf(shardPlan?.executionLanes)
+      .filter((lane) => lane.acceptedByFullShardIntake === true)
+      .map((lane) => lane.id),
+    diagnosticLaneIds: arrayOf(shardPlan?.executionLanes)
+      .filter((lane) => lane.acceptedByFullShardIntake !== true)
+      .map((lane) => lane.id),
+    commandSource: files.sotaOperatorPacket,
+    commandCount: fullShardFlow?.commands?.length ?? 0,
+    firstCommands: arrayOf(fullShardFlow?.commands).slice(0, 6),
+    requiredAfterShardRuns: [
+      "benchmark:answer-quality:shard-workorder",
+      "benchmark:local-embedding:runtime-doctor before local Apple embedding durability",
+      "benchmark:local-embedding:durability before local Apple response-arm export",
+      "benchmark:answer-quality:shard-intake --require-ready",
+      "benchmark:answer-quality:combine -- --combine-mode shards",
+      "benchmark:memory-score:reviewer-intake -- --strict-target",
+      "benchmark:memory-score:result-gate -- --require-ready",
+      "benchmark:sota-ladder",
+      "UI evidence, docs, release notes, owner approval, and real canary refresh",
+    ],
+  };
+}
+
+function summarizeEvidence(loadedEvidence) {
+  return Object.fromEntries(
+    Object.entries(loadedEvidence).map(([key, value]) => [
+      key,
+      {
+        path: value.path,
+        exists: value.exists,
+        hash: value.hash,
+        mode: value.json?.mode ?? null,
+        status: value.json?.status ?? null,
+      },
+    ]),
+  );
+}
+
+function renderMarkdown(value) {
+  const lines = [
+    "# Full Memory SOTA Doctor",
+    "",
+    `- Status: ${value.status}`,
+    `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
+    `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
+    `- Primary score: ${value.benchmarkContract.primaryScoreName}`,
+    `- Supermemory comparison surface: ${value.benchmarkContract.supermemoryComparisonSurface}`,
+    `- Diagnostics are alternate scoreboards: ${!value.benchmarkContract.diagnosticsAreNotAlternateScoreboards}`,
+    `- Live plugin actor required: ${value.benchmarkContract.primaryScoreRequiresPluginActor}`,
+    `- Explicit memory writes required: ${value.benchmarkContract.primaryScoreRequiresExplicitMemoryWrites}`,
+    `- Post-boundary recall required: ${value.benchmarkContract.primaryScoreRequiresPostBoundaryRecall}`,
+    `- Isolated benchmark containers required: ${value.benchmarkContract.benchmarkContainersMustBeIsolatedFromLiveResearch}`,
+    `- Full target query count: ${value.fullTarget.queryCount}`,
+    `- Current canary query count: ${value.currentCanary.queryCount}`,
+    `- Current best score: ${value.currentCanary.score ?? "n/a"}`,
+    `- Current score delta vs reported target: ${value.currentCanary.scoreDelta ?? "n/a"}`,
+    `- Reported target source evidence checked at: ${value.reportedTargets.sourceEvidenceCheckedAt ?? "n/a"}`,
+    `- Benchmark harness source locks: ${value.reportedTargets.benchmarkHarnessTargetCount}`,
+    `- Provider wave intake status: ${value.providerWaveState.status ?? "n/a"}`,
+    "",
+    "## Gates",
+    ...value.gates.map((item) => `- ${item.id}: ${item.status}${item.blockers.length ? ` (${item.blockers.join(", ")})` : ""}`),
+    "",
+    "## Raw Source Retention",
+    `- Retains raw sources privately: ${value.rawSourceRetention.retainsRawSourcesPrivately}`,
+    `- Public report is safe: ${value.rawSourceRetention.publicReportIsSafe}`,
+    `- Private raw roles: ${value.rawSourceRetention.roles.map((item) => item.role).join(", ")}`,
+    "",
+    "## Private Inputs",
+    `- Status: ${value.privateInputState.status}`,
+    `- Ready for shard run: ${value.privateInputState.readyForAnswerQualityShardRun}`,
+    `- Private directory present: ${value.privateInputState.privateDirectoryPresent}`,
+    `- Private directory inside repository: ${value.privateInputState.privateDirectoryInsideRepository}`,
+    `- Files present/hash-matched: ${value.privateInputState.filesPresent}/${value.privateInputState.filesHashMatched}`,
+    `- Max memory bytes: ${value.privateInputState.maxMemoryBytes ?? "n/a"}`,
+    "",
+    "## Accepted Lane Launch",
+    `- Status: ${value.acceptedLaneLaunchState.status}`,
+    `- Ready for first accepted shard run: ${value.acceptedLaneLaunchState.readyForFirstAcceptedShardRun}`,
+    `- Selected provider-env evidence: ${value.acceptedLaneLaunchState.selectedProviderEnvEvidence}`,
+    `- Provider env evidence used: ${value.acceptedLaneLaunchState.providerEnvEvidenceUsed}`,
+    `- Provider credential evidence ready: ${value.acceptedLaneLaunchState.providerCredentialEvidenceReady}`,
+    `- Provider credential families ready: ${value.acceptedLaneLaunchState.providerCredentialFamiliesReady.join(", ") || "none"}`,
+    `- Provider credential families blocked: ${value.acceptedLaneLaunchState.providerCredentialFamiliesBlocked.join(", ") || "none"}`,
+    `- Provider key counts: gemini=${value.acceptedLaneLaunchState.providerKeyCounts.gemini}, nvidia=${value.acceptedLaneLaunchState.providerKeyCounts.nvidia}, voyage=${value.acceptedLaneLaunchState.providerKeyCounts.voyage}`,
+    `- Provider credential evidence blockers: ${value.acceptedLaneLaunchState.providerCredentialEvidenceBlockers.join(", ") || "none"}`,
+    `- Superseded operator credential blockers: ${value.sotaOperatorPacketState.supersededProviderCredentialBlockers.join(", ") || "none"}`,
+    `- Query expansion requirement: ${value.acceptedLaneLaunchState.queryExpansionRequirement ?? "n/a"}`,
+    `- Query expansion model-backed: ${value.acceptedLaneLaunchState.queryExpansionModelBacked}`,
+    `- Response export ready: ${value.acceptedLaneLaunchState.responseExportReady}`,
+    `- Answer-quality scoring ready: ${value.acceptedLaneLaunchState.answerQualityScoringReady}`,
+    `- Operator inputs needed: ${value.acceptedLaneLaunchState.operatorInputCount}`,
+    "",
+    "## Control Preflight",
+    `- Status: ${value.controlPreflightState.status}`,
+    `- Same-data shard ready: ${value.controlPreflightState.sameDataShardReady}`,
+    `- Live answer-quality can run: ${value.controlPreflightState.liveAnswerQualityCanRun}`,
+    `- Counts as full memory SOTA evidence: ${value.controlPreflightState.countsAsFullMemorySotaEvidence}`,
+    `- Arms: ${value.controlPreflightState.arms.map((item) => `${item.strategy}:${item.responseCount}`).join(", ")}`,
+    "",
+    "## Shards",
+    `- Plan status: ${value.shardState.planStatus}`,
+    `- Intake status: ${value.shardState.intakeStatus}`,
+    `- Accepted shards: ${value.shardState.acceptedShardCount}`,
+    `- Missing shards: ${value.shardState.missingShardCount}`,
+    `- Full SOTA lane ready for response export: ${value.shardState.fullSotaLaneReadyForResponseArmExport}`,
+    `- Full SOTA lane ready for answer-quality scoring: ${value.shardState.fullSotaLaneReadyForAnswerQualityScoring}`,
+    "",
+    "## Local Full Lane",
+    `- Status: ${value.localFullLaneState.status}`,
+    `- Claim scope: ${value.localFullLaneState.claimScope}`,
+    `- Accepted lane: ${value.localFullLaneState.acceptedLaneId ?? "n/a"}`,
+    `- Query count: ${value.localFullLaneState.queryCount}`,
+    `- Shard count: ${value.localFullLaneState.shardCount}`,
+    `- Ready for response export: ${value.localFullLaneState.readyForResponseArmExport}`,
+    `- Ready for first shard run: ${value.localFullLaneState.readyForFirstShardRun}`,
+    `- Intake status: ${value.localFullLaneState.intakeStatus}`,
+    `- Ready for shard combine: ${value.localFullLaneState.readyForShardCombine}`,
+    `- Accepted local-full shards: ${value.localFullLaneState.acceptedShardCount}`,
+    `- Missing local-full shards: ${value.localFullLaneState.missingShardCount}`,
+    `- Launch progress source: ${value.localFullLaneState.launchProgressSource ?? "n/a"}`,
+    `- Performance coverage: ${value.localFullLaneState.performanceReport.coveragePercent}%`,
+    `- Performance best strategy: ${value.localFullLaneState.performanceReport.bestStrategy ?? "n/a"}`,
+    `- Performance best answer quality: ${value.localFullLaneState.performanceReport.bestAnswerQuality ?? "n/a"}`,
+    `- Performance counts as SOTA evidence: ${value.localFullLaneState.performanceReport.countsAsFullMemorySotaEvidence}`,
+    `- Combined score status: ${value.localFullLaneState.combinedScore.status}`,
+    `- Combined score ready: ${value.localFullLaneState.combinedScore.evidenceReady}`,
+    `- Combined score winner: ${value.localFullLaneState.combinedScore.winnerStrategy ?? "n/a"}`,
+    `- Combined score answer quality: ${value.localFullLaneState.combinedScore.winnerAnswerQuality ?? "n/a"}`,
+    `- Combined score BM25 answer quality: ${value.localFullLaneState.combinedScore.bm25AnswerQuality ?? "n/a"}`,
+    `- Memory score gate status: ${value.localFullLaneState.memoryScoreGate.status ?? "n/a"}`,
+    `- Memory score gate ready: ${value.localFullLaneState.memoryScoreGate.evidenceReady}`,
+    `- Memory score gate counts as local-full evidence: ${value.localFullLaneState.memoryScoreGate.countsAsLocalFullBenchmarkEvidence}`,
+    `- Memory score gate counts as SOTA evidence: ${value.localFullLaneState.memoryScoreGate.countsAsFullMemorySotaEvidence}`,
+    `- Memory score gate observed score: ${value.localFullLaneState.memoryScoreGate.observedScore ?? "n/a"}`,
+    `- Memory score gate reported target score: ${value.localFullLaneState.memoryScoreGate.reportedTargetScore ?? "n/a"}`,
+    `- Resume env ready for missing-arm export: ${value.localFullLaneState.resumeEnv.readyForMissingArmExport}`,
+    `- Resume env ready for missing-arm export except env: ${value.localFullLaneState.resumeEnv.readyForMissingArmExportExceptEnv}`,
+    `- Resume env ready for command materialization: ${value.localFullLaneState.resumeEnv.readyForCommandMaterialization}`,
+    `- Resume env private input files ready: ${value.localFullLaneState.resumeEnv.privateInputFilesReady}`,
+    `- Resume env completed private arm files ready: ${value.localFullLaneState.resumeEnv.completedPrivateArmFilesReady}`,
+    `- Resume env private directory provided: ${value.localFullLaneState.resumeEnv.privateDirectoryProvided}`,
+    `- Resume env raw-source private audit ready: ${value.localFullLaneState.resumeEnv.rawSourcePrivateAuditReady}`,
+    `- Resume env compressed default retrieval allowed: ${value.localFullLaneState.resumeEnv.compressedDefaultRetrievalAllowed}`,
+    `- Resume env local execution env ready: ${value.localFullLaneState.resumeEnv.localResumeExecutionEnvReady}`,
+    `- Resume env local embedding env ready: ${value.localFullLaneState.resumeEnv.localEmbeddingEnvReady}`,
+    `- Resume env local rerank env ready: ${value.localFullLaneState.resumeEnv.localRerankEnvReady}`,
+    `- Resume env answer-quality env ready: ${value.localFullLaneState.resumeEnv.answerQualityEnvReady}`,
+    `- Resume command security ready: ${value.localFullLaneState.resumeCommandSecurity.evidenceReady}`,
+    `- Resume command private file mode: ${value.localFullLaneState.resumeCommandSecurity.privateCommandFileMode ?? "n/a"}`,
+    `- Resume command first guard: ${value.localFullLaneState.resumeCommandSecurity.firstCommandId ?? "n/a"}`,
+    `- Resume command second guard: ${value.localFullLaneState.resumeCommandSecurity.secondCommandId ?? "n/a"}`,
+    `- Resume command third guard: ${value.localFullLaneState.resumeCommandSecurity.thirdCommandId ?? "n/a"}`,
+    `- Resume command guarded command: ${value.localFullLaneState.resumeCommandSecurity.guardedCommandId ?? "n/a"}`,
+    `- Resume command counts as SOTA evidence: ${value.localFullLaneState.resumeCommandSecurity.countsAsFullMemorySotaEvidence}`,
+    `- Resume result gate satisfied by accepted shard intake: ${value.localFullLaneState.resumeResult.gateSatisfiedByAcceptedShardIntake}`,
+    `- Resume result ready for local shard intake: ${value.localFullLaneState.resumeResult.readyForLocalShardIntake}`,
+    `- Resume result previous shard accepted: ${value.localFullLaneState.resumeResult.previousShardAccepted}`,
+    `- Resume result shard 002 present: ${value.localFullLaneState.resumeResult.shard002ResultPresent}`,
+    `- Resume result shard 002 accepted: ${value.localFullLaneState.resumeResult.shard002ResultAccepted}`,
+    `- Next local-full shard: ${value.localFullLaneState.nextPendingShardId ?? "n/a"} (${value.localFullLaneState.nextPendingShardRange ?? "n/a"})`,
+    `- Runtime-blocked local-full shards: ${value.localFullLaneState.runtimeBlockedShardCount}`,
+    `- Historical runtime-blocked local-full shards: ${value.localFullLaneState.historicalRuntimeBlockedShardCount}`,
+    `- Recovered runtime-blocked local-full shards: ${value.localFullLaneState.recoveredRuntimeBlockedShardCount}`,
+    `- Runtime recovery status: ${value.localFullLaneState.runtimeRecoveryStatus ?? "n/a"}`,
+    `- Runtime recovery retrieval recovered: ${value.localFullLaneState.runtimeRecoveryRetrievalRecovered}`,
+    `- Runtime recovery answer-quality env ready: ${value.localFullLaneState.runtimeRecoveryAnswerQualityEnvReady}`,
+    `- Runtime blocker resume plans: ${value.localFullLaneState.runtimeBlockerResumeAvailableCount}`,
+    `- Next shard missing resume arms: ${value.localFullLaneState.nextPendingShardResumeMissingStrategies.join(", ") || "none"}`,
+    `- Historical next shard missing resume arms: ${value.localFullLaneState.historicalNextPendingShardResumeMissingStrategies.join(", ") || "none"}`,
+    `- Latest runtime-blocked shard: ${value.localFullLaneState.latestRuntimeBlockedShard ?? "n/a"}`,
+    `- Latest runtime-blocked arm: ${value.localFullLaneState.latestRuntimeBlockedArm ?? "n/a"}`,
+    `- Local embedding runtime status: ${value.localFullLaneState.localEmbeddingRuntimeStatus ?? "n/a"}`,
+    `- Local embedding runtime ready: ${value.localFullLaneState.localEmbeddingRuntimeReady}`,
+    `- Local embedding durability status: ${value.localFullLaneState.localEmbeddingDurabilityStatus ?? "n/a"}`,
+    `- Local embedding durability ready: ${value.localFullLaneState.localEmbeddingDurabilityReady}`,
+    `- Cloud provider blocker count: ${value.localFullLaneState.cloudProviderBlockerCount}`,
+    `- Operator inputs needed: ${value.localFullLaneState.operatorInputCount}`,
+    `- Counts as full memory SOTA evidence: ${value.localFullLaneState.countsAsFullMemorySotaEvidence}`,
+    "",
+    "## Provider Wave Intake",
+    `- Status: ${value.providerWaveState.status ?? "n/a"}`,
+    `- Evidence ready: ${value.providerWaveState.evidenceReady}`,
+    `- Reports: ${value.providerWaveState.reportCount}`,
+    `- Completed reports: ${value.providerWaveState.completedReportCount}`,
+    `- Partial reports: ${value.providerWaveState.partialReportCount}`,
+    `- All waves include BM25: ${value.providerWaveState.allHaveBm25}`,
+    `- All waves include full hybrid: ${value.providerWaveState.allHaveFullHybrid}`,
+    `- Completed provider families: ${value.providerWaveState.completedProviderFamilies.join(", ") || "none"}`,
+    `- Retryable provider limit observed: ${value.providerWaveState.retryableProviderLimitObserved}`,
+    `- Repair wave status: ${value.providerWaveState.nextRunPlan.status ?? "n/a"}`,
+    `- Repair slices: ${value.providerWaveState.nextRunPlan.repairSliceCount}`,
+    `- Recommended repair execution: ${value.providerWaveState.nextRunPlan.recommendedExecution ?? "n/a"}`,
+    `- Avoid concurrent provider arms: ${value.providerWaveState.nextRunPlan.avoidConcurrentProviderArms}`,
+    `- Counts as full memory SOTA evidence: ${value.providerWaveState.countsAsFullMemorySotaEvidence}`,
+    `- Counts as end-to-end memory benchmark: ${value.providerWaveState.countsAsEndToEndMemoryBenchmark}`,
+    `- Best provider rows: ${value.providerWaveState.bestProviderRows.map((row) => `${row.provider}:${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}`).join(", ") || "none"}`,
+    "",
+    "## Model Challenger Memory Score",
+    `- Status: ${value.modelChallengerState.status ?? "n/a"}`,
+    `- Benchmark evidence ready: ${value.modelChallengerState.benchmarkEvidenceReady}`,
+    `- Reported-score claim ready: ${value.modelChallengerState.reportedScoreClaimReady}`,
+    `- Counts as end-to-end memory benchmark: ${value.modelChallengerState.countsAsEndToEndMemoryBenchmark}`,
+    `- Counts as full memory SOTA evidence: ${value.modelChallengerState.countsAsFullMemorySotaEvidence}`,
+    `- Direct DeepSeek scoring: ${value.modelChallengerState.directDeepSeekScoring}`,
+    `- Answer model: ${value.modelChallengerState.answerModel ?? "n/a"}`,
+    `- Judge model: ${value.modelChallengerState.judgeModel ?? "n/a"}`,
+    `- Scored queries: ${value.modelChallengerState.scoredQueryCount} of ${value.modelChallengerState.totalQueryCount}`,
+    `- Arm count: ${value.modelChallengerState.armCount}`,
+    `- Best arm: ${value.modelChallengerState.bestArmStrategy ?? "n/a"}:${value.modelChallengerState.bestArmAnswerQuality ?? "n/a"}`,
+    `- BM25 control score: ${value.modelChallengerState.bm25AnswerQuality ?? "n/a"}`,
+    `- Full hybrid score: ${value.modelChallengerState.fullHybridAnswerQuality ?? "n/a"}`,
+    `- Local dense score: ${value.modelChallengerState.localDenseAnswerQuality ?? "n/a"}`,
+    `- Local rerank score: ${value.modelChallengerState.localRerankAnswerQuality ?? "n/a"}`,
+    `- Model-challenger blockers: ${value.modelChallengerState.modelChallengerBlockers.join("; ") || "none"}`,
+    `- Evidence blockers: ${value.modelChallengerState.evidenceBlockers.join("; ") || "none"}`,
+    "",
+    "## Method Ladder Result Gate",
+    `- Status: ${value.methodLadderState.status ?? "n/a"}`,
+    `- Evidence ready: ${value.methodLadderState.evidenceReady}`,
+    `- Counts as method-ladder evidence: ${value.methodLadderState.countsAsMethodLadderEvidence}`,
+    `- Counts as full memory SOTA evidence: ${value.methodLadderState.countsAsFullMemorySotaEvidence}`,
+    `- Query count: ${value.methodLadderState.queryCount}`,
+    `- Method count: ${value.methodLadderState.methodCount}`,
+    `- Baseline: ${value.methodLadderState.baselineMethod ?? "n/a"}:${value.methodLadderState.baselineWinnerStrategy ?? "n/a"}:${value.methodLadderState.baselineAnswerQuality ?? "n/a"}`,
+    `- Best challenger: ${value.methodLadderState.bestChallengerMethod ?? "n/a"}:${value.methodLadderState.bestChallengerWinnerStrategy ?? "n/a"}:${value.methodLadderState.bestChallengerAnswerQuality ?? "n/a"}`,
+    `- Delta vs baseline: ${value.methodLadderState.deltaVsBaseline ?? "n/a"}`,
+    `- Paired bootstrap available: ${value.methodLadderState.pairedBootstrapAvailable}`,
+    `- Paired bootstrap common queries: ${value.methodLadderState.pairedBootstrapCommonQueryCount}`,
+    `- Paired bootstrap mean delta: ${value.methodLadderState.pairedBootstrapMeanDelta ?? "n/a"}`,
+    `- Paired bootstrap 95% lower bound: ${value.methodLadderState.pairedBootstrapLowerBound95 ?? "n/a"}`,
+    `- Winning arm failures: ${value.methodLadderState.winningArmFailureCount}`,
+    `- Total failure rate: ${value.methodLadderState.totalFailureRate}`,
+    `- Next larger-slice promotion ready: ${value.methodLadderState.nextLargerSlicePromotionReady}`,
+    `- Promotion scope: ${value.methodLadderState.promotionScope ?? "n/a"}`,
+    `- Production default allowed by method ladder: ${value.methodLadderState.productionDefaultAllowed}`,
+    `- Public SOTA claim allowed by method ladder: ${value.methodLadderState.publicSotaClaimAllowedByMethodLadder}`,
+    `- Promotion warnings: ${value.methodLadderState.promotionWarnings.join("; ") || "none"}`,
+    `- Next larger-slice challenger: ${value.methodLadderState.nextLargerSliceChallenger ?? "n/a"}`,
+    `- Rows: ${value.methodLadderState.rows.map((row) => `${row.method}:${row.winnerStrategy ?? "n/a"}:${row.answerQuality ?? "n/a"}`).join(", ") || "none"}`,
+    "",
+    "## Blockers",
+    ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
+    "",
+    "## Next Run",
+    `- Primary stage: ${value.nextRunPlan.primaryStage}`,
+    `- Strategy set: ${value.nextRunPlan.strategySet.join(", ")}`,
+    `- Required after shard runs: ${value.nextRunPlan.requiredAfterShardRuns.join("; ")}`,
+  ];
+  return lines.join("\n");
+}
+
+function loadFile(file) {
+  const path = file;
+  const abs = resolveInputPath(file);
+  assert.ok(existsSync(abs), `required evidence missing: ${file}`);
+  const text = readFileSync(abs, "utf8");
+  assertNoCredentialText(text, file);
+  return {
+    path,
+    exists: true,
+    hash: `sha256:${sha256(text)}`,
+    text,
+    json: file.endsWith(".json") ? JSON.parse(text) : null,
+  };
+}
+
+function preferReviewFile(...names) {
+  for (const name of names) {
+    const candidate = `${reviewDir}/${name}`;
+    if (existsSync(resolveInputPath(candidate))) return candidate;
+  }
+  return `${reviewDir}/${names.at(-1)}`;
+}
+
+function runJson(nodeArgs) {
+  const result = spawnSync("node", nodeArgs, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `node ${nodeArgs.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
+  assertSafePublicText(result.stdout, nodeArgs.join(" "));
+  return JSON.parse(result.stdout);
+}
+
+function writeOutput(path, text) {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, text, { encoding: "utf8", mode: 0o600 });
+}
+
+function resolveInputPath(path) {
+  return isAbsolute(path) ? path : resolve(root, path);
+}
+
+function arrayOf(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function parseArgs(argv) {
+  const parsed = {};
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (!arg.startsWith("--")) continue;
+    const key = arg.slice(2).replace(/-([a-z])/g, (_, ch) => ch.toUpperCase());
+    const next = argv[i + 1];
+    if (!next || next.startsWith("--")) parsed[key] = true;
+    else {
+      parsed[key] = next;
+      i += 1;
+    }
+  }
+  return parsed;
+}
+
+function sha256(text) {
+  return createHash("sha256").update(text).digest("hex");
+}
+
+function assertSafePublicText(text, label) {
+  const secretPattern =
+    /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+  const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/|\/home\/|[A-Za-z]:\\Users\\)/i;
+  assert.ok(!secretPattern.test(text), `${label} appears to contain a credential`);
+  assert.ok(!privatePathPattern.test(text), `${label} appears to contain a private path`);
+}
+
+function assertNoCredentialText(text, label) {
+  const secretPattern =
+    /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+  assert.ok(!secretPattern.test(text), `${label} appears to contain a credential`);
+}

@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "agentic-memory-ingest-contract",
+  "generatedAt": "2026-05-29T22:33:23.867Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawTrajectoryIncluded": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "countsAsBenchmarkScore": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForSourceLockProof": true,
+  "contractHash": "sha256:ce1cae11c2d74764c165a0bd4308120492c153be3ba0e67ee142bcd335f41ee9",
+  "sourceLock": {
+    "mode": "agentic-memory-source-lock-check",
+    "targetId": "longmemeval-v2",
+    "liveChecksRequested": true,
+    "liveSourceSnapshotOk": true,
+    "repoCommitHash": "sha256:11bf5666eaac2576fe87d3fdfcd1b7fa7fe2e835b3feb0bdbcbd721779b335f6",
+    "datasetRevisionHash": "sha256:43eb8790db2b1afe40c4f6e4ea57d9d3dd167a88ce5a63b39f17005aabb5e282"
+  },
+  "contract": {
+    "schemaVersion": 1,
+    "id": "longmemeval-v2-to-recallweave-ingest-v1",
+    "benchmark": "longmemeval-v2",
+    "sourceRevisions": {
+      "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
+      "datasetRevision": "f152293e235517d504809563c833d7190b8c713b",
+      "repoContentsHash": "sha256:3d09d12e19ae6331d90eb9396c8e53285ad5b679a79ef267f610e029afc8a911",
+      "datasetSiblingsHash": "sha256:8c412be7d7c772cb91cfed53043c7882a77271a4a913380f13fcd42438b503c8"
+    },
+    "inputBoundary": {
+      "operatorPrivateRawRows": true,
+      "rawRowsInRepository": false,
+      "rawTrajectoryTextInPublicReport": false,
+      "rawImagesInPublicReport": false,
+      "publicArtifactsContain": [
+        "counts",
+        "hashes",
+        "strategy names",
+        "reason codes",
+        "model ids"
+      ],
+      "privateArtifactsContain": [
+        "raw trajectory rows",
+        "raw observations",
+        "raw actions",
+        "answer labels",
+        "candidate chunks"
+      ]
+    },
+    "sessionization": {
+      "sessionUnit": "one benchmark trajectory becomes one RecallWeave session",
+      "sessionIdDerivation": "sha256(benchmark-id | dataset-revision | trajectory-id)",
+      "chunkIdDerivation": "sha256(session-id | event-index | event-kind | normalized-content-hash)",
+      "eventKinds": [
+        "task_prompt",
+        "observation",
+        "action",
+        "state_delta",
+        "tool_result",
+        "checkpoint",
+        "final_answer"
+      ],
+      "chunkBoundaries": [
+        "split on benchmark trajectory event boundaries first",
+        "preserve observation/action adjacency as retrieval neighbors",
+        "clip oversized observations into ordered private chunks",
+        "store chunk hashes and token counts in public reports only"
+      ]
+    },
+    "topicMapping": {
+      "rootTopicPath": "Benchmarks / LongMemEval-V2 / {domain}",
+      "subtopicPath": "{ability-family} / {task-entity-fingerprint} / {temporal-state-phase}",
+      "multiTopicLinks": true,
+      "maxTopicLinksPerChunk": 4,
+      "salienceScale": "0.0-1.0",
+      "requiredReasonCodes": [
+        "domain",
+        "ability",
+        "entity-page",
+        "temporal-state",
+        "user-task-intent"
+      ],
+      "lowConfidencePolicy": "link to benchmark/domain root and retain private vector chunk for later review"
+    },
+    "wikiLayer": {
+      "publicWikiStoresRawText": false,
+      "publicWikiStores": [
+        "topic title",
+        "summary",
+        "subtopic edges",
+        "source fingerprints",
+        "revision hashes"
+      ],
+      "editableByHuman": true,
+      "titleAmplificationDefault": "off-until-answer-quality-win",
+      "subtopicAmplificationDefault": "experimental-gated",
+      "summarySessionDefault": "experimental-gated"
+    },
+    "vectorLayer": {
+      "vectorizesFullSessionChunks": true,
+      "vectorStoreVisibility": "operator-private",
+      "denseSearchDefault": "available-but-not-required-for-every-query",
+      "lexicalControl": "bm25-lite",
+      "hybridPolicy": [
+        "start with lexical control and topic/wiki candidates",
+        "use vector session chunks when lexical or topic recall lacks enough evidence",
+        "rerank only within the configured candidate budget",
+        "log provider, cache hit, candidate count, and fallback reason codes"
+      ]
+    },
+    "lifecycleAndCompaction": {
+      "preCompactCheckpointRequired": true,
+      "storeFullSessionBeforeSummary": true,
+      "condensedSummaryLinksToSessionHashes": true,
+      "lifecycleEvents": [
+        "ingest-start",
+        "chunked",
+        "topic-linked",
+        "vectorized",
+        "wiki-updated",
+        "retrieval-used",
+        "pre-compact-checkpoint"
+      ],
+      "lcmCompressionDefault": "off-until-benchmark-positive"
+    },
+    "benchmarkIsolation": {
+      "hostedSupermemorySearchDisabledForMethodology": true,
+      "hostedWriteBackDisabled": true,
+      "rawSourceRetentionPrivate": true,
+      "sameDataComparatorsRequired": true,
+      "answerAndJudgeModelsPinnedBySourceLock": true,
+      "countsAsScore": false
+    },
+    "validation": {
+      "requiredBeforeMaterialization": [
+        "source-lock repo commit",
+        "source-lock dataset revision",
+        "leaderboard tier",
+        "question id hash",
+        "answer label hash",
+        "scoring code hash",
+        "leaderboard row hash",
+        "reader model",
+        "judge model"
+      ],
+      "metricsToLog": [
+        "coverage",
+        "candidate counts",
+        "context tokens",
+        "latency",
+        "fallback reason codes",
+        "privacy failures"
+      ],
+      "failureModesToTrack": [
+        "unlinked chunks",
+        "overbroad topic links",
+        "topic drift",
+        "query expansion harm",
+        "vector-only miss",
+        "bm25-only miss"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "name": "contract-id",
+      "ok": true
+    },
+    {
+      "name": "raw-public-disabled",
+      "ok": true
+    },
+    {
+      "name": "sessionization-present",
+      "ok": true
+    },
+    {
+      "name": "topic-mapping-present",
+      "ok": true
+    },
+    {
+      "name": "wiki-layer-present",
+      "ok": true
+    },
+    {
+      "name": "vector-layer-present",
+      "ok": true
+    },
+    {
+      "name": "lifecycle-checkpoint-present",
+      "ok": true
+    },
+    {
+      "name": "benchmark-isolation",
+      "ok": true
+    }
+  ],
+  "failedChecks": [],
+  "sourceLockProof": {
+    "proofField": "trajectoryIngestContractHash",
+    "proofValue": "sha256:ce1cae11c2d74764c165a0bd4308120492c153be3ba0e67ee142bcd335f41ee9",
+    "commandArg": "--ingest-contract-hash sha256:ce1cae11c2d74764c165a0bd4308120492c153be3ba0e67ee142bcd335f41ee9"
+  },
+  "nextActions": [
+    "Feed sourceLockProof.proofValue into benchmark:agentic-source-lock when regenerating the LongMemEval-V2 source-lock packet.",
+    "Use this contract when materializing LongMemEval-V2 rows into private sessions and public wiki/topic evidence.",
+    "Keep title, subtopic, and summary-session amplification gated until answer-quality shards prove a win."
+  ]
+}

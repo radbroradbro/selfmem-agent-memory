@@ -1,0 +1,59 @@
+{
+  "mode": "current-head-live-browser-ui-evidence",
+  "generatedAt": "2026-06-01T13:10:00Z",
+  "gitHead": "5e55cb8b7231be4c43e7ba514c76a03722546304",
+  "branch": "feat/nucleus-wiki-native-contract",
+  "sourceUrl": "http://127.0.0.1:4189/",
+  "screenshot": "reviews/overnight-20260522/ui-evidence/brain-ui-20260601-current-head-filtered-retrieval.jpg",
+  "browserFlow": [
+    "loaded self-hosted Brain UI on localhost",
+    "searched for native memory",
+    "selected retrieval trace fixture node",
+    "inspected lifecycle trail, Nucleus snapshot, research lineage, source lock, container health, and update flow"
+  ],
+  "page": {
+    "bodyTextLength": 47001,
+    "privateLeakChecks": {
+      "keyShapeVisible": false,
+      "privatePathVisible": false
+    },
+    "searchValue": "native memory",
+    "selectedHeading": "Retrieval trace for native memory optimization",
+    "statusText": [
+      "2/2 nodes | 2 links",
+      "source locked",
+      "guarded",
+      "PASS",
+      "READY_FOR_ONE_AGENT_CANARY",
+      "FAIL",
+      "Fixture policy loaded.",
+      "Fixture review queue loaded.",
+      "12 files compiled. Lint clean.",
+      "This fixture node is inspect-only.",
+      "No saved fixture edits."
+    ],
+    "title": "RecallWeave Brain",
+    "url": "http://127.0.0.1:4189/",
+    "visibleChecks": {
+      "containerHealthy": true,
+      "lifecycleTrailVisible": true,
+      "localOnlyWrites": true,
+      "noKeyShapedVisibleText": true,
+      "noPrivatePathVisibleText": true,
+      "nucleusSnapshotFixture": true,
+      "researchLineageVisible": true,
+      "researchSourceLockVisible": true,
+      "retrievalTraceSelected": true,
+      "searchFiltered": true,
+      "updateFlowVisible": true
+    }
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "publicSafety": {
+    "fixtureOnly": true,
+    "writesRealFilesVisibleAsFalse": true,
+    "noKeyShapedVisibleText": true,
+    "noPrivatePathVisibleText": true
+  }
+}

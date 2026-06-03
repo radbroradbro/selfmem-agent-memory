@@ -1,0 +1,600 @@
+{
+  "ok": true,
+  "mode": "canary-returned-supervisor",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicLaunchAllowed": false,
+  "fleetRolloutAllowed": false,
+  "requireFound": false,
+  "includeAllZips": true,
+  "maxBytes": 26214400,
+  "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
+  "sourceControl": {
+    "expectedCommit": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea"
+  },
+  "input": {
+    "defaultInboxScan": true,
+    "discoveredRootCount": 2,
+    "rootLabels": [
+      "Downloads",
+      "Telegram Desktop"
+    ],
+    "rootLabelsHash": "ac42f650efe3265a41787e37ffbc0041327361fbcd401e445b8c4ed18b589bc7"
+  },
+  "counts": {
+    "candidateZipCount": 37,
+    "scannedZipCount": 37,
+    "skippedLargeZipCount": 0,
+    "returnedEvidencePackets": 0,
+    "productionEvidencePackets": 0,
+    "handoffPackets": 1,
+    "diagnosticBundles": 11,
+    "unknownPackets": 25,
+    "unreadablePackets": 0,
+    "failedParseCount": 0
+  },
+  "selectedProductionPacket": null,
+  "workspaceResult": null,
+  "candidates": [
+    {
+      "packetId": "zip-a434cbebec60",
+      "sha256": "a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2",
+      "kind": "handoff-packet",
+      "status": "HANDOFF_PACKET_NOT_RETURNED_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "canary request packets must be executed by an agent before they can count as returned canary evidence"
+      }
+    },
+    {
+      "packetId": "zip-cbd19a2fb2b1",
+      "sha256": "cbd19a2fb2b18f00826809fe1451f2fbcac00dd0fa91d6fcadd1a6721906acd1",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-768fea8993cf",
+      "sha256": "768fea8993cfab625cf514844a7bcfb26dcb3b73cf37a04b7ac56a70eea6dfc4",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-9a0fd193ce5e",
+      "sha256": "9a0fd193ce5eee72ea46d5f03d05d4dd25ea5784b18515558f63c61109881098",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-2284e18c981e",
+      "sha256": "2284e18c981e3cc7e20739ac2539bc0106dda7ddce15bd71331156f5e56553bc",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-f0e9fcbb747f",
+      "sha256": "f0e9fcbb747fb22964222dbf4ead3da5ab3be7916b9f61c1f0090652601e6114",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-e0b12b85d7bf",
+      "sha256": "e0b12b85d7bfbb8bf35d313c098755ba0a0d7fced6c1d70d16641819506a6982",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-16352c5c2ef9",
+      "sha256": "16352c5c2ef94556d328f560e2900eb819e7a0cfd55b07c3f8feaa38aef17c8a",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-fa7497ed4263",
+      "sha256": "fa7497ed42635ca46e10d4ccf5103d557a91e19d989650ae520c8fd3d3a43974",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-76917aa9cabb",
+      "sha256": "76917aa9cabbbfd2026041e6e49620b542e1f1112377159d9a246c6be601f3ab",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-7c35106ed962",
+      "sha256": "7c35106ed962ff02bd71e698c407bf822dbaff7302a1f61c650424533034693f",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-9058d237bc7f",
+      "sha256": "9058d237bc7fe347726af7581e44537a51f47ed19398df6f37be40fec246ba73",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-4e08e6542536",
+      "sha256": "4e08e6542536dd3f5f63a137b0dec29ae6e9749817247f5f11ebf8d0f0355f22",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-10244ed1cc36",
+      "sha256": "10244ed1cc36fefe1de8121a459232a2f07fdf274f4fa49d84bd138eda216a64",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-836e3d1c01ce",
+      "sha256": "836e3d1c01ceeb11ec3dfc8dec848fde712fdfa646fd5e43aa8a6f3641cd48c8",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-ffc8b5d8b8c4",
+      "sha256": "ffc8b5d8b8c495c214711c7e347736fcc641940c5761f51f7c26c76b1c4d9880",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-79ae05f7dd51",
+      "sha256": "79ae05f7dd510da495af86a36d68017f13ed7d94a185d5b316e502b48b08259a",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-06baf2421f10",
+      "sha256": "06baf2421f100f6d61d09c27bb1df2decdbbb3d20f87912fb28438a1eb841adc",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-663fad97df55",
+      "sha256": "663fad97df55977c0aa44d5ed954343adb43a0b1917ec4c16e8f9a2a900fcd0c",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-81e2cf5cbeff",
+      "sha256": "81e2cf5cbeff68332b9d3d819e5c654703a2ee2bab92c21f1fa28e6c36076cc6",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-11618823e283",
+      "sha256": "11618823e2830fc5dbf895ab948c2a455ece661d9c0bc969b21037e520c67efc",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-0d89d11c6128",
+      "sha256": "0d89d11c6128e92219ff3f6db40d037052071723611decf19f0e3bde1d2c69ea",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-c0fbacd5b435",
+      "sha256": "c0fbacd5b4353ed429024d0b930d7ec691b6d2f51ead5a71173f09664f675ac5",
+      "kind": "diagnostic-bundle",
+      "status": "DIAGNOSTIC_BUNDLE_USE_CANARY_BATCH_AUDIT",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-returned-evidence-packet"
+        ],
+        "strictFailureReason": "diagnostic bundles should go through canary:batch-audit before returned-packet intake"
+      }
+    },
+    {
+      "packetId": "zip-3616fe224f2b",
+      "sha256": "3616fe224f2bd4255c22ee5745040024d130ebd6678af359ceca3d90662c0fb3",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-3da6246517e3",
+      "sha256": "3da6246517e303fae6d9b262de9d494e8b244c0c4a036784d04d0ff19005e970",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-6f6b126de0a7",
+      "sha256": "6f6b126de0a7d46695f22b6c4fe7d34ddf9ce60a1b58615a2a1dc53d7e27ddfe",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-2bb02cab8831",
+      "sha256": "2bb02cab88313d954d1e901ef5df5865df269af801f0c9927861773c1cebca33",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-a4d3fa80d0e4",
+      "sha256": "a4d3fa80d0e4397e4c49378af048a94a8d5be5a9e91840487bac27a108227f57",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-35dadada12ac",
+      "sha256": "35dadada12ac351bd025476309a32c88db10bb433a90c6d1a28248174f96d3d9",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-35dadada12ac",
+      "sha256": "35dadada12ac351bd025476309a32c88db10bb433a90c6d1a28248174f96d3d9",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-4f9423e00845",
+      "sha256": "4f9423e008458e4e188614e6384896907bc4a504fc85cb05a5ac0f139d0bb2b3",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-8637a0fb9198",
+      "sha256": "8637a0fb9198dc6ab81ff300f2312832c347e8aa1344434ba9ccb35ac774d4d1",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-ae02256bbba1",
+      "sha256": "ae02256bbba1f84646340ebb6fc738de8822a5c06f3b89b4c606d37fe9ed0d3e",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-21bdd26b49f9",
+      "sha256": "21bdd26b49f90a483fff697f99e98ccdbb6cf8473c55f45d6020c5676da9c0c2",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-1869e3224be4",
+      "sha256": "1869e3224be42318c5334b6bf71e7755ae33fba0d2603911610500a67d17d067",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-d120c87d7c2c",
+      "sha256": "d120c87d7c2c285999c299ea358f04fd9e50f50b87141cb01d12ec7b1f33787d",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    },
+    {
+      "packetId": "zip-4d6b788b5ccf",
+      "sha256": "4d6b788b5ccf95800e047cc0779369295bd7e82e4bc5408628c504d3ab4192c3",
+      "kind": "unknown-zip",
+      "status": "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE",
+      "ok": true,
+      "countsAsProductionCanaryEvidence": false,
+      "review": {
+        "ok": false,
+        "failedChecks": [
+          "not-canary-evidence-packet"
+        ],
+        "strictFailureReason": "zip does not contain the returned canary evidence packet contract"
+      }
+    }
+  ],
+  "nextActions": [
+    "Keep waiting for a returned metrics-only production canary evidence packet.",
+    "Do not count canary request packets, diagnostic bundles, unreadable zips, or unknown zips as production evidence.",
+    "Send the current OpenClaw next-agent request packet to exactly one selected agent if it has not been run yet."
+  ]
+}

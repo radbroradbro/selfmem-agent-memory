@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "mode": "provider-benchmark-blocker",
+  "status": "BLOCKED_VOYAGE_RATE_LIMIT",
+  "generatedAt": "2026-05-25T21:44:39.000Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": true,
+  "sendsBenchmarkTextToProvider": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "provider": "voyage",
+  "httpStatus": 429,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "benchmark": "longmemeval",
+    "claimTier": "run-only"
+  },
+  "attemptedStrategies": [
+    "cloud-voyage4-voyage",
+    "cloud-voyage4-lite-voyage-lite"
+  ],
+  "freshRetry": {
+    "attemptedAt": "2026-05-25T21:44:39.000Z",
+    "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "sameDataMaterializationOk": true,
+    "localControlArmsExported": [
+      "bm25-lite",
+      "full-hybrid-rerank"
+    ],
+    "voyageArmAttempted": "cloud-voyage4-voyage",
+    "voyageArmExported": false,
+    "httpStatus": 429,
+    "retryAttempts": 2,
+    "providerMinIntervalMs": 12000,
+    "maxMemoryBytes": 25000000,
+    "privateInputsStoredOutsideRepository": true,
+    "rawPrivateOutputPathIncluded": false,
+    "providerResponseBodyCommitted": false
+  },
+  "mitigationsTried": [
+    "provider retry/backoff added to recallweave-response-export",
+    "full Voyage 4 arm retried with provider pacing",
+    "lower-call Voyage 4 lite/lite arm retried with stricter provider pacing",
+    "fresh same-data materialization rerun and local control arms exported before another Voyage 429"
+  ],
+  "impact": [
+    "NVIDIA same-data answer-quality could run and should count only as the non-Voyage provider challenger.",
+    "Voyage answer-quality remains missing and continues to block full SOTA/replacement claims.",
+    "No full Voyage result, lite Voyage result, raw benchmark text, private path, credential, or response body is committed."
+  ],
+  "nextActions": [
+    "Retry the Voyage arm after provider quota or rate-limit reset.",
+    "Keep the SOTA ladder blocked on missing Voyage same-data answer-quality.",
+    "Do not substitute NVIDIA, MTEB, or reported Supermemory stats for a same-data Voyage result."
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-03T11:33:59Z",
+  "mode": "answer-quality-model-challenger-contextual-source-scoring-blocker",
+  "status": "BLOCKED_ANSWER_QUALITY_SCORER_RATE_LIMIT",
+  "ok": false,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "claimScope": "blocked diagnostic evidence only; not a SOTA claim and not full-memory benchmark completion evidence",
+  "target": {
+    "benchmark": "LongMemEval",
+    "memoryMethod": "contextual-source-chunk-v1",
+    "shardId": "shard-001",
+    "startIndex": 0,
+    "endIndexExclusive": 25,
+    "selectedQueryCount": 25,
+    "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+  },
+  "upstreamEvidence": {
+    "materializeReport": "public-longmemeval-model-challenger-contextual-source-materialize-shard-001-20260603.json",
+    "armExportReport": "answer-quality-model-challenger-contextual-source-shard-001-arm-export-20260603.json",
+    "preflightReport": "answer-quality-model-challenger-contextual-source-preflight-shard-001-20260603.json",
+    "materializePublicSafe": true,
+    "retrievalArmExportStatus": "EXPORTED_RESPONSE_ARMS",
+    "preflightStatus": "READY_FOR_LIVE_ANSWER_QUALITY",
+    "completedArmCount": 6
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0,
+      "responseHash": "sha256:0f29380d8db45d2bf9cf3f2e1fc3d37180a87297e34db1348d0028c1a622a14c"
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0,
+      "responseHash": "sha256:d8adedaeda31b5756be3e2dc562331361a34b3c65d3de466020eabec0ecc1101"
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0,
+      "responseHash": "sha256:9d17d8b082cf798b939410992709efd361b889b3439ce84077a43b49be92b632"
+    },
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "responseCount": 25,
+      "providerCallsMade": 50,
+      "queryExpansionCalls": 0,
+      "responseHash": "sha256:e2091a0751511fdb7b3728c2ac0951d61fdbd3e9f64c39c6c17195937460d191"
+    },
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "responseCount": 25,
+      "providerCallsMade": 75,
+      "queryExpansionCalls": 0,
+      "responseHash": "sha256:003b2a823592d97cbd6ce6fd3ef51c51aeeb20abdc218dd722d2497062cd8099"
+    },
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "responseCount": 25,
+      "providerCallsMade": 75,
+      "queryExpansionCalls": 0,
+      "responseHash": "sha256:fe54b369e106e622202c09940cf5ad1a24ddf140a5460e2c81c830f86fd83863"
+    }
+  ],
+  "scorerFailure": {
+    "stage": "answer",
+    "strategy": "bm25-lite",
+    "queryHashPrefix": "3d6e37516f59af91",
+    "providerEndpointLabel": "openrouter",
+    "modelLabel": "qwen/qwen3-next-80b-a3b-instruct:free",
+    "httpStatus": 429,
+    "rawProviderResponseIncluded": false
+  },
+  "safety": {
+    "rawQuestionIdsIncluded": false,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPrivateOutputPathIncluded": false,
+    "rawProviderResponseIncluded": false,
+    "credentialsIncluded": false,
+    "privateInputsStoredOutsideRepository": true,
+    "privateOutputPathIncluded": false
+  },
+  "nextActions": [
+    "Retry live answer-quality scoring with a non-rate-limited OpenAI-compatible scorer or another allowed scorer key/model.",
+    "Reuse the already exported six private response-arm files; rerun retrieval arms only if the private inputs become stale.",
+    "Commit only metrics-only answer-quality results if scoring completes.",
+    "Do not make a SOTA or public-launch claim from this partial state."
+  ]
+}

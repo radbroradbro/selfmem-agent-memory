@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "mode": "answer-quality-local-full-shard-runtime-blocker",
+  "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+  "generatedAt": "2026-05-26T21:46:35Z",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "claimScope": "local-full",
+  "acceptedShard": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "queryShard": {
+    "shardId": "shard-003",
+    "queryOffset": 50,
+    "maxQueries": 25,
+    "startIndex": 50,
+    "endIndexExclusive": 75,
+    "totalQueryCount": 500,
+    "rangeHash": "sha256:58db3648c91f8830588df1a55353107279ecfda54e6fa9a2d0ea7f57b304a1bb",
+    "selectedQueryIdHash": "sha256:8e98d70b10c7c4e002dd570f82584db2894c31e88d3bcae0911a25eb1e10d539"
+  },
+  "attemptedStrategies": [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank"
+  ],
+  "completedPrivateArmEvidence": [
+    {
+      "strategy": "bm25-lite",
+      "name": "bm25-lite-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:9bdd5ff38882f650ede7d17b7accb140007286223e008c1e96f9ff4b6ca737da",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:c4666efc2ca1af18e961fb9e9762e09968bab293618bff993fdc70d78a90caf9",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:1a53a216e585ed54cbf1f10eafbcd783ace7f2f39f8213c3ea0a609d38cbdc81",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionCalls": 0,
+      "queryExpansionFallbacks": 25,
+      "queryExpansionMode": "deterministic-proxy"
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "name": "local-apple-qwen3-0_6b-responses.private.json",
+      "pathLabel": "external-private-response-file",
+      "hash": "sha256:cc99920f9deb3130e3f0d60def6c5ef8a51e8ff78ef3e0e7d428339d9a675d6d",
+      "responseCount": 25,
+      "providerCallsMade": 401,
+      "embeddingCalls": 401,
+      "localEmbeddingCacheHits": 24,
+      "localEmbeddingCacheMisses": 376,
+      "queryExpansionCalls": 0
+    }
+  ],
+  "failedArm": {
+    "strategy": "local-apple-qwen3-0_6b-local-rerank",
+    "failureClass": "local-rerank-response-body-stall",
+    "observedBehavior": "rerank sidecar accepted work but did not produce a complete response file within the bounded run window",
+    "completedPublicShardResultWritten": false
+  },
+  "runtimeMitigation": {
+    "timeoutPatchApplied": true,
+    "patchedSurface": "local provider response JSON body parsing now stays under the same abort timeout as the request",
+    "launchJobStopped": true,
+    "reason": "free local compute and pivot benchmark methodology back to cloud Voyage default plus isolated local refinement arms"
+  },
+  "localRuntime": {
+    "hardwareClass": "Apple Silicon M5 24GB",
+    "embeddingModel": "Qwen3-Embedding-0.6B-Q8_0 GGUF",
+    "rerankModel": "Qwen3-Reranker-0.6B-Q8_0 GGUF",
+    "rawModelPathsIncluded": false,
+    "rawEndpointUrlsIncluded": false
+  },
+  "partialAttempt": {
+    "completedArmCount": 4,
+    "missingArmCount": 1,
+    "completedStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b"
+    ],
+    "missingStrategies": [
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "readyForAnswerQualityPreflight": false,
+    "readyForShardIntake": false,
+    "acceptedShardCountAfterAttempt": 2,
+    "missingShardCountAfterAttempt": 18
+  },
+  "blockers": [
+    "local-rerank-response-body-stall",
+    "local-full-shard-003-incomplete",
+    "local-full-shard-coverage-incomplete"
+  ],
+  "nextActions": [
+    "Do not report shard 003 as accepted local-full evidence.",
+    "Keep cloud Voyage as the default personal/Codex memory provider arm.",
+    "Use local arms for bounded methodology refinement and plugin benchmark loops.",
+    "Disable hosted Supermemory search during methodology benchmarks unless running an explicit hosted-baseline parity lane.",
+    "Retry the local-rerank arm only as an isolated challenger after the sidecar has a bounded health and response-body timeout proof."
+  ]
+}

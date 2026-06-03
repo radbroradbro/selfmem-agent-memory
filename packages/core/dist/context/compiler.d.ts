@@ -10,6 +10,12 @@ export interface ContextFact {
     text: string;
     sourceId: string;
     confidence: "high" | "medium" | "low";
+    atomicKind?: string;
+    lifecycleStatus?: "current" | "superseded" | "tombstone" | "historical";
+    supersedes?: string[];
+    supersededBy?: string;
+    validFrom?: string;
+    validUntil?: string;
 }
 export interface CompiledContext {
     intent: ContextIntent;

@@ -83,6 +83,28 @@ const stateDirStatus = stateDirPlugin.tools.selfmem_status();
 if (oldStateDir === undefined) delete process.env.OPENCLAW_STATE_DIR;
 else process.env.OPENCLAW_STATE_DIR = oldStateDir;
 
+const oldSupermemorySearchDisabled = process.env.SELFMEM_SUPERMEMORY_SEARCH_DISABLED;
+process.env.SELFMEM_SUPERMEMORY_SEARCH_DISABLED = "1";
+const disabledHome = mkdtempSync(join(tmpdir(), "selfmem-openclaw-disabled-supermemory-"));
+const supermemoryCallsBeforeDisabledSearch = providerCalls.supermemory;
+const disabledPlugin = createSelfmemOpenClawCanary({
+  home: disabledHome,
+  agentIdentity: "openclaw-disabled-supermemory-agent",
+  supermemoryContainer: "disabled_supermemory_source",
+  supermemoryKey: "test-read-through-key",
+  voyageKeys: ["test-voyage-key"],
+});
+const disabledSearch = await disabledPlugin.tools.supermemory_search({
+  query: "Remote Supermemory history should be disabled for benchmark methodology.",
+  limit: 5,
+});
+const disabledStatus = disabledPlugin.tools.supermemory_status();
+const disabledTraceText = readFileSync(join(disabledStatus.store_dir, "trace.jsonl"), "utf8");
+const disabledTraceEvents = disabledTraceText.split(/\n+/).filter(Boolean).map((line) => JSON.parse(line));
+const disabledSearchTrace = disabledTraceEvents.find((item) => item.event === "search");
+if (oldSupermemorySearchDisabled === undefined) delete process.env.SELFMEM_SUPERMEMORY_SEARCH_DISABLED;
+else process.env.SELFMEM_SUPERMEMORY_SEARCH_DISABLED = oldSupermemorySearchDisabled;
+
 const readOnlyHome = mkdtempSync(join(tmpdir(), "selfmem-openclaw-readonly-"));
 const readOnlyPlugin = createSelfmemOpenClawCanary({ home: readOnlyHome });
 const readOnlyStore = readOnlyPlugin.tools.selfmem_store({
@@ -108,6 +130,10 @@ pluginDefinition.register({
 
 const traceText = readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "trace.jsonl"), "utf8");
 const rawText = readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "raw_events.jsonl"), "utf8");
+const containerMap = JSON.parse(readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "container-map.json"), "utf8"));
+const traceEvents = traceText.split(/\n+/).filter(Boolean).map((line) => JSON.parse(line));
+const searchTrace = traceEvents.find((item) => item.event === "search" && item.data?.supermemory_attempted === true);
+const storeTraces = traceEvents.filter((item) => item.event === "store");
 const audit = JSON.parse(execFileSync("python3", [
   new URL("./selfmem_audit.py", import.meta.url).pathname,
   "--home",
@@ -120,6 +146,19 @@ const output = {
   sessionLocalContainer: session.local_container,
   sourceSupermemoryContainer: status.source_supermemory_container,
   localContainer: status.local_container,
+  adapterContractCovered: status.adapter_contract?.name === "recallweave-selfmem-canary"
+    && status.adapter_contract?.strictCanaryContract === "v1"
+    && status.adapter_contract?.searchLatencyInstrumentation === true
+    && status.adapter_contract?.storeLatencyInstrumentation === true
+    && containerMap.adapter_contract?.strictCanaryContract === "v1",
+  boundedReadThroughPolicyCovered: status.search_policy === "local_first_then_bounded_supermemory_read_through"
+    && status.recall_policy?.remote_read_through === "explicit_history_intent_or_thin_local_results",
+  searchLatencyInstrumentationCovered: Number(searchTrace?.data?.elapsed_ms || 0) > 0
+    && Number(searchTrace?.data?.local_elapsed_ms || 0) > 0
+    && Number(searchTrace?.data?.remote_elapsed_ms || 0) > 0,
+  storeLatencyInstrumentationCovered: storeTraces.length > 0
+    && storeTraces.every((item) => Number(item.data?.elapsed_ms || 0) > 0),
+  storeLatencySampleCount: storeTraces.filter((item) => Number(item.data?.elapsed_ms || 0) > 0).length,
   aliasStoreSuccess: Boolean(store.success),
   aliasSearchResultCount: search.results.length,
   hybridSearchCovered: search.results.some((item) => item.memory_source === "supermemory_read_through"),
@@ -130,6 +169,13 @@ const output = {
   statusLikeRecallCovered: statusLikeRealPre.includes("<selfmem-context>"),
   openclawStateDirCovered: stateDirStatus.local_container === "selfmem_state_dir_source" && existsSync(join(envHome, "selfmem", "containers", "selfmem_state_dir_source", "container-map.json")),
   identityPinCovered: stateDirStatus.agent_identity === "state-dir-agent" && stateDirStatus.identity_resolved === true && stateDirStatus.read_only === false,
+  benchmarkSupermemoryDisableCovered: disabledStatus.supermemory_search_disabled === true
+    && disabledStatus.supermemory_read_through === false
+    && disabledStatus.recall_policy?.remote_read_through === "disabled_for_benchmark"
+    && disabledSearch.results.length === 0
+    && providerCalls.supermemory === supermemoryCallsBeforeDisabledSearch
+    && disabledSearchTrace?.data?.supermemory_attempted === false
+    && disabledSearchTrace?.data?.supermemory_skip_reason === "read_through_disabled",
   readOnlyCovered: readOnlyStatus.read_only === true && readOnlyStore.success === false,
   pluginEntryCovered: pluginDefinition.id === "selfmem_canary" && registered.tools.includes("supermemory_search") && registered.events.includes("before_prompt_build") && registered.memoryCapability,
   compressionCheckpointCovered: traceText.includes("compression_checkpoint") && rawText.includes("compression_checkpoint_raw"),
@@ -142,7 +188,7 @@ const output = {
 
 console.log(JSON.stringify(output, null, 2));
 
-if (!output.aliasStoreSuccess || output.aliasSearchResultCount < 1 || !output.hybridSearchCovered || !output.voyageEnabled || !output.voyageCallsCovered || !output.embeddingCacheCovered || !output.maintenanceRecallGateCovered || !output.statusLikeRecallCovered || !output.openclawStateDirCovered || !output.identityPinCovered || !output.readOnlyCovered || !output.pluginEntryCovered || !output.compressionCheckpointCovered || !output.auditCovered || !output.beforePromptHasContext || !output.lifecycleCovered || !output.rawAuditCovered || output.privacyLeakCount !== 0) {
+if (!output.adapterContractCovered || !output.boundedReadThroughPolicyCovered || !output.searchLatencyInstrumentationCovered || !output.storeLatencyInstrumentationCovered || !output.aliasStoreSuccess || output.aliasSearchResultCount < 1 || !output.hybridSearchCovered || !output.voyageEnabled || !output.voyageCallsCovered || !output.embeddingCacheCovered || !output.maintenanceRecallGateCovered || !output.statusLikeRecallCovered || !output.openclawStateDirCovered || !output.identityPinCovered || !output.benchmarkSupermemoryDisableCovered || !output.readOnlyCovered || !output.pluginEntryCovered || !output.compressionCheckpointCovered || !output.auditCovered || !output.beforePromptHasContext || !output.lifecycleCovered || !output.rawAuditCovered || output.privacyLeakCount !== 0) {
   process.exit(1);
 }
 

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "fixtureOnly": true,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawAnswerIncluded": false,
+  "responses": {
+    "local-first-policy": {
+      "timing": 96,
+      "total": 3,
+      "results": [
+        {
+          "id": "mem_local_first_policy",
+          "memory": "RecallWeave writes locally by default and uses hosted Supermemory as read-through only.",
+          "similarity": 0.98
+        },
+        {
+          "id": "mem_release_gate",
+          "memory": "Public launch remains blocked until owner approval.",
+          "similarity": 0.7
+        },
+        {
+          "id": "mem_hosted_baseline",
+          "memory": "Hosted comparison claims require a fresh metrics-only baseline.",
+          "similarity": 0.66
+        }
+      ]
+    },
+    "strict-real-canary": {
+      "timing": 132,
+      "total": 3,
+      "results": [
+        {
+          "id": "mem_strict_real_canary",
+          "memory": "A strict real canary must prove lifecycle coverage, hybrid search, local writes, hosted read-through, latency, rollback, and zero privacy leaks.",
+          "similarity": 0.95
+        },
+        {
+          "id": "mem_local_first_policy",
+          "memory": "RecallWeave writes locally by default and uses hosted Supermemory as read-through only.",
+          "similarity": 0.74
+        },
+        {
+          "id": "mem_release_gate",
+          "memory": "Public launch remains blocked until owner approval.",
+          "similarity": 0.62
+        }
+      ]
+    },
+    "brain-ui-proof": {
+      "timing": 120,
+      "total": 2,
+      "results": [
+        {
+          "id": "mem_brain_ui_fixture",
+          "memory": "The Brain UI preview is proven with sanitized fixture graph, lifecycle trail, context preview, and release readiness evidence.",
+          "similarity": 0.96
+        },
+        {
+          "id": "mem_strict_real_canary",
+          "memory": "A strict real canary must prove lifecycle coverage, hybrid search, local writes, hosted read-through, latency, rollback, and zero privacy leaks.",
+          "similarity": 0.6
+        }
+      ]
+    }
+  }
+}

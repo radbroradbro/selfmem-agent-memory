@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "mode": "public-memorybench-source-lock",
+  "checkedAt": "2026-05-23",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionIdsIncluded": false,
+  "rawLabelsIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "source": {
+    "name": "MemoryBench",
+    "repoUrl": "https://github.com/supermemoryai/memorybench",
+    "branch": "main",
+    "commit": "118209a746d97d0d85e5a7234267f0b6962857e9",
+    "license": "MIT",
+    "retrievalMethod": "git clone --depth 1",
+    "sourceUrls": [
+      "https://github.com/supermemoryai/memorybench"
+    ]
+  },
+  "benchmarkContract": {
+    "sourceFile": "src/types/benchmark.ts",
+    "methods": [
+      "load",
+      "getQuestions",
+      "getHaystackSessions",
+      "getGroundTruth",
+      "getQuestionTypes"
+    ],
+    "questionFilterFields": [
+      "questionTypes",
+      "limit",
+      "offset"
+    ],
+    "benchmarkNames": [
+      "locomo",
+      "longmemeval",
+      "convomem"
+    ]
+  },
+  "providerContract": {
+    "sourceFile": "src/types/provider.ts",
+    "methods": [
+      "initialize",
+      "ingest",
+      "awaitIndexing",
+      "search",
+      "clear"
+    ],
+    "registeredProviders": [
+      "supermemory",
+      "mem0",
+      "zep",
+      "filesystem",
+      "rag"
+    ]
+  },
+  "cli": {
+    "entrypoint": "src/index.ts",
+    "runCommand": "bun run src/index.ts run",
+    "compareCommand": "bun run src/index.ts compare",
+    "pipeline": [
+      "ingest",
+      "index",
+      "search",
+      "answer",
+      "evaluate",
+      "report"
+    ],
+    "options": [
+      "provider",
+      "benchmark",
+      "judge",
+      "run-id",
+      "answering-model",
+      "limit",
+      "question-id",
+      "force"
+    ],
+    "memScoreComponents": [
+      "quality",
+      "latencyMs",
+      "contextTokens"
+    ]
+  },
+  "availableBenchmarks": [
+    "locomo",
+    "longmemeval",
+    "convomem"
+  ],
+  "datasetSources": {
+    "longmemeval": {
+      "sourceFile": "src/benchmarks/longmemeval/index.ts",
+      "datasetUrl": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json",
+      "defaultDataPath": "./data/benchmarks/longmemeval/datasets",
+      "questionTypes": [
+        "single-session-user",
+        "single-session-assistant",
+        "single-session-preference",
+        "multi-session",
+        "temporal-reasoning",
+        "knowledge-update"
+      ],
+      "questionCountSource": "dataset file after download",
+      "targetUse": "preferred first public canary target"
+    },
+    "locomo": {
+      "sourceFile": "src/benchmarks/locomo/index.ts",
+      "datasetUrl": "https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json",
+      "defaultDataPath": "./data/benchmarks/locomo/locomo10.json",
+      "questionTypes": [
+        "single-hop",
+        "multi-hop",
+        "temporal",
+        "world-knowledge",
+        "adversarial"
+      ],
+      "questionCountSource": "dataset file after download",
+      "targetUse": "second public canary target after LongMemEval"
+    },
+    "convomem": {
+      "sourceFile": "src/benchmarks/convomem/index.ts",
+      "datasetUrl": "https://huggingface.co/datasets/Salesforce/ConvoMem/resolve/main/core_benchmark/pre_mixed_testcases",
+      "defaultDataPath": "./data/benchmarks/convomem",
+      "questionTypes": [
+        "user_evidence",
+        "assistant_facts_evidence",
+        "preference_evidence",
+        "changing_evidence",
+        "implicit_connection_evidence",
+        "abstention_evidence"
+      ],
+      "questionCountSource": "downloaded category files after aggregation",
+      "targetUse": "third public canary target after LongMemEval and LoCoMo"
+    }
+  },
+  "keyFileHashes": {
+    "README.md": "sha256:20354143455430512b68aae2bed431eb81909c8ff9029d99e4967c51f620e55a",
+    "package.json": "sha256:f691aabbf1fdfd5564d1997f46e1c9b573ef0566062a46cd1092b4c16ebe3561",
+    "src/benchmarks/README.md": "sha256:d5fefe3ff300296ef7b9a294fe9dc702cdb634449cc5e6ef4e6f8cf834bc48b5",
+    "src/benchmarks/index.ts": "sha256:42b7e978236108253223a38d6d6aea2ba6136dcf28caed4e4183e1174c36691d",
+    "src/benchmarks/longmemeval/index.ts": "sha256:508c73bc84f746dd34a1d401330b18d85e26efcb90b97d6916600a4ab4d2ee8d",
+    "src/benchmarks/longmemeval/types.ts": "sha256:93a876f4de5207a3a7e39a7e84fb08013c2d1ce628caf62028ad1aa77632f06e",
+    "src/benchmarks/locomo/index.ts": "sha256:47de1882724905fb25264a7ebb7e20c49da106e8c5fa36ce389627a192e75927",
+    "src/benchmarks/locomo/types.ts": "sha256:d38d0b957e2c09d4cbb53a0e31dbfa497d301792f038f16918cc91cd33953b73",
+    "src/benchmarks/convomem/index.ts": "sha256:0cd2835210c08d9c6d6588791576b8fdc4a4ad0e1d020fe3669e609310834daa",
+    "src/benchmarks/convomem/types.ts": "sha256:c097030419cb343aff1da00495fea6e9bf744394868c8fde5dba1d4096732436",
+    "src/providers/README.md": "sha256:83c4b054953d1b8ff0486299ba0542180fde03def851fe4211a3fa0275172772",
+    "src/types/provider.ts": "sha256:5d3691fad4fbcddb2a269542f28ffcb5e2540cd9e8ae0e91f846c55760b1adc0",
+    "src/types/benchmark.ts": "sha256:ff70d23d23d36866d94384b1ffd5e4512edd3ed2f4a92b2f23feac2e804aa89b",
+    "src/types/unified.ts": "sha256:36295d7864731f34dab671eb8632551401088f1d87d1bd5331f2d1937f4cb54c",
+    "src/utils/config.ts": "sha256:0eed39d1366083b0393816abefc90987ae6731c7d221d4f76ccaacc58dd3561c"
+  },
+  "nextTargetRecommendation": {
+    "benchmark": "longmemeval",
+    "claimTier": "canary-trend",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o",
+    "sourceLockNote": "MemoryBench main commit 118209a746d97d0d85e5a7234267f0b6962857e9, LongMemEval adapter source URL, benchmark contract, provider contract, and scoring/report surfaces are source-locked before target authoring.",
+    "requiredBeforeRun": [
+      "download or materialize the public LongMemEval dataset",
+      "freeze a small public question id slice",
+      "hash the answer label source",
+      "hash the exact scoring script",
+      "run benchmark:public-target:author",
+      "run benchmark:public-target --strict"
+    ]
+  },
+  "caveats": [
+    "This source lock does not include raw benchmark questions, raw answers, or raw sessions.",
+    "This source lock does not claim a RecallWeave benchmark score.",
+    "LongMemEval, LoCoMo, and ConvoMem target files still need dataset and scorer hashes before a canary run."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "consoleErrorCount": 0,
+  "edgeCount": 9,
+  "graphClientHeight": 876,
+  "graphScrollHeight": 876,
+  "hasPrivateOrKeyText": false,
+  "layoutColumns": 2,
+  "layoutMode": "dynamic-graph-layout",
+  "layoutRows": 5,
+  "nodeCount": 9,
+  "ok": true,
+  "overlapCount": 0,
+  "title": "RecallWeave Brain",
+  "url": "http://127.0.0.1:4177/"
+}

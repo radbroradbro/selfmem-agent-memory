@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "mode": "codex-memory-dogfood-graduation-review",
+  "ok": true,
+  "status": "PASS_CONTROLLED_DOGFOOD_GRADUATION_REVIEW",
+  "generatedAt": "2026-06-03T13:41:24.048Z",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "writesRealFiles": true,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawContextIncluded": false,
+  "evidence": {
+    "path": "reviews/overnight-20260522/codex-memory-dogfood-evidence-current.json",
+    "hash": "sha256:113222656ebbb3f967ae36a815a0a3755e14be2ae54c98002d2a2d1f1f27a71e",
+    "mode": "codex-memory-dogfood-evidence-check",
+    "phase": "rewired",
+    "watch": true,
+    "iterationCount": 12,
+    "sourceMonitorStatus": "READY_DOGFOOD_MONITOR",
+    "sourceBridgeHashMatchesCurrent": true
+  },
+  "currentHealth": {
+    "status": "READY_FOR_REWIRED_CONTROLLED_DOGFOOD",
+    "phase": "rewired",
+    "blockerVisible": true,
+    "sourceBridgeHash": "sha256:67986c43ddf19d938fe7bece6d9f7074060a8c3f187ca5480241e71db04c4ca1"
+  },
+  "graduationGate": {
+    "readyForDogfoodGraduationReview": true,
+    "minCleanIterations": 12,
+    "observedIterations": 12,
+    "cleanIterations": 12,
+    "elapsedMs": 11000,
+    "allIterationsClean": true,
+    "blockers": []
+  },
+  "monitoredSignals": {
+    "quietPromptClean": true,
+    "directLookupUseful": true,
+    "directLookupQuietEmpty": true,
+    "relevanceGated": true,
+    "forcedOrPeriodicRecallAnchored": true,
+    "randomCanaryBenchmarkInjectionRisk": false,
+    "severeNoiseClean": true,
+    "explicitWritesObserved": true
+  },
+  "verdict": {
+    "controlledDogfoodGraduationReviewPassed": true,
+    "memoryNoiseStepResolved": true,
+    "relevanceRetrievalAndWriteLogicAccepted": true,
+    "controlledCodexLaneCanContinue": true,
+    "continuePeriodicMonitoringRequired": true,
+    "ownerApprovalRequired": true,
+    "publicLaunchAllowed": false,
+    "countsAsBenchmarkEvidence": false,
+    "broaderRolloutAllowed": false,
+    "productionDefaultAllowed": false
+  },
+  "blockers": [],
+  "nextActions": [
+    "Keep the rewired Codex lane under periodic dogfood monitoring.",
+    "Do not broaden rollout, publish benchmark claims, or remove owner approval gates from this review.",
+    "Continue the full-memory SOTA and strict-real canary blockers separately."
+  ]
+}

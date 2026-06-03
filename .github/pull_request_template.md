@@ -35,7 +35,9 @@ Expected user/agent benefit:
 - [ ] Typecheck
 - [ ] Hermes smoke
 - [ ] OpenClaw smoke
-- [ ] Core package dry-run pack
+- [ ] Full smoke
+- [ ] Release readiness check
+- [ ] UI evidence, if UI changed
 - [ ] Live provider check, labeled with provider and budget
 - [ ] Not applicable because:
 

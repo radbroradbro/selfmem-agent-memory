@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "partialResultsAllowed": true,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "partialResultsAllowed": true,
+  "generatedAt": "2026-05-31T00:44:53.190Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "collectorCompatibleQuerySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:f108b212c8e1e93b5b71e4f213c02e0d680eeab47e1b7bc380fe9e9e2300d582",
+    "queryCount": 500,
+    "expectedResultRefCount": 1896,
+    "haystackSessionCount": 19195,
+    "requestedQuerySelection": {
+      "queryOffset": 78,
+      "maxQueries": 5,
+      "completeDataset": false
+    },
+    "selectedQueryCount": 5,
+    "armTimeoutMs": 0,
+    "providerTimeoutMs": 60000,
+    "providerRetryAttempts": 8,
+    "parallelArms": 3,
+    "isolateArms": true
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:c2fe3f24f508cb0f53c9ab964fb1f2e6eee173b622f2f77bc32eee828c0b7cae",
+      "resultHash": "sha256:701135d833cd2d3176084587b342c2038fb26be8f9939eeae67580513f36dd43",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "e71d2a995bc04572",
+        "containerTagHash": "c47001f36550d3b3",
+        "localEmbeddingCachePathHash": "sha256:ad5e9fe44cd5f1634aca15a71c32f71dc1d25ec0b5966168b878c5bfff33243a"
+      },
+      "queryShard": {
+        "startIndex": 78,
+        "endIndexExclusive": 83,
+        "totalQueryCount": 500,
+        "responseCount": 5,
+        "requestedLimit": 5,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:8c4dda965eabd33f507c483d6c3218641c0797b7e2cbdd004d72f0c34b4b68fb"
+      },
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 2326,
+        "latencyP95Ms": 3213,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 5,
+        "queriesClipped": 5,
+        "clippedResultCount": 5,
+        "skippedByBudgetCount": 20,
+        "fullCandidateTokensAvg": 16265,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "a256467afcd101e2",
+          "topResultIdHash": "0921b849df0fe420",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "39b198ddb1103c67",
+          "topResultIdHash": "3c3760fe314fa8ce",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "203aaf01d255bb21",
+          "topResultIdHash": "b54a7c9055205d38",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "2766acc8fb3b0752",
+          "topResultIdHash": "d4fb328b119981cf",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "5e35a88f4cf41f0e",
+          "topResultIdHash": "e58fac10b77452b8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:394922d583196df1b68d886af6dc7e8c721575bb6602e883db28c476ce3ff097",
+      "resultHash": "sha256:27118a931fc6b90f77975e941d0861c150fc6c3eec67c63d704551a3f10615ca",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "b9938c3cb43354d4",
+        "containerTagHash": "345b42ba33e4c96f",
+        "localEmbeddingCachePathHash": "sha256:3bbdeb2bf15a4c0a535b36b044624a72d34bf53370fa96bbe602bcb4511d1564"
+      },
+      "queryShard": {
+        "startIndex": 78,
+        "endIndexExclusive": 83,
+        "totalQueryCount": 500,
+        "responseCount": 5,
+        "requestedLimit": 5,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:8c4dda965eabd33f507c483d6c3218641c0797b7e2cbdd004d72f0c34b4b68fb"
+      },
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 10476,
+        "latencyP95Ms": 15326,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 5,
+        "queriesClipped": 5,
+        "clippedResultCount": 5,
+        "skippedByBudgetCount": 20,
+        "fullCandidateTokensAvg": 16883,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "a256467afcd101e2",
+          "topResultIdHash": "99a8720a2aea99aa",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "39b198ddb1103c67",
+          "topResultIdHash": "911f735b9eae6775",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "203aaf01d255bb21",
+          "topResultIdHash": "b54a7c9055205d38",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "2766acc8fb3b0752",
+          "topResultIdHash": "e58fac10b77452b8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "5e35a88f4cf41f0e",
+          "topResultIdHash": "e58fac10b77452b8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responsesHash": "sha256:85d4873eb754d3d939ddc7e8053b9a4a53ee974679cd7fdd6160b8f55652f773",
+      "resultHash": "sha256:3fc62723186a13309b110b3c02da3c61d7a1fc43156b18bcf2d963c9ec436f42",
+      "rankingStrategy": "cloud-voyage4-voyage-lite-rerank",
+      "provider": {
+        "strategy": "cloud-voyage4-voyage-lite-rerank",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 20,
+        "providerMockCalls": 0,
+        "embeddingCalls": 15,
+        "rerankCalls": 5,
+        "documentCountSent": 225,
+        "queryCountSent": 5,
+        "queryExpansionCalls": 0,
+        "queryExpansionFallbacks": 0,
+        "queryExpansionRewritesReturned": 0,
+        "queryExpansionProvider": null,
+        "queryExpansionMode": null,
+        "queryExpansionModel": null,
+        "queryExpansionElapsedMsTotal": 0,
+        "queryExpansionOnlyCurrentQuerySent": true,
+        "queryExpansionStoredMemoriesSent": false,
+        "localEmbeddingCacheEnabled": false,
+        "localEmbeddingCacheEntriesLoaded": 0,
+        "localEmbeddingCacheHits": 0,
+        "localEmbeddingCacheMisses": 0,
+        "localEmbeddingCacheWrites": 0,
+        "localEmbeddingCacheReadErrors": 0,
+        "localEmbeddingCacheWriteErrors": 0,
+        "modelArm": "cloud-voyage4-voyage-lite-rerank",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-large",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5-lite",
+        "fixtureProviderMock": false,
+        "queryExpansionElapsedMsAverage": 0,
+        "providerKeyCounts": {
+          "voyage": 8
+        },
+        "keyCountAvailable": 8
+      },
+      "armIsolation": {
+        "isolated": true,
+        "armIdHash": "09fad8518d762e46",
+        "containerTagHash": "1da2289e39a32b2f",
+        "localEmbeddingCachePathHash": "sha256:f8b7b9be9efba4c2c1a71f68babdb9e49d045f471c4897e3f2b3229f11b2b02d"
+      },
+      "queryShard": {
+        "startIndex": 78,
+        "endIndexExclusive": 83,
+        "totalQueryCount": 500,
+        "responseCount": 5,
+        "requestedLimit": 5,
+        "completeDataset": false,
+        "selectedQueryIdHash": "sha256:8c4dda965eabd33f507c483d6c3218641c0797b7e2cbdd004d72f0c34b4b68fb"
+      },
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 17651,
+        "latencyP95Ms": 241069,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 5,
+        "queriesClipped": 5,
+        "clippedResultCount": 5,
+        "skippedByBudgetCount": 20,
+        "fullCandidateTokensAvg": 16590,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "a256467afcd101e2",
+          "topResultIdHash": "a939a33c1864adec",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "39b198ddb1103c67",
+          "topResultIdHash": "07f39ff733bb0712",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "203aaf01d255bb21",
+          "topResultIdHash": "b54a7c9055205d38",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "2766acc8fb3b0752",
+          "topResultIdHash": "2d6da41b5b593588",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "5e35a88f4cf41f0e",
+          "topResultIdHash": "aeae10c7b7ec5d44",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    }
+  ],
+  "failedStrategies": [
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "quality": 0,
+    "pAt1": 0,
+    "recallAt5": 0,
+    "recallAt10": 0,
+    "ndcgAt10": 0,
+    "latencyP50Ms": 2326
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0,
+    "pAt1": 0,
+    "recallAt5": 0,
+    "recallAt10": 0,
+    "ndcgAt10": 0,
+    "latencyP50Ms": 2326
+  },
+  "promotion": {
+    "kind": "provider",
+    "bestProviderStrategy": "cloud-voyage4-voyage-lite-rerank",
+    "bestHybridStrategy": "cloud-voyage4-voyage-lite-rerank",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "qualityDeltaVsFullHybrid": 0,
+    "latencyDeltaVsBm25": 15325,
+    "latencyDeltaVsFullHybrid": 7175
+  },
+  "hybridPromotion": {
+    "kind": "provider",
+    "bestProviderStrategy": "cloud-voyage4-voyage-lite-rerank",
+    "bestHybridStrategy": "cloud-voyage4-voyage-lite-rerank",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "qualityDeltaVsFullHybrid": 0,
+    "latencyDeltaVsBm25": 15325,
+    "latencyDeltaVsFullHybrid": 7175
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

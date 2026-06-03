@@ -8,6 +8,11 @@ on:
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   verify:
@@ -16,6 +21,8 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -30,21 +37,11 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
-
       - name: Test
         run: pnpm test
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Full smoke
+        run: pnpm smoke
 
-      - name: OpenClaw smoke
-        run: pnpm smoke:openclaw
-
-      - name: Hermes smoke
-        run: pnpm smoke:hermes
-
-      - name: Core package dry-run pack
-        working-directory: packages/core
-        run: npm pack --dry-run
+      - name: Release readiness check
+        run: pnpm release:check

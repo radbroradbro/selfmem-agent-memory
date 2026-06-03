@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-rerank-durability-smoke",
+  "status": "READY_LOCAL_RERANK_DURABILITY",
+  "generatedAt": "2026-05-28T15:32:57.601Z",
+  "fixtureOnly": false,
+  "strategy": "local-apple-qwen3-0_6b-local-rerank",
+  "model": "Qwen/Qwen3-Reranker-0.6B",
+  "localEndpointConfigured": true,
+  "endpointPrinted": false,
+  "baseUrlPrinted": false,
+  "syntheticOnly": true,
+  "rawSyntheticInputIncluded": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "callsLocalEndpoint": true,
+  "sendsBenchmarkTextToProvider": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForLocalRerankArmExport": true,
+  "timeoutMs": 60000,
+  "responseBodyTimeoutBounded": true,
+  "documentCounts": [
+    3,
+    8,
+    12
+  ],
+  "maxDocumentChars": 180,
+  "probes": [
+    {
+      "documentCount": 3,
+      "queryHash": "sha256:71e50e11ddc5139976d6b2c27a9d1af67d7650a16e61be6a18513ded46632e3b",
+      "documentsHash": "sha256:846160fde9ca4c1b4c160de82990741dfedd2db96f7d2335ed66c9010a81938e",
+      "status": "pass",
+      "httpStatus": 200,
+      "scoreCount": 3,
+      "elapsedMs": 220,
+      "failureClass": null
+    },
+    {
+      "documentCount": 8,
+      "queryHash": "sha256:71e50e11ddc5139976d6b2c27a9d1af67d7650a16e61be6a18513ded46632e3b",
+      "documentsHash": "sha256:b3ca6c964bbb837decc40d93af1b1152a9009d52c9f0bb13576e495b75d9b398",
+      "status": "pass",
+      "httpStatus": 200,
+      "scoreCount": 8,
+      "elapsedMs": 243,
+      "failureClass": null
+    },
+    {
+      "documentCount": 12,
+      "queryHash": "sha256:71e50e11ddc5139976d6b2c27a9d1af67d7650a16e61be6a18513ded46632e3b",
+      "documentsHash": "sha256:b2be191649414e71961261e24a94c25d2092da3156b14aeb55b267f82014be4d",
+      "status": "pass",
+      "httpStatus": 200,
+      "scoreCount": 12,
+      "elapsedMs": 324,
+      "failureClass": null
+    }
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Use this report as the local rerank response-body completion guard before missing-arm export.",
+    "Run the local-full shard retry with the same local rerank sidecar still alive.",
+    "Keep raw benchmark inputs and response files outside the repository."
+  ]
+}

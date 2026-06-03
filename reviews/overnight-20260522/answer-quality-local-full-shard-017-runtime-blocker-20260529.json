@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "mode": "answer-quality-local-full-shard-runtime-blocker",
+  "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+  "generatedAt": "2026-05-29T06:55:00Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "targetShard": {
+    "shardId": "shard-017",
+    "startIndex": 400,
+    "endIndexExclusive": 425,
+    "queryCount": 25,
+    "totalQueryCount": 500,
+    "selectedQueryIdHash": "sha256:10d1eec03b5727101842a2edfad1dbcf0a9636bf189fa597124511e0f966134b"
+  },
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsPrivatePaths": false,
+  "printsEnvValues": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "completedArmCount": 3,
+  "missingArmCount": 2,
+  "completedArms": [
+    {
+      "strategy": "bm25-lite",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "privateResponseFileHash": "sha256:6840b43ad7c912dfad4f1a941ba1b4f127a73e600b5ff6f01c021b6e08baf7f2"
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "privateResponseFileHash": "sha256:e265b5bfa1e17e50c9ceb12d83847559fcb4f49864fb0e10db2146f000b305a6"
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "responseCount": 25,
+      "providerCallsMade": 0,
+      "queryExpansionFallbacks": 25,
+      "queryExpansionMode": "deterministic-proxy",
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "privateResponseFileHash": "sha256:d7c4e35ea479b03eabc4146a27112d94cf7f684b6190e1f650e58f96cd1e7700"
+    }
+  ],
+  "missingArms": [
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank"
+  ],
+  "runtime": {
+    "failureClass": "local-embedding-sidecar-interrupted-during-model-load",
+    "failedStage": "local-embedding-sidecar-startup",
+    "stalePidObserved": true,
+    "stalePidAlive": false,
+    "activeLocalModelSidecars": 0,
+    "embeddingLogPublicSummary": "The shard-017 embedding sidecar log reached model-load initialization and then stopped without a live process or completed local arms.",
+    "treatAsMethodQualityEvidence": false
+  },
+  "blockers": [
+    "local-apple-arms-missing",
+    "local-embedding-sidecar-not-running",
+    "local-full-coverage-incomplete"
+  ],
+  "nextActions": [
+    "Reuse the completed deterministic shard-017 arms.",
+    "Restart the local embedding and local rerank sidecars with conservative token and batch settings.",
+    "Export only the missing local Apple and local rerank arms for shard-017.",
+    "Run shard-017 preflight, answer-quality scoring, intake, performance report, topic ledger, and SOTA doctor after the missing arms exist."
+  ]
+}

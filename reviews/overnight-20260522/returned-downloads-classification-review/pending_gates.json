@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "base_ref": "HEAD",
+  "head_ref": "e159cd99-dirty",
+  "changed_files": [
+    {
+      "path": "packages/bench/canary-returned-downloads.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "code"
+      ]
+    },
+    {
+      "path": "packages/bench/canary-returned-inbox.mjs",
+      "status": "modified",
+      "matched_gates": [
+        "code"
+      ]
+    },
+    {
+      "path": "reviews/overnight-20260522/canary-returned-downloads-evidence.md",
+      "status": "modified",
+      "matched_gates": []
+    },
+    {
+      "path": "reviews/overnight-20260522/returned-downloads-current-scan.json",
+      "status": "modified",
+      "matched_gates": []
+    },
+    {
+      "path": "reviews/overnight-20260522/returned-downloads-current-scan.md",
+      "status": "modified",
+      "matched_gates": []
+    }
+  ],
+  "required_gates": [
+    "code",
+    "integration",
+    "final"
+  ],
+  "reasons": [
+    {
+      "gate": "code",
+      "path": "packages/bench/canary-returned-downloads.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "code",
+      "path": "packages/bench/canary-returned-inbox.mjs",
+      "predicate": "source root and code extension rule"
+    },
+    {
+      "gate": "integration",
+      "path": "<diff>",
+      "predicate": "cross-surface contract dependency or multi-package rule"
+    },
+    {
+      "gate": "final",
+      "path": "<diff>",
+      "predicate": "diff or gate state exists"
+    }
+  ]
+}

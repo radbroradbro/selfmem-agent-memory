@@ -1,0 +1,392 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("../..", import.meta.url));
+const args = parseArgs(process.argv.slice(2));
+const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
+const sourceLockPath = resolveInputPath(args.sourceLock ?? `${reviewDir}/agentic-memory-source-lock-live-20260529.json`);
+const outputPath = args.output ? resolveInputPath(args.output) : null;
+const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
+const format = String(args.format ?? "json").toLowerCase();
+const strict = Boolean(args.strict);
+
+assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+
+const secretPattern =
+  /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,}|sk-or-v1-[A-Za-z0-9_-]{20,})/;
+const privatePathPattern =
+  /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
+
+const sourceLock = loadSourceLock(sourceLockPath);
+const report = buildReport(sourceLock);
+const jsonText = `${JSON.stringify(report, null, 2)}\n`;
+const markdownText = `${renderMarkdown(report)}\n`;
+assertSafePublicText(jsonText, "agentic provider autoresearch plan");
+assertSafePublicText(markdownText, "agentic provider autoresearch plan markdown");
+if (outputPath) writeOutput(outputPath, jsonText);
+if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
+process.stdout.write(format === "markdown" ? markdownText : jsonText);
+if (strict) {
+  assert.equal(report.ok, true, jsonText);
+  assert.equal(report.publicSafe, true, jsonText);
+  assert.equal(report.metricsOnly, true, jsonText);
+  assert.equal(report.callsProviderApis, false, jsonText);
+  assert.equal(report.sendsBenchmarkTextToProvider, false, jsonText);
+  assert.equal(report.cloudDefaultForPersonalUse, "cloud-voyage4-lite-voyage-lite");
+  assert.equal(report.methodologyDefault, "local-apple-controlled-lanes");
+  assert.equal(report.primaryScoreContract?.scoreName, "whole-harness-agent-memory-answer-quality");
+  assert.equal(report.primaryScoreContract?.supermemoryComparisonSurface, "plugin-to-plugin-agent-memory-layer");
+  assert.equal(report.primaryScoreContract?.diagnosticScoresAreNotReleaseScores, true);
+}
+
+function loadSourceLock(path) {
+  assert.ok(existsSync(path), `source lock missing: ${path}`);
+  const text = readFileSync(path, "utf8");
+  assertSafePublicText(text, "agentic source lock input");
+  return JSON.parse(text);
+}
+
+function buildReport(lock) {
+  const blockers = arrayOf(lock.blockersBeforeRun);
+  const questionCount = Number(lock.liveSourceSnapshot?.questionCount ?? lock.target?.expectedPublicShape?.questionCount ?? 0);
+  const sourceLockProof = {
+    repoCommit: proofProvided(lock, "repoCommit"),
+    datasetRevision: proofProvided(lock, "datasetRevision"),
+    questionIdsHash: proofProvided(lock, "questionIdsHash"),
+    answerLabelsHash: proofProvided(lock, "answerLabelsHash"),
+    scoringCodeHash: proofProvided(lock, "scoringCodeHash"),
+    trajectoryIngestContractHash: proofProvided(lock, "trajectoryIngestContractHash"),
+    leaderboardTier: proofProvided(lock, "leaderboardTier"),
+    leaderboardRowHash: proofProvided(lock, "leaderboardRowHash"),
+    readerModel: proofProvided(lock, "readerModel"),
+    judgeModel: proofProvided(lock, "judgeModel"),
+  };
+  const missingBeforeFullRun = Object.entries(sourceLockProof)
+    .filter(([, provided]) => !provided)
+    .map(([field]) => `missing-${field}`);
+  const providerMatrix = buildProviderMatrix();
+  const primaryScoreContract = {
+    scoreName: "whole-harness-agent-memory-answer-quality",
+    supermemoryComparisonSurface: "plugin-to-plugin-agent-memory-layer",
+    benchmarkActorMustUseCurrentPlugin: true,
+    explicitDurableWritesRequired: true,
+    postBoundaryRecallRequired: true,
+    sessionWikiTopicMapsRequired: true,
+    benchmarkContainersIsolatedFromLiveResearch: true,
+    privateWorkspaceStoresRawResearchState: true,
+    diagnosticScoresAreNotReleaseScores: true,
+    diagnosticScoreTypes: [
+      "bm25-lexical-floor",
+      "retrieval-proxy",
+      "provider-vector-rerank-arm",
+      "component-leaderboard",
+      "ui-fixture-smoke",
+      "method-ladder-slice",
+    ],
+  };
+  const phases = [
+    {
+      id: "agent-memory-health-gate",
+      status: "ready",
+      purpose:
+        "Before any score loop, prove the agent that runs the benchmark is using the current RecallWeave memory path, can explicitly write durable memories, and has clean enough logs for recall to be useful.",
+      requiredBeforeProviderSpend: true,
+      requiredBeforeScoreTrust: true,
+      requiredChecks: [
+        "codex-lifecycle-audit --strict",
+        "explicit-memory-store-available",
+        "hosted-supermemory-write-back-disabled",
+        "benchmark-container-isolated-from-live-research-memory",
+        "session-wiki-topic-map-visible-for-run",
+        "post-boundary-retrieval-check",
+        "duplicate-memory-rate-at-or-below-0.02",
+        "unsafe-transcript-hit-count-zero-or-scrubbed-before-run",
+        "memory-write-error-rate-at-or-below-0.01",
+        "recall-context-sample-reviewed-for-usefulness",
+      ],
+      blockers: [],
+    },
+    {
+      id: "long-agent-workflow-canary",
+      status: "ready",
+      purpose:
+        "Run a multi-step Codex/Bob Code style workflow with RecallWeave enabled, explicit memory writes during the task, compaction/session continuity, and a post-run retrieval check.",
+      requiredBeforeProviderSpend: false,
+      countsAsProductReadinessEvidence: true,
+      taskClasses: [
+        "repo implementation with later recall of design decisions",
+        "law/accounting research packet with topic and subtopic continuity",
+        "multi-agent handoff-free update flow where each agent reads the same container contract",
+      ],
+      passCriteria: [
+        "the actor uses RecallWeave/selfmem recall before substantive phases",
+        "the actor stores at least three intentional durable memories with explicit store/write",
+        "the actor can retrieve those memories after a session boundary or compaction surrogate",
+        "the run finishes the user task without losing key constraints",
+        "the memory-health gate passes after the run",
+      ],
+    },
+    {
+      id: "source-lock-closeout",
+      status: missingBeforeFullRun.length ? "blocked" : "ready",
+      purpose: "Pin the exact LongMemEval-V2 tier, comparable row, reader model, and judge/scorer before any public-comparable run.",
+      requiredBeforeProviderSpend: true,
+      blockers: missingBeforeFullRun,
+    },
+    {
+      id: "local-method-refinement",
+      status: "ready",
+      purpose: "Use local Apple lanes to refine chunking, topic/subtopic amplification, query expansion gates, and hybrid retrieval without spending provider quota.",
+      arms: [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "wiki-title-amplified-hybrid",
+        "wiki-subtopic-amplified-hybrid",
+        "wiki-summary-session-hybrid",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank",
+        "local-apple-qwen3-4b",
+        "local-apple-qwen3-4b-local-rerank",
+      ],
+    },
+    {
+      id: "cloud-challenger-run",
+      status: missingBeforeFullRun.length ? "blocked-until-source-lock-ready" : "ready",
+      purpose: "Run the best local method against controlled NVIDIA, Gemini, and Voyage challengers on the same source-locked rows.",
+      arms: providerMatrix.map((item) => item.harnessArm),
+      requiredBeforeProviderSpend: true,
+      blockers: missingBeforeFullRun,
+    },
+    {
+      id: "answer-quality-and-review",
+      status: missingBeforeFullRun.length ? "blocked-until-source-lock-ready" : "ready",
+      purpose: "Use Codex GPT-5.5 as the reader/actor when declared, then score with the official scorer or the declared judge model and attach reviewer intake.",
+      readerModel: "codex-gpt-5.5",
+      judgePolicy:
+        "Prefer the benchmark official scorer when available; use deepseek-v4-pro only as the declared judge/reviewer lane when the scoring contract permits LLM judging.",
+    },
+  ];
+
+  return {
+    schemaVersion: 1,
+    ok: true,
+    mode: "agentic-memory-provider-autoresearch-plan",
+    generatedAt: new Date().toISOString(),
+    metricsOnly: true,
+    publicSafe: true,
+    callsProviderApis: false,
+    sendsBenchmarkTextToProvider: false,
+    writesRealFiles: Boolean(outputPath || markdownOutputPath),
+    rawQuestionIdsIncluded: false,
+    rawQuestionsIncluded: false,
+    rawAnswersIncluded: false,
+    rawMemoryIncluded: false,
+    rawTranscriptIncluded: false,
+    target: {
+      id: lock.target?.id ?? "longmemeval-v2",
+      name: lock.target?.name ?? "LongMemEval-V2",
+      sourceLockHash: `sha256:${stableHash(JSON.stringify(lock.proofChecks ?? []))}`,
+      questionCount,
+      sourceLockReadyForMaterialization: Boolean(lock.sourceLockReadyForMaterialization),
+      sourceLockReadyForPublicClaim: Boolean(lock.sourceLockReadyForPublicClaim),
+      remainingSourceLockBlockers: blockers,
+    },
+    sourceLockProof,
+    cloudDefaultForPersonalUse: "cloud-voyage4-lite-voyage-lite",
+    methodologyDefault: "local-apple-controlled-lanes",
+    primaryScoreContract,
+    hostedSupermemorySearchForMethodology: "disabled",
+    providerMatrix,
+    runPolicy: {
+      fullSetPreferred: true,
+      fullQuestionCount: questionCount || 451,
+      sampleWaveQuestionCounts: [45, 150, questionCount || 451],
+      concurrentProviderFamiliesAllowed: true,
+      maxConcurrentProviderFamilies: 3,
+      zeroDollarProviderFamiliesPreferred: ["nvidia", "openrouter", "gemini", "voyage"],
+      zeroDollarProviderPolicy:
+        "Treat zero-dollar and free-tier APIs as quota-limited lanes, not spend-limited lanes; pace requests and retry safely, but keep running useful waves while credentials and public-data consent are present.",
+      scheduleStyle: "completion-waves",
+      publicClaimRequiresFullRun: true,
+      publicClaimRequiresReviewerIntake: true,
+      publicClaimRequiresZeroPrivacyFailures: true,
+      memoryHealthGateRequiredBeforeEveryWave: true,
+      longAgentWorkflowCanaryRequiredBeforeProdDefault: true,
+    },
+    watchdog: {
+      enabled: true,
+      minimumQuestionsBeforeQualityStop: 45,
+      stopArmIfScoreTrailsBestControlByPoints: 8,
+      stopArmIfPrivacyFailuresAbove: 0,
+      stopArmIfErrorRateAbove: 0.05,
+      stopArmIfRateLimitRetryStreakAbove: 6,
+      stopArmIfLatencyExceedsBudgetMultiplier: 2,
+      stopLoopIfMemoryHealthFails: true,
+      stopLoopIfExplicitWriteUnavailable: true,
+      stopLoopIfRecallContextIsNoise: true,
+      keepRunningIfArmIsWithinPointsOfLeader: 3,
+      reasonCodes: [
+        "agent-memory-health-failure",
+        "explicit-write-unavailable",
+        "recall-context-noisy",
+        "quality-under-control",
+        "privacy-failure",
+        "provider-error-rate",
+        "rate-limit-streak",
+        "latency-budget",
+        "source-lock-mismatch",
+      ],
+    },
+    phases,
+    nextActions: [
+      ...(missingBeforeFullRun.length
+        ? ["Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run."]
+        : ["Materialize LongMemEval-V2 in an operator-private run directory, then start local-method-refinement waves."]),
+      "Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.",
+      "Keep the Voyage-lite/lite arm as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
+      "Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane.",
+    ],
+  };
+}
+
+function buildProviderMatrix() {
+  return [
+    {
+      family: "voyage",
+      harnessArm: "cloud-voyage4-lite-voyage-lite",
+      role: "prod-default-low-cost-and-quality-challenger",
+      embedModel: "voyage-4-lite",
+      rerankModel: "rerank-2.5-lite",
+      costClass: "free-tier-or-trial-when-account-allows",
+      safeRpmCap: 10,
+      higherCapWhenDashboardConfirms: 60,
+      freeTierNote: "Use free-tier/trial pacing when available; keep Voyage-lite/lite as personal/prod default unless a same-data challenger wins.",
+    },
+    {
+      family: "gemini",
+      harnessArm: "cloud-gemini2-embed-rerank-proxy",
+      role: "free-tier-embedding-challenger",
+      embedModel: "gemini-embedding-001-or-gemini-embedding",
+      rerankModel: "proxy-or-voyage-rerank",
+      costClass: "free-tier",
+      safeRpmCap: 20,
+      publishedFreeTierRpm: 100,
+      publishedFreeTierRpd: 1000,
+      freeTierNote: "Cap below the published free-tier RPM because TPM is tighter for embedding.",
+    },
+    {
+      family: "nvidia",
+      harnessArm: "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      role: "free-nim-retrieval-challenger",
+      embedModel: "nvidia/nv-embed-v1",
+      rerankModel: "nvidia/rerank-qa-mistral-4b",
+      costClass: "zero-dollar-free-nim",
+      safeRpmCap: 30,
+      upperRpmCapByUserBudget: 40,
+      freeTierNote: "Primary no-spend cloud lane; run aggressively within the free 40 RPM budget and back off only on 429/error telemetry.",
+    },
+    {
+      family: "openrouter",
+      harnessArm: "openrouter-free-query-expansion",
+      role: "zero-dollar-query-expansion-and-reviewer-fallback",
+      embedModel: "nvidia/llama-nemotron-embed-vl-1b-v2:free when exposed by OpenRouter",
+      rerankModel: "not-primary-free-rerank",
+      queryExpansionModels: ["moonshotai/kimi-k2.6:free", "qwen/qwen3-next-80b-a3b-instruct:free"],
+      costClass: "zero-dollar-free-routes",
+      safeRpmCap: 20,
+      upperRpmCapByUserBudget: 40,
+      freeTierNote: "Use for query expansion, critic/reviewer, and fallback generation; do not treat it as the primary rerank lane unless a free rerank endpoint is actually available.",
+    },
+    {
+      family: "local-apple",
+      harnessArm: "local-apple-qwen3-4b-local-rerank",
+      role: "methodology-refinement-baseline",
+      embedModel: "qwen3-embedding-local",
+      rerankModel: "qwen3-reranker-local",
+      safeRpmCap: null,
+      freeTierNote: "No provider quota; bounded by unified memory, sidecar stability, and cache reuse.",
+    },
+  ];
+}
+
+function proofProvided(lock, field) {
+  return lock.proofChecks?.find((item) => item.field === field)?.provided === true;
+}
+
+function renderMarkdown(report) {
+  return [
+    "# Agentic Provider Autoresearch Plan",
+    "",
+    `- OK: ${report.ok}`,
+    `- Target: ${report.target.name}`,
+    `- Source-lock ready: ${report.target.sourceLockReadyForMaterialization}`,
+    `- Remaining source-lock blockers: ${report.target.remainingSourceLockBlockers.length ? report.target.remainingSourceLockBlockers.join(", ") : "none"}`,
+    `- Personal/prod default: ${report.cloudDefaultForPersonalUse}`,
+    `- Methodology default: ${report.methodologyDefault}`,
+    `- Primary score: ${report.primaryScoreContract.scoreName}`,
+    `- Supermemory comparison: ${report.primaryScoreContract.supermemoryComparisonSurface}`,
+    `- Diagnostics are release scores: ${!report.primaryScoreContract.diagnosticScoresAreNotReleaseScores}`,
+    `- Calls provider APIs: ${report.callsProviderApis}`,
+    "",
+    "## Provider Matrix",
+    "",
+    ...report.providerMatrix.map((item) => `- ${item.family}: ${item.harnessArm}; embed=${item.embedModel}; rerank=${item.rerankModel}; cap=${item.safeRpmCap ?? "local"}`),
+    "",
+    "## Watchdog",
+    "",
+    `- Minimum questions before quality stop: ${report.watchdog.minimumQuestionsBeforeQualityStop}`,
+    `- Stop if trailing best control by points: ${report.watchdog.stopArmIfScoreTrailsBestControlByPoints}`,
+    `- Stop on privacy failures above: ${report.watchdog.stopArmIfPrivacyFailuresAbove}`,
+    "",
+    "## Phases",
+    "",
+    ...report.phases.map((phase) => `- ${phase.id}: ${phase.status}`),
+    "",
+    "## Next Actions",
+    "",
+    ...report.nextActions.map((item) => `- ${item}`),
+  ].join("\n");
+}
+
+function parseArgs(argv) {
+  const parsed = {};
+  for (let index = 0; index < argv.length; index += 1) {
+    const item = argv[index];
+    if (item === "--") continue;
+    if (!item.startsWith("--")) continue;
+    const key = item.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    const next = argv[index + 1];
+    if (!next || next.startsWith("--")) parsed[key] = true;
+    else {
+      parsed[key] = next;
+      index += 1;
+    }
+  }
+  return parsed;
+}
+
+function resolveInputPath(value) {
+  return isAbsolute(String(value ?? "")) ? String(value) : resolve(root, String(value ?? ""));
+}
+
+function writeOutput(path, text) {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, text, { encoding: "utf8", mode: 0o600 });
+}
+
+function stableHash(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function arrayOf(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function assertSafePublicText(text, label) {
+  assert.doesNotMatch(String(text), secretPattern, `${label} contains a key-shaped secret`);
+  assert.doesNotMatch(String(text), privatePathPattern, `${label} contains a private path`);
+}
