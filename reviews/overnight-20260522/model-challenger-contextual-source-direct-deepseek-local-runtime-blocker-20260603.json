@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "mode": "model-challenger-contextual-source-provider-route-and-local-runtime-blocker",
+  "status": "BLOCKED_ON_LOCAL_RUNTIME_ONLY",
+  "blockers": [
+    "missing-local-apple-arm",
+    "missing-local-rerank-arm"
+  ],
+  "generatedAt": "2026-06-03T12:05:00.000Z",
+  "publicSafe": true,
+  "secretValuesIncluded": false,
+  "privatePathsIncluded": false,
+  "rawBenchmarkInputIncluded": false,
+  "claimScope": "model-challenger",
+  "sourceLockedShard": {
+    "shardId": "shard-001",
+    "queryCount": 25,
+    "sourceLocked": true,
+    "contextualSourceMode": true
+  },
+  "correctedProviderRoute": {
+    "answerQualityScorer": "direct-deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "answerModel": "deepseek-v4-flash",
+    "judgeModel": "deepseek-v4-flash",
+    "apiKeySource": "private-key-file",
+    "apiKeyFilePresent": true,
+    "openRouterUsedForAnswerQualityScoring": false,
+    "openRouterRole": "not-used-for-this-scorer-route"
+  },
+  "latestScoredResult": {
+    "path": "reviews/overnight-20260522/answer-quality-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-20260603.json",
+    "scorerRoute": "direct-deepseek",
+    "callsCompleted": 350,
+    "callFailures": 0,
+    "armCount": 7,
+    "bestArm": "cloud-voyage4-voyage-lite-rerank",
+    "bestAnswerQuality": 42,
+    "bm25AnswerQuality": 34,
+    "denseProxyAnswerQuality": 20
+  },
+  "memoryScoreGate": {
+    "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
+    "blockingReasons": [
+      "missing-local-apple-arm",
+      "missing-local-rerank-arm"
+    ],
+    "notBlockedBy": [
+      "openrouter-scorer-route",
+      "deepseek-key-availability",
+      "dense-control"
+    ]
+  },
+  "localRuntimeEvidence": {
+    "localEmbeddingRuntimeDoctor": {
+      "path": "reviews/overnight-20260522/local-embedding-runtime-doctor-contextual-shard-001-20260603.json",
+      "status": "BLOCKED_LOCAL_EMBEDDING_RUNTIME",
+      "readyForLocalAppleArmExport": false,
+      "blockers": [
+        "local-embedding-runtime-not-ready",
+        "local-embedding-server-bin-missing",
+        "local-embedding-model-path-missing",
+        "local-embedding-endpoint-missing"
+      ]
+    },
+    "localRerankDurabilitySmoke": {
+      "path": "reviews/overnight-20260522/local-rerank-durability-smoke-contextual-shard-001-20260603.json",
+      "status": "BLOCKED_LOCAL_RERANK_DURABILITY",
+      "readyForLocalRerankArmExport": false,
+      "blockers": [
+        "local-rerank-endpoint-missing"
+      ]
+    },
+    "liveExpectedEndpointPortsListening": false,
+    "dedicatedQwenEmbeddingOrRerankGgufFoundByNarrowSearch": false,
+    "llamaServerBinaryFoundByNarrowSearch": true
+  },
+  "nextAction": {
+    "kind": "local-runtime-provisioning",
+    "summary": "Provision or point SELFMEM_LOCAL_EMBED_* and SELFMEM_LOCAL_RERANK_* at dedicated local embedding/rerank endpoints, then export only the two missing local arms and rerun the same direct-DeepSeek score gate.",
+    "doNotDo": [
+      "do-not-reroute-answer-quality-scoring-through-openrouter",
+      "do-not-repeat-a-full-75-question-bm25-only-loop",
+      "do-not-treat-bm25-as-the-research-destination"
+    ]
+  }
+}
