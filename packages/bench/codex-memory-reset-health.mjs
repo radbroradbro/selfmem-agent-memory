@@ -31,18 +31,32 @@ const dogfoodMonitor = buildDogfoodMonitor({ storeHealth, contextQuality, doctor
 const publicSurface = inspectPublicSurface();
 const injection = inspectInjectionState({ hooks, codexConfig });
 
-const repairModeReady =
-  injection.customHooksDisabled
-  && injection.nativeMemoryUseDisabled
+const baseMemoryHealthReady =
+  injection.nativeMemoryUseDisabled
   && injection.nativeMemoryGenerationDisabled
   && doctor.ok === true
   && doctor.mirrorWritesToSupermemory === false
   && contextQuality.ok === true;
+const hooksRewired = injection.userPromptSubmitHookCount > 0 && injection.stopHookCount > 0;
+const resetModeReady = injection.customHooksDisabled && baseMemoryHealthReady;
+const rewiredDogfoodReady =
+  hooksRewired
+  && baseMemoryHealthReady
+  && dogfoodMonitor.relevance?.relevanceReadyForAutoInjection === true
+  && Array.isArray(dogfoodMonitor.rewireBlockers)
+  && dogfoodMonitor.rewireBlockers.length === 0;
+const controlledDogfoodReady = resetModeReady || rewiredDogfoodReady;
+const phase = rewiredDogfoodReady ? "rewired" : resetModeReady ? "reset" : "blocked";
+const status = rewiredDogfoodReady
+  ? "READY_FOR_REWIRED_CONTROLLED_DOGFOOD"
+  : resetModeReady
+    ? "READY_FOR_CONTROLLED_DOGFOOD"
+    : "BLOCKED_MEMORY_DOGFOOD_HEALTH";
 
 const releaseBlockedByPublicSurface = publicSurface.publicSurfaceNeedsCollapse === true;
-const releaseBlockedByResetMode = true;
+const releaseBlockedByDogfoodMode = true;
 const releaseBlockers = [
-  releaseBlockedByResetMode ? "codex-memory-reset-mode-active" : null,
+  releaseBlockedByDogfoodMode ? "codex-memory-controlled-dogfood-active" : null,
   releaseBlockedByPublicSurface ? "public-review-surface-collapse-required" : null,
 ].filter(Boolean);
 
@@ -50,8 +64,9 @@ const report = {
   schemaVersion: 1,
   mode: "codex-memory-reset-health",
   generatedAt: new Date().toISOString(),
-  ok: repairModeReady,
-  status: repairModeReady ? "READY_FOR_CONTROLLED_DOGFOOD" : "BLOCKED_RESET_HEALTH",
+  ok: controlledDogfoodReady,
+  status,
+  phase,
   callsProviderApis: false,
   callsHostedSupermemory: false,
   writesRealFiles: false,
@@ -79,20 +94,22 @@ const report = {
   dogfoodMonitor,
   publicSurface,
   release: {
-    blockedByResetMode: releaseBlockedByResetMode,
+    resetPhaseReady: resetModeReady,
+    blockedByDogfoodMode: releaseBlockedByDogfoodMode,
     blockedByPublicSurface: releaseBlockedByPublicSurface,
     blockers: releaseBlockers,
     reason: releaseBlockers.length
-      ? "Codex memory is in controlled reset mode and public review evidence must stay compact before release."
+      ? "Codex memory is in controlled dogfood and public review evidence must stay compact before release."
       : "",
   },
   blockers: [
-    injection.customHooksDisabled ? null : "custom-prompt-stop-hooks-still-enabled",
+    injection.customHooksDisabled || hooksRewired ? null : "custom-prompt-stop-hooks-partially-enabled",
     injection.nativeMemoryUseDisabled ? null : "codex-native-memory-use-still-enabled",
     injection.nativeMemoryGenerationDisabled ? null : "codex-native-memory-generation-still-enabled",
     doctor.ok === true ? null : "bridge-doctor-failed",
     doctor.mirrorWritesToSupermemory === false ? null : "hosted-write-back-enabled",
     contextQuality.ok === true ? null : "context-quality-gate-failed",
+    phase === "blocked" && hooksRewired ? "rewired-dogfood-gate-failed" : null,
   ].filter(Boolean),
 };
 

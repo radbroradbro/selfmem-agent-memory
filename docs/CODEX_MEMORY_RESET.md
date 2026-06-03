@@ -1,14 +1,16 @@
-# Codex Memory Reset
+# Codex Memory Controlled Dogfood
 
 This page describes the current Codex bridge recovery gate. It is a product
 safety gate, not public benchmark evidence.
 
 ## Current Mode
 
-The Codex memory bridge is in controlled reset mode. Automatic prompt injection
-and native Codex memory use should stay disabled while maintainers verify that
-manual recall, explicit durable writes, context ranking, dedupe, and pruning are
-boringly useful in live agent work.
+The Codex memory bridge can be in either reset dogfood or rewired dogfood.
+Native Codex memory use and generation stay disabled in both phases. In reset
+dogfood, prompt/stop hooks are disabled while maintainers verify manual recall,
+explicit durable writes, context ranking, dedupe, and pruning. In rewired
+dogfood, one controlled Codex lane may use the local bridge hooks while the
+monitor proves that recall remains relevant, quiet, and useful in live work.
 
 Do not restart unattended benchmark loops or agent-wide rollout automation from
 this mode. Re-enable automatic recall only after the local reset-health gate and
@@ -24,14 +26,18 @@ Run the reset-health gate on the workstation where Codex is installed:
 npm exec --yes pnpm@10.23.0 -- codex:memory-reset-health
 ```
 
-The gate is intentionally local. It checks the installed bridge, disabled hook
-state, disabled native Codex memory state, hosted write-back status,
-context-quality scenarios, and active-store noise counts without printing raw
-memory, transcripts, keys, or private paths.
+The gate is intentionally local. It checks the installed bridge, hook phase,
+disabled native Codex memory state, hosted write-back status, context-quality
+scenarios, and active-store noise counts without printing raw memory,
+transcripts, keys, or private paths.
 
 `READY_FOR_CONTROLLED_DOGFOOD` means maintainers may use manual recall and
 explicit writes in a limited dogfood loop. It does not mean production ready,
 public release ready, or Supermemory replacement ready.
+
+`READY_FOR_REWIRED_CONTROLLED_DOGFOOD` means the local hook pair is enabled in
+one controlled Codex lane and the relevance gate is clean. It still does not
+mean production ready, public release ready, or Supermemory replacement ready.
 
 The report also includes a `dogfoodMonitor` block. Use that block during and
 after any rewire to track:

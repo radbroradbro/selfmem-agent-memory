@@ -505,7 +505,7 @@
     "human-public-launch-approval-required",
     "full-memory-sota-benchmark-gate-incomplete",
     "fresh-real-container-canary-not-current",
-    "codex-memory-reset-mode-active"
+    "codex-memory-controlled-dogfood-active"
   ],
   "safetyBoundary": {
     "usesFixtureUiEvidence": true,

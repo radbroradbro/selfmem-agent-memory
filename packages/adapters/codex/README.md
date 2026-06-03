@@ -24,8 +24,8 @@ state. Validate a live install with:
 npm exec --yes pnpm@10.23.0 -- codex:live-agent-canary:local
 ```
 
-When the bridge is in reset mode, keep automatic injection disabled and run the
-local health gate first:
+When the bridge is in reset dogfood, keep automatic injection disabled and run
+the local health gate first:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- codex:memory-reset-health
@@ -35,7 +35,8 @@ npm exec --yes pnpm@10.23.0 -- codex:memory-reset-health
 explicit writes in live work. It is not release approval and it is not a
 benchmark score.
 
-After automatic recall is rewired, keep running the same gate and inspect its
+After automatic recall is rewired in one controlled Codex lane, the same gate
+may report `READY_FOR_REWIRED_CONTROLLED_DOGFOOD`. Keep inspecting its
 `dogfoodMonitor` block. The monitor tracks relevance, retrieval, direct lookup
 usefulness, write outcomes, and quiet-prompt behavior without printing raw
 memories or transcripts.

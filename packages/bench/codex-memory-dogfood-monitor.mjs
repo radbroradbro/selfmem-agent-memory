@@ -118,6 +118,7 @@ function evaluateHealth(health, { phase }) {
     if (Number(injection.userPromptSubmitHookCount ?? 0) === 0) blockers.push("rewired-phase-recall-hook-missing");
     if (Number(injection.stopHookCount ?? 0) === 0) blockers.push("rewired-phase-stop-hook-missing");
     if (Number(retrieval.recallRunEvents ?? 0) === 0) blockers.push("rewired-phase-recall-not-observed");
+    if (Number(retrieval.userFacingRecallRunEvents ?? 0) === 0) blockers.push("rewired-phase-user-facing-recall-not-observed");
     if (Number(retrieval.averageRecallMatches ?? 0) > 4) blockers.push("rewired-phase-recall-too-broad");
     if (relevance.relevanceReadyForAutoInjection !== true) blockers.push("rewired-phase-recall-not-relevance-gated");
     if (Number(relevance.unanchoredRecallEvents ?? 0) > 0) blockers.push("rewired-phase-unanchored-recall-observed");
@@ -147,6 +148,9 @@ function evaluateHealth(health, { phase }) {
   }
   if (blockers.includes("rewired-phase-random-benchmark-canary-risk")) {
     nextActions.push("Treat benchmark/canary memories as task-scoped recall only; periodic or forced injection must require a matching task anchor.");
+  }
+  if (blockers.includes("rewired-phase-user-facing-recall-not-observed")) {
+    nextActions.push("Generate or wait for a real user-facing hook recall event; audit-forced recall is useful for testing but does not prove live plugin behavior.");
   }
   if (blockers.some((item) => item.startsWith("rewired-phase"))) {
     nextActions.push("Keep rewire to one Codex lane and gather another monitored interval after repair.");

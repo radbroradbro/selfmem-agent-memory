@@ -14,7 +14,7 @@ const requiredBlockers = [
   "human-public-launch-approval-required",
   "full-memory-sota-benchmark-gate-incomplete",
   "fresh-real-container-canary-not-current",
-  "codex-memory-reset-mode-active",
+  "codex-memory-controlled-dogfood-active",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
@@ -579,15 +579,18 @@ assert.equal(githubLiveSync.issueTitleMatches, true);
 assert.equal(githubLiveSync.issueBodyMatches, true);
 const codexMemoryResetHealth = JSON.parse(run("node", ["packages/bench/codex-memory-reset-health.mjs", "--strict"]).stdout);
 assert.equal(codexMemoryResetHealth.ok, true);
-assert.equal(codexMemoryResetHealth.status, "READY_FOR_CONTROLLED_DOGFOOD");
+assert.ok(
+  ["READY_FOR_CONTROLLED_DOGFOOD", "READY_FOR_REWIRED_CONTROLLED_DOGFOOD"].includes(codexMemoryResetHealth.status),
+  `unexpected Codex memory health status ${codexMemoryResetHealth.status}`,
+);
 assert.deepEqual(codexMemoryResetHealth.blockers, []);
-assert.equal(codexMemoryResetHealth.release?.blockedByResetMode, true);
+assert.equal(codexMemoryResetHealth.release?.blockedByDogfoodMode, true);
 assert.equal(codexMemoryResetHealth.release?.blockedByPublicSurface, false);
 assert.equal(codexMemoryResetHealth.publicSurface?.publicSurfaceCollapsed, true);
 assert.equal(codexMemoryResetHealth.publicSurface?.reviewExportIgnored, true);
 assert.equal(codexMemoryResetHealth.publicSurface?.publicReviewExportedFileCount, 0);
 assert.equal(codexMemoryResetHealth.publicSurface?.publicEvidenceIndexSafe, true);
-assert.ok(codexMemoryResetHealth.release?.blockers?.includes("codex-memory-reset-mode-active"));
+assert.ok(codexMemoryResetHealth.release?.blockers?.includes("codex-memory-controlled-dogfood-active"));
 assert.equal(codexMemoryResetHealth.release?.blockers?.includes("public-review-surface-collapse-required"), false);
 
 const reviewerReport = [
@@ -645,10 +648,10 @@ const blockerReport = [
     nextAction: realCanaryNextAction,
   },
   {
-    id: "codex-memory-reset-mode-active",
+    id: "codex-memory-controlled-dogfood-active",
     status: "blocked",
     evidence: "docs/CODEX_MEMORY_RESET.md",
-    nextAction: "Keep unattended automation and automatic Codex memory injection off until controlled dogfood proves quiet prompt context, explicit writes, post-boundary recall, and store-noise health.",
+    nextAction: "Keep Codex memory in controlled dogfood until monitored live hook intervals prove quiet prompt context, explicit writes, post-boundary recall, relevance-gated retrieval, and store-noise health.",
   },
   codexMemoryResetHealth.release?.blockedByPublicSurface ? {
     id: "public-review-surface-collapse-required",
@@ -788,8 +791,11 @@ console.log(
         },
         codexMemoryResetHealth: {
           status: codexMemoryResetHealth.status,
+          phase: codexMemoryResetHealth.phase,
           controlledDogfoodReady: codexMemoryResetHealth.ok,
           customHooksDisabled: codexMemoryResetHealth.injection?.customHooksDisabled,
+          userPromptSubmitHookCount: codexMemoryResetHealth.injection?.userPromptSubmitHookCount,
+          stopHookCount: codexMemoryResetHealth.injection?.stopHookCount,
           nativeMemoryUseDisabled: codexMemoryResetHealth.injection?.nativeMemoryUseDisabled,
           nativeMemoryGenerationDisabled: codexMemoryResetHealth.injection?.nativeMemoryGenerationDisabled,
           contextQualityOk: codexMemoryResetHealth.contextQuality?.ok,

@@ -11,9 +11,10 @@ Use this checklist before making the repository public.
   credentials.
 - [ ] The public surface is compact: large review-evidence piles are collapsed,
   moved out of the public tree, or represented by metrics-only summaries.
-- [ ] If the Codex bridge is still in reset mode, public release remains
-  blocked by `codex-memory-reset-mode-active`; `codex:memory-reset-health`
-  may allow controlled dogfood, but it is not launch approval.
+- [ ] While the Codex bridge is in reset or rewired controlled dogfood, public
+  release remains blocked by `codex-memory-controlled-dogfood-active`;
+  `codex:memory-reset-health` may allow controlled dogfood, but it is not
+  launch approval.
 - [ ] Automatic Codex prompt injection is not re-enabled until controlled
   dogfood proves unrelated prompts retrieve no memory, task prompts retrieve
   directly relevant context only, explicit writes work, and post-boundary recall
@@ -85,7 +86,7 @@ Use this checklist before making the repository public.
 - [ ] Docs clarity review completed.
 - [ ] Release claim review completed.
 - [ ] `pnpm release:doctor` shows
-  `codex-memory-reset-mode-active`,
+  `codex-memory-controlled-dogfood-active`,
   `full-memory-sota-benchmark-gate-incomplete`, and the real canary blocker
   until controlled dogfood, the full same-data answer-quality shard ladder,
   reviewer gate, owner approval, and real canary are complete. It must keep

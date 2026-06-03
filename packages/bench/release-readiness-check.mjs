@@ -1153,14 +1153,24 @@ check("fresh Codex runtime canary fixture passes", () => {
   }
 });
 
-check("fresh Codex memory reset-health gate passes for controlled dogfood", () => {
+check("fresh Codex memory health gate passes for controlled dogfood", () => {
   run("node", ["--check", "packages/bench/codex-memory-context-quality-audit.mjs"]);
   run("node", ["--check", "packages/bench/codex-memory-reset-health.mjs"]);
   const report = JSON.parse(run("node", ["packages/bench/codex-memory-reset-health.mjs", "--strict"]).stdout);
 
   assert.equal(report.ok, true);
-  assert.equal(report.status, "READY_FOR_CONTROLLED_DOGFOOD");
-  assert.equal(report.injection?.customHooksDisabled, true);
+  assert.ok(
+    ["READY_FOR_CONTROLLED_DOGFOOD", "READY_FOR_REWIRED_CONTROLLED_DOGFOOD"].includes(report.status),
+    `unexpected memory health status ${report.status}`,
+  );
+  assert.ok(["reset", "rewired"].includes(report.phase), `unexpected memory health phase ${report.phase}`);
+  if (report.phase === "reset") {
+    assert.equal(report.injection?.customHooksDisabled, true);
+  } else {
+    assert.equal(report.injection?.customHooksDisabled, false);
+    assert.ok(Number(report.injection?.userPromptSubmitHookCount ?? 0) > 0);
+    assert.ok(Number(report.injection?.stopHookCount ?? 0) > 0);
+  }
   assert.equal(report.injection?.nativeMemoryUseDisabled, true);
   assert.equal(report.injection?.nativeMemoryGenerationDisabled, true);
   assert.equal(report.contextQuality?.ok, true);
@@ -1184,10 +1194,13 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.equal(report.dogfoodMonitor?.relevance?.autoInjectionAllowed, false);
   assert.match(report.dogfoodMonitor?.relevance?.policy ?? "", /periodic-or-signal/i);
   assert.ok(Array.isArray(report.dogfoodMonitor?.rewireBlockers));
-  const monitor = JSON.parse(run("node", ["packages/bench/codex-memory-dogfood-monitor.mjs", "--strict"]).stdout);
+  const monitorArgs = report.phase === "rewired"
+    ? ["packages/bench/codex-memory-dogfood-monitor.mjs", "--phase", "rewired", "--strict"]
+    : ["packages/bench/codex-memory-dogfood-monitor.mjs", "--strict"];
+  const monitor = JSON.parse(run("node", monitorArgs).stdout);
   assert.equal(monitor.ok, true);
   assert.equal(monitor.status, "READY_DOGFOOD_MONITOR");
-  assert.equal(monitor.phase, "reset");
+  assert.equal(monitor.phase, report.phase);
   assert.equal(monitor.metricsOnly, true);
   assert.equal(monitor.autoFixesApplied, false);
   assert.equal(monitor.autoRecallExpansionAllowed, false);
@@ -1199,13 +1212,13 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.deepEqual(monitor.blockers, []);
   assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);
   assert.deepEqual(report.blockers, []);
-  assert.equal(report.release?.blockedByResetMode, true);
+  assert.equal(report.release?.blockedByDogfoodMode, true);
   assert.equal(report.release?.blockedByPublicSurface, false);
   assert.equal(report.publicSurface?.publicSurfaceCollapsed, true);
   assert.equal(report.publicSurface?.reviewExportIgnored, true);
   assert.equal(report.publicSurface?.publicReviewExportedFileCount, 0);
   assert.equal(report.publicSurface?.publicEvidenceIndexSafe, true);
-  assert.ok(report.release?.blockers?.includes("codex-memory-reset-mode-active"));
+  assert.ok(report.release?.blockers?.includes("codex-memory-controlled-dogfood-active"));
   assert.equal(report.release?.blockers?.includes("public-review-surface-collapse-required"), false);
   assert.equal(report.countsAsBenchmarkEvidence, false);
 });
@@ -2004,7 +2017,7 @@ check("release state is conservative", () => {
     "human-public-launch-approval-required",
     "full-memory-sota-benchmark-gate-incomplete",
     "fresh-real-container-canary-not-current",
-    "codex-memory-reset-mode-active",
+    "codex-memory-controlled-dogfood-active",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
