@@ -86,10 +86,12 @@ Use this checklist before making the repository public.
 - [ ] Release claim review completed.
 - [ ] `pnpm release:doctor` shows
   `codex-memory-reset-mode-active`,
-  `public-review-surface-collapse-required`, and
-  `full-memory-sota-benchmark-gate-incomplete` until controlled dogfood, public
-  surface cleanup, the full same-data answer-quality shard ladder, reviewer
-  gate, owner approval, and real canary are complete.
+  `full-memory-sota-benchmark-gate-incomplete`, and the real canary blocker
+  until controlled dogfood, the full same-data answer-quality shard ladder,
+  reviewer gate, owner approval, and real canary are complete. It must keep
+  `public-review-surface-collapse-required` absent only when `.gitattributes`
+  hides `reviews/` from release archives and `docs/PUBLIC_EVIDENCE_INDEX.md`
+  remains compact and public-safe.
 - [ ] Any `CONCERNS` decision has an explicit acceptance note.
 - [ ] Public live-update draft says whether the release is production ready or
   alpha only.

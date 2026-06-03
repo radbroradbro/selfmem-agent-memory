@@ -39,9 +39,11 @@ the orchestrator workstation. Passing `codex:memory-reset-health` means the
 installed bridge is ready for controlled manual dogfood with automatic
 injection disabled; it does not count as benchmark evidence, SOTA evidence, or
 public release approval. The same report deliberately keeps release blocked
-while reset mode is active or while the tracked public review surface is too
-large. Whole-harness benchmark runs should resume only after the memory product
-itself is quiet and useful in live work. After any automatic-recall rewire,
+while reset mode is active, and it separately verifies that the detailed
+`reviews/` evidence is hidden from release archives behind a compact public
+evidence index. Whole-harness benchmark runs should resume only after the
+memory product itself is quiet and useful in live work. After any
+automatic-recall rewire,
 monitor the memory system through the reset-health `dogfoodMonitor` block:
 noise, retrieval, writes, and usefulness must be tracked continuously, because
 a canary that writes and recalls once can still hide clutter that hurts agents.

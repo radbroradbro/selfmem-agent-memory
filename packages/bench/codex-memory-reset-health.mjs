@@ -41,8 +41,7 @@ const repairModeReady =
   && storeHealth.severeNoise.privatePathMemoryCount === 0
   && storeHealth.severeNoise.secretShapedMemoryCount === 0;
 
-const releaseBlockedByPublicSurface = publicSurface.trackedReviewMarkdownCount > 50
-  || publicSurface.trackedReviewFileCount > 120;
+const releaseBlockedByPublicSurface = publicSurface.publicSurfaceNeedsCollapse === true;
 const releaseBlockedByResetMode = true;
 const releaseBlockers = [
   releaseBlockedByResetMode ? "codex-memory-reset-mode-active" : null,
@@ -335,13 +334,60 @@ function inspectPublicSurface() {
   const reviewFiles = trackedFiles.filter((file) => file.startsWith("reviews/"));
   const reviewMarkdown = reviewFiles.filter((file) => file.endsWith(".md"));
   const docsMarkdown = trackedFiles.filter((file) => file.startsWith("docs/") && file.endsWith(".md"));
+  const exportIgnoredFiles = gitExportIgnoredFiles(trackedFiles);
+  const exportIgnoredReviewFiles = reviewFiles.filter((file) => exportIgnoredFiles.has(file));
+  const exportIgnoredReviewMarkdown = reviewMarkdown.filter((file) => exportIgnoredFiles.has(file));
+  const publicEvidenceIndexPath = join(root, "docs/PUBLIC_EVIDENCE_INDEX.md");
+  const publicEvidenceIndexText = existsSync(publicEvidenceIndexPath)
+    ? readFileSync(publicEvidenceIndexPath, "utf8")
+    : "";
+  const publicEvidenceIndexSafe = publicEvidenceIndexText.length > 0
+    && !secretPattern().test(publicEvidenceIndexText)
+    && !/\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\/.test(publicEvidenceIndexText)
+    && /reviews\/.*export-ignore/i.test(publicEvidenceIndexText)
+    && /compact product docs/i.test(publicEvidenceIndexText);
+  const publicReviewExportedFileCount = reviewFiles.length - exportIgnoredReviewFiles.length;
+  const publicReviewExportedMarkdownCount = reviewMarkdown.length - exportIgnoredReviewMarkdown.length;
+  const publicSurfaceCollapsed = reviewFiles.length > 0
+    && publicReviewExportedFileCount === 0
+    && publicEvidenceIndexSafe;
+  const thresholdExceeded = reviewMarkdown.length > 50 || reviewFiles.length > 120;
   return {
     trackedMarkdownCount: trackedFiles.filter((file) => file.endsWith(".md")).length,
     trackedDocsMarkdownCount: docsMarkdown.length,
     trackedReviewFileCount: reviewFiles.length,
     trackedReviewMarkdownCount: reviewMarkdown.length,
-    publicSurfaceNeedsCollapse: reviewMarkdown.length > 50 || reviewFiles.length > 120,
+    reviewExportIgnored: exportIgnoredReviewFiles.length === reviewFiles.length && reviewFiles.length > 0,
+    reviewExportIgnoredFileCount: exportIgnoredReviewFiles.length,
+    reviewExportIgnoredMarkdownCount: exportIgnoredReviewMarkdown.length,
+    publicReviewExportedFileCount,
+    publicReviewExportedMarkdownCount,
+    publicEvidenceIndexPresent: publicEvidenceIndexText.length > 0,
+    publicEvidenceIndexSafe,
+    publicSurfaceCollapsed,
+    publicSurfaceNeedsCollapse: thresholdExceeded && !publicSurfaceCollapsed,
   };
+}
+
+function gitExportIgnoredFiles(files) {
+  if (!files.length) return new Set();
+  const result = spawnSync("git", ["check-attr", "--stdin", "export-ignore"], {
+    cwd: root,
+    input: `${files.join("\n")}\n`,
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  if (result.status !== 0) return new Set();
+  const ignored = new Set();
+  for (const line of result.stdout.split("\n").filter(Boolean)) {
+    const marker = ": export-ignore: ";
+    const index = line.lastIndexOf(marker);
+    if (index < 0) continue;
+    if (line.slice(index + marker.length).trim() === "set") {
+      ignored.add(line.slice(0, index));
+    }
+  }
+  return ignored;
 }
 
 function gitLsFiles() {

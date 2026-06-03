@@ -44,10 +44,12 @@ const requiredFiles = [
   "README.md",
   "LICENSE",
   "SECURITY.md",
+  ".gitattributes",
   "bin/selfmem_update",
   "docs/LOCAL_CONTAINER_AUDIT.md",
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
+  "docs/PUBLIC_EVIDENCE_INDEX.md",
   "docs/CODEX_MEMORY_RESET.md",
   "docs/UPDATE_FLOW.md",
   "docs/MODEL_MATRIX.md",
@@ -1192,9 +1194,13 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.equal(report.storeHealth?.severeNoise?.secretShapedMemoryCount, 0);
   assert.deepEqual(report.blockers, []);
   assert.equal(report.release?.blockedByResetMode, true);
-  assert.equal(report.release?.blockedByPublicSurface, true);
+  assert.equal(report.release?.blockedByPublicSurface, false);
+  assert.equal(report.publicSurface?.publicSurfaceCollapsed, true);
+  assert.equal(report.publicSurface?.reviewExportIgnored, true);
+  assert.equal(report.publicSurface?.publicReviewExportedFileCount, 0);
+  assert.equal(report.publicSurface?.publicEvidenceIndexSafe, true);
   assert.ok(report.release?.blockers?.includes("codex-memory-reset-mode-active"));
-  assert.ok(report.release?.blockers?.includes("public-review-surface-collapse-required"));
+  assert.equal(report.release?.blockers?.includes("public-review-surface-collapse-required"), false);
   assert.equal(report.countsAsBenchmarkEvidence, false);
 });
 
@@ -1975,6 +1981,7 @@ check("release state is conservative", () => {
     "public-longmemeval-autoresearch-loop",
     "codex-lifecycle-audit",
     "local-full-wiki-shard-plan",
+    "public-review-surface-export-hide",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
   }
@@ -1986,11 +1993,11 @@ check("release state is conservative", () => {
     "full-memory-sota-benchmark-gate-incomplete",
     "fresh-real-container-canary-not-current",
     "codex-memory-reset-mode-active",
-    "public-review-surface-collapse-required",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
   assert.equal(releaseState.remainingBlockers?.includes("hosted-supermemory-baseline-not-current"), false);
+  assert.equal(releaseState.remainingBlockers?.includes("public-review-surface-collapse-required"), false);
 });
 
 check("post-baseline public evidence guard is honored", () => {
@@ -11289,6 +11296,7 @@ function isPublicEvidencePath(file) {
 function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
   return allowedCodePaths.has(file) && (
     file === ".gitignore" ||
+    file === ".gitattributes" ||
     file === ".env.example" ||
     file === "configs/bench-budget.yaml" ||
     file === "configs/benchmark-target-lock.json" ||

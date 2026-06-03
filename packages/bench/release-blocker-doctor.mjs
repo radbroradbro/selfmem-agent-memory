@@ -15,7 +15,6 @@ const requiredBlockers = [
   "full-memory-sota-benchmark-gate-incomplete",
   "fresh-real-container-canary-not-current",
   "codex-memory-reset-mode-active",
-  "public-review-surface-collapse-required",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
@@ -583,9 +582,13 @@ assert.equal(codexMemoryResetHealth.ok, true);
 assert.equal(codexMemoryResetHealth.status, "READY_FOR_CONTROLLED_DOGFOOD");
 assert.deepEqual(codexMemoryResetHealth.blockers, []);
 assert.equal(codexMemoryResetHealth.release?.blockedByResetMode, true);
-assert.equal(codexMemoryResetHealth.release?.blockedByPublicSurface, true);
+assert.equal(codexMemoryResetHealth.release?.blockedByPublicSurface, false);
+assert.equal(codexMemoryResetHealth.publicSurface?.publicSurfaceCollapsed, true);
+assert.equal(codexMemoryResetHealth.publicSurface?.reviewExportIgnored, true);
+assert.equal(codexMemoryResetHealth.publicSurface?.publicReviewExportedFileCount, 0);
+assert.equal(codexMemoryResetHealth.publicSurface?.publicEvidenceIndexSafe, true);
 assert.ok(codexMemoryResetHealth.release?.blockers?.includes("codex-memory-reset-mode-active"));
-assert.ok(codexMemoryResetHealth.release?.blockers?.includes("public-review-surface-collapse-required"));
+assert.equal(codexMemoryResetHealth.release?.blockers?.includes("public-review-surface-collapse-required"), false);
 
 const reviewerReport = [
   {
@@ -647,13 +650,13 @@ const blockerReport = [
     evidence: "docs/CODEX_MEMORY_RESET.md",
     nextAction: "Keep unattended automation and automatic Codex memory injection off until controlled dogfood proves quiet prompt context, explicit writes, post-boundary recall, and store-noise health.",
   },
-  {
+  codexMemoryResetHealth.release?.blockedByPublicSurface ? {
     id: "public-review-surface-collapse-required",
     status: "blocked",
     evidence: "packages/bench/codex-memory-reset-health.mjs",
     nextAction: "Collapse or hide the large tracked review-evidence surface before public release so the repository presents compact product docs and metrics-only evidence.",
-  },
-];
+  } : null,
+].filter(Boolean);
 
 if (live) {
   claudeLiveHealth = inspectCommand("claude", [
