@@ -17,6 +17,7 @@ const requiredBlockers = [
   "codex-memory-controlled-dogfood-active",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-150q-combined-20260603.json",
   "full-memory-sota-doctor-after-method-ladder-100q-combined-20260603.json",
   "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json",
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
@@ -39,6 +40,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-150q-combined-20260603.md",
   "full-memory-sota-doctor-after-method-ladder-100q-combined-20260603.md",
   "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md",
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
@@ -524,10 +526,10 @@ assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsMethodLadderEvidenc
 assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsFullMemorySotaEvidence, false);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
 assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
-assert.equal(fullMemorySotaDoctor.methodLadderState?.queryCount, 100);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.queryCount, 150);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapAvailable, true);
-assert.equal(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapCommonQueryCount, 100);
-assert.ok(Number(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapLowerBound95 ?? 0) >= 8.9);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapCommonQueryCount, 150);
+assert.ok(Number(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapLowerBound95 ?? 0) >= 10.6);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmFailureCount, 1);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmJudgeFailures, 1);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmAnswerFailures, 0);
@@ -543,8 +545,8 @@ assert.match(fullMemorySotaDoctorText, /Provider Wave Intake/);
 assert.match(fullMemorySotaDoctorText, /All waves include BM25: true/);
 assert.match(fullMemorySotaDoctorText, /All waves include full hybrid: true/);
 assert.match(fullMemorySotaDoctorText, /Method Ladder Result Gate/);
-assert.match(fullMemorySotaDoctorText, /Paired bootstrap common queries: 100/);
-assert.match(fullMemorySotaDoctorText, /Paired bootstrap 95% lower bound: 8\.9/);
+assert.match(fullMemorySotaDoctorText, /Paired bootstrap common queries: 150/);
+assert.match(fullMemorySotaDoctorText, /Paired bootstrap 95% lower bound: 10\.6/);
 assert.match(fullMemorySotaDoctorText, /Next larger-slice promotion ready: true/);
 assert.match(fullMemorySotaDoctorText, /Production default allowed by method ladder: false/);
 assert.match(fullMemorySotaDoctorText, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);

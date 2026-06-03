@@ -117,6 +117,7 @@ const files = {
     "answer-quality-model-challenger-contextual-source-shard-001-deepseek-v4-flash-20260603.json",
   ),
   methodLadderResultGate: preferReviewFile(
+    "answer-quality-memory-method-ladder-150q-combined-tolerant-result-gate-20260603.json",
     "answer-quality-memory-method-ladder-100q-combined-result-gate-20260603.json",
     "answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     "answer-quality-memory-method-ladder-60q-result-gate-20260531.json",
