@@ -47,6 +47,18 @@ For periodic rewire monitoring:
 npm exec --yes pnpm@10.23.0 -- codex:memory-dogfood-monitor:watch
 ```
 
+After the watched evidence is compacted with
+`codex:memory-dogfood-evidence`, run the graduation review gate:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- codex:memory-dogfood-graduation-review
+```
+
+Passing this review means the controlled Codex lane cleared the noise,
+relevance, direct lookup, and explicit-write dogfood gate. It still does not
+authorize broad rollout, public launch, production defaulting, or benchmark
+claims.
+
 Collect a 15-minute metrics-only runtime report for the strict-real canary
 contract with:
 

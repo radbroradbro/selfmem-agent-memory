@@ -159,6 +159,7 @@ const requiredFiles = [
   "packages/bench/codex-lifecycle-audit.mjs",
   "packages/bench/codex-memory-context-quality-audit.mjs",
   "packages/bench/codex-memory-dogfood-evidence-check.mjs",
+  "packages/bench/codex-memory-dogfood-graduation-review.mjs",
   "packages/bench/codex-memory-dogfood-monitor.mjs",
   "packages/bench/codex-memory-reset-health.mjs",
   "packages/bench/codex-live-agent-memory-canary.mjs",
@@ -428,6 +429,8 @@ const requiredFiles = [
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/full-memory-sota-doctor-20260527.json`,
   `${reviewDir}/full-memory-sota-doctor-20260527.md`,
+  `${reviewDir}/codex-memory-dogfood-graduation-review-current.json`,
+  `${reviewDir}/codex-memory-dogfood-graduation-review-current.md`,
   `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-deepseek-flash-20260603.json`,
   `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-deepseek-flash-20260603.md`,
   `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-result-gate-20260603.json`,
@@ -799,6 +802,7 @@ const requiredScripts = [
   "codex:memory-dogfood-monitor",
   "codex:memory-dogfood-monitor:watch",
   "codex:memory-dogfood-evidence",
+  "codex:memory-dogfood-graduation-review",
   "codex:live-agent-canary",
   "codex:live-agent-canary:local",
   "codex:runtime-canary",
@@ -1311,6 +1315,50 @@ check("watched Codex dogfood interval evidence is graduation-review ready", () =
   assert.deepEqual(report.blockers, []);
   assert.equal(report.claimBoundary?.publicLaunchAllowed, false);
   assert.equal(report.claimBoundary?.countsAsBenchmarkEvidence, false);
+});
+
+check("Codex dogfood graduation review passes without enabling launch", () => {
+  run("node", ["--check", "packages/bench/codex-memory-dogfood-graduation-review.mjs"]);
+  const report = JSON.parse(run("node", ["packages/bench/codex-memory-dogfood-graduation-review.mjs", "--strict"]).stdout);
+
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "codex-memory-dogfood-graduation-review");
+  assert.equal(report.status, "PASS_CONTROLLED_DOGFOOD_GRADUATION_REVIEW");
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.publicSafe, true);
+  assert.equal(report.callsProviderApis, false);
+  assert.equal(report.callsHostedSupermemory, false);
+  assert.equal(report.rawMemoryIncluded, false);
+  assert.equal(report.rawTranscriptIncluded, false);
+  assert.equal(report.rawPromptIncluded, false);
+  assert.equal(report.rawContextIncluded, false);
+  assert.equal(report.evidence?.phase, "rewired");
+  assert.equal(report.evidence?.watch, true);
+  assert.equal(report.evidence?.sourceBridgeHashMatchesCurrent, true);
+  assert.equal(report.currentHealth?.status, "READY_FOR_REWIRED_CONTROLLED_DOGFOOD");
+  assert.equal(report.currentHealth?.blockerVisible, true);
+  assert.equal(report.graduationGate?.readyForDogfoodGraduationReview, true);
+  assert.ok(Number(report.graduationGate?.cleanIterations ?? 0) >= 12);
+  assert.deepEqual(report.graduationGate?.blockers, []);
+  assert.equal(report.monitoredSignals?.quietPromptClean, true);
+  assert.equal(report.monitoredSignals?.directLookupUseful, true);
+  assert.equal(report.monitoredSignals?.directLookupQuietEmpty, true);
+  assert.equal(report.monitoredSignals?.relevanceGated, true);
+  assert.equal(report.monitoredSignals?.forcedOrPeriodicRecallAnchored, true);
+  assert.equal(report.monitoredSignals?.randomCanaryBenchmarkInjectionRisk, false);
+  assert.equal(report.monitoredSignals?.severeNoiseClean, true);
+  assert.equal(report.monitoredSignals?.explicitWritesObserved, true);
+  assert.equal(report.verdict?.controlledDogfoodGraduationReviewPassed, true);
+  assert.equal(report.verdict?.memoryNoiseStepResolved, true);
+  assert.equal(report.verdict?.relevanceRetrievalAndWriteLogicAccepted, true);
+  assert.equal(report.verdict?.controlledCodexLaneCanContinue, true);
+  assert.equal(report.verdict?.continuePeriodicMonitoringRequired, true);
+  assert.equal(report.verdict?.ownerApprovalRequired, true);
+  assert.equal(report.verdict?.publicLaunchAllowed, false);
+  assert.equal(report.verdict?.countsAsBenchmarkEvidence, false);
+  assert.equal(report.verdict?.broaderRolloutAllowed, false);
+  assert.equal(report.verdict?.productionDefaultAllowed, false);
+  assert.deepEqual(report.blockers, []);
 });
 
 check("Codex bridge adapter source preserves explicit writes", () => {

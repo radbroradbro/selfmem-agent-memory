@@ -69,6 +69,8 @@ const files = {
   hostedBaselineLiveBudgetedPacketReport: `${reviewDir}/hosted-baseline-live-budgeted-packet.json`,
   codexLiveAgentCanaryReport: `${reviewDir}/codex-live-agent-memory-canary-20260602.json`,
   codexLiveAgentCanaryMarkdown: `${reviewDir}/codex-live-agent-memory-canary-20260602.md`,
+  codexMemoryDogfoodGraduationReview: `${reviewDir}/codex-memory-dogfood-graduation-review-current.json`,
+  codexMemoryDogfoodGraduationReviewMarkdown: `${reviewDir}/codex-memory-dogfood-graduation-review-current.md`,
   budgetedBaselineReviewerFindings: `${reviewDir}/reviewer-work/reviewer-findings.md`,
   budgetedBaselineReviewerIntakeEvidence: `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-evidence.md`,
   budgetedBaselineReviewerIntakeReport: `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json`,
@@ -221,6 +223,7 @@ const hostedBaselineLiveMirrorPacket = JSON.parse(readFileSync(join(root, files.
 const hostedBaselineLiveBudgetedRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedRunReport), "utf8"));
 const hostedBaselineLiveBudgetedPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedPacketReport), "utf8"));
 const codexLiveAgentCanary = JSON.parse(readFileSync(join(root, files.codexLiveAgentCanaryReport), "utf8"));
+const codexMemoryDogfoodGraduationReview = JSON.parse(readFileSync(join(root, files.codexMemoryDogfoodGraduationReview), "utf8"));
 const budgetedBaselineReviewerIntake = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewerIntakeReport), "utf8"));
 const budgetedBaselineReviewedComparison = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewedComparison), "utf8"));
 const budgetedBaselineReviewedPacketReview = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewedPacketReview), "utf8"));
@@ -313,6 +316,44 @@ assert.match(texts.codexLiveAgentCanaryMarkdown, /Explicit write observed: true/
 assert.match(texts.codexLiveAgentCanaryMarkdown, /Post-boundary recall observed: true/i);
 assert.match(texts.codexLiveAgentCanaryMarkdown, /Counts as benchmark evidence: false/i);
 assert.match(texts.codexLiveAgentCanaryMarkdown, /Primary benchmark still required: true/i);
+assert.equal(codexMemoryDogfoodGraduationReview.mode, "codex-memory-dogfood-graduation-review");
+assert.equal(codexMemoryDogfoodGraduationReview.status, "PASS_CONTROLLED_DOGFOOD_GRADUATION_REVIEW");
+assert.equal(codexMemoryDogfoodGraduationReview.ok, true);
+assert.equal(codexMemoryDogfoodGraduationReview.metricsOnly, true);
+assert.equal(codexMemoryDogfoodGraduationReview.publicSafe, true);
+assert.equal(codexMemoryDogfoodGraduationReview.callsProviderApis, false);
+assert.equal(codexMemoryDogfoodGraduationReview.callsHostedSupermemory, false);
+assert.equal(codexMemoryDogfoodGraduationReview.rawMemoryIncluded, false);
+assert.equal(codexMemoryDogfoodGraduationReview.rawTranscriptIncluded, false);
+assert.equal(codexMemoryDogfoodGraduationReview.rawPromptIncluded, false);
+assert.equal(codexMemoryDogfoodGraduationReview.rawContextIncluded, false);
+assert.equal(codexMemoryDogfoodGraduationReview.evidence?.phase, "rewired");
+assert.equal(codexMemoryDogfoodGraduationReview.evidence?.watch, true);
+assert.equal(codexMemoryDogfoodGraduationReview.evidence?.sourceBridgeHashMatchesCurrent, true);
+assert.equal(codexMemoryDogfoodGraduationReview.currentHealth?.status, "READY_FOR_REWIRED_CONTROLLED_DOGFOOD");
+assert.equal(codexMemoryDogfoodGraduationReview.graduationGate?.readyForDogfoodGraduationReview, true);
+assert.deepEqual(codexMemoryDogfoodGraduationReview.graduationGate?.blockers, []);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.quietPromptClean, true);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.directLookupUseful, true);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.directLookupQuietEmpty, true);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.relevanceGated, true);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.forcedOrPeriodicRecallAnchored, true);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.randomCanaryBenchmarkInjectionRisk, false);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.severeNoiseClean, true);
+assert.equal(codexMemoryDogfoodGraduationReview.monitoredSignals?.explicitWritesObserved, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.controlledDogfoodGraduationReviewPassed, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.memoryNoiseStepResolved, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.relevanceRetrievalAndWriteLogicAccepted, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.controlledCodexLaneCanContinue, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.continuePeriodicMonitoringRequired, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.ownerApprovalRequired, true);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.publicLaunchAllowed, false);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.countsAsBenchmarkEvidence, false);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.broaderRolloutAllowed, false);
+assert.equal(codexMemoryDogfoodGraduationReview.verdict?.productionDefaultAllowed, false);
+assert.match(texts.codexMemoryDogfoodGraduationReviewMarkdown, /Controlled dogfood review passed: true/i);
+assert.match(texts.codexMemoryDogfoodGraduationReviewMarkdown, /Public launch allowed: false/i);
+assert.match(texts.codexMemoryDogfoodGraduationReviewMarkdown, /Broader rollout allowed: false/i);
 assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.publicBenchmarkReady, true);
 assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.uniqueQueryCount, 8);
 assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.duplicateQueryCount, 0);
@@ -676,6 +717,11 @@ const requirements = [
     "packages/bench/codex-live-agent-memory-canary.mjs",
     files.codexLiveAgentCanaryReport,
     files.codexLiveAgentCanaryMarkdown,
+  ]),
+  proven("codex-memory-dogfood-graduation-review", "Controlled Codex dogfood graduation review passes for noise, relevant retrieval, direct lookup usefulness, anchored periodic recall, and explicit writes without enabling launch or benchmark claims", [
+    "packages/bench/codex-memory-dogfood-graduation-review.mjs",
+    files.codexMemoryDogfoodGraduationReview,
+    files.codexMemoryDogfoodGraduationReviewMarkdown,
   ]),
   proven("safe-pr-implementation", "Safe PR-based implementation has an open mergeable PR and CI evidence", [
     files.prBodyDraft,

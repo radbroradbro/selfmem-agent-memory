@@ -99,6 +99,8 @@ const requiredFiles = {
   codexLiveAgentCanaryReport: "codex-live-agent-memory-canary-20260602.json",
   codexLiveAgentCanaryMarkdown: "codex-live-agent-memory-canary-20260602.md",
   codexDogfoodGraduationEvidence: "codex-memory-dogfood-evidence-current.json",
+  codexDogfoodGraduationReview: "codex-memory-dogfood-graduation-review-current.json",
+  codexDogfoodGraduationReviewMarkdown: "codex-memory-dogfood-graduation-review-current.md",
   budgetedBaselineReviewerFindings: "reviewer-work/reviewer-findings.md",
   budgetedBaselineReviewerIntakeEvidence: "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md",
   budgetedBaselineReviewerIntakeReport: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
@@ -632,6 +634,21 @@ const codexDogfoodEvidenceCurrent =
   codexDogfoodGraduationEvidence.ok === true
   && codexDogfoodGraduationEvidence.graduationGate?.readyForDogfoodGraduationReview === true
   && codexDogfoodGraduationEvidence.sourceBridgeHashMatchesCurrent === true;
+const codexDogfoodGraduationReview = JSON.parse(
+  run("node", ["packages/bench/codex-memory-dogfood-graduation-review.mjs"]).stdout,
+);
+assert.equal(codexDogfoodGraduationReview.mode, "codex-memory-dogfood-graduation-review");
+assert.equal(codexDogfoodGraduationReview.verdict?.publicLaunchAllowed, false);
+assert.equal(codexDogfoodGraduationReview.verdict?.countsAsBenchmarkEvidence, false);
+assert.equal(codexDogfoodGraduationReview.verdict?.broaderRolloutAllowed, false);
+assert.equal(codexDogfoodGraduationReview.verdict?.productionDefaultAllowed, false);
+const codexDogfoodGraduationReviewPassed =
+  codexDogfoodGraduationReview.ok === true
+  && codexDogfoodGraduationReview.status === "PASS_CONTROLLED_DOGFOOD_GRADUATION_REVIEW"
+  && codexDogfoodGraduationReview.verdict?.controlledDogfoodGraduationReviewPassed === true
+  && codexDogfoodGraduationReview.verdict?.memoryNoiseStepResolved === true
+  && codexDogfoodGraduationReview.verdict?.relevanceRetrievalAndWriteLogicAccepted === true
+  && codexDogfoodGraduationReview.verdict?.controlledCodexLaneCanContinue === true;
 
 const reviewerReport = [
   {
@@ -689,10 +706,14 @@ const blockerReport = [
   },
   {
     id: "codex-memory-controlled-dogfood-active",
-    status: codexDogfoodEvidenceCurrent ? "ready-for-graduation-review" : "stale-or-incomplete-evidence",
-    evidence: requiredFiles.codexDogfoodGraduationEvidence,
-    nextAction: codexDogfoodEvidenceCurrent
-      ? "Watched rewired dogfood intervals are clean for quiet prompts, direct lookup usefulness, relevance-gated retrieval, explicit writes, and store-noise health. Keep public launch blocked; use this only as controlled dogfood graduation-review evidence."
+    status: codexDogfoodGraduationReviewPassed ? "graduation-review-passed-controlled-dogfood" : codexDogfoodEvidenceCurrent ? "ready-for-graduation-review" : "stale-or-incomplete-evidence",
+    evidence: codexDogfoodGraduationReviewPassed
+      ? requiredFiles.codexDogfoodGraduationReview
+      : requiredFiles.codexDogfoodGraduationEvidence,
+    nextAction: codexDogfoodGraduationReviewPassed
+      ? "Controlled Codex dogfood graduation review passed for noise, direct lookup usefulness, relevance-gated retrieval, explicit writes, and store-noise health. Keep the lane under periodic monitoring and keep public launch, broader rollout, production defaulting, and benchmark claims blocked."
+      : codexDogfoodEvidenceCurrent
+        ? "Watched rewired dogfood intervals are clean for quiet prompts, direct lookup usefulness, relevance-gated retrieval, explicit writes, and store-noise health. Run codex:memory-dogfood-graduation-review before treating this step as reviewed; keep public launch blocked."
       : `Refresh watched rewired dogfood evidence under the currently installed bridge before graduation review; current evidence blockers: ${codexDogfoodGraduationEvidence.blockers?.join(", ") || "unknown"}.`,
   },
   codexMemoryResetHealth.release?.blockedByPublicSurface ? {
@@ -859,6 +880,20 @@ console.log(
           publicLaunchAllowed: codexDogfoodGraduationEvidence.claimBoundary?.publicLaunchAllowed,
           countsAsBenchmarkEvidence: codexDogfoodGraduationEvidence.claimBoundary?.countsAsBenchmarkEvidence,
           monitoredSignals: codexDogfoodGraduationEvidence.monitoredSignals,
+        },
+        codexDogfoodGraduationReview: {
+          ok: codexDogfoodGraduationReview.ok,
+          status: codexDogfoodGraduationReview.status,
+          controlledDogfoodGraduationReviewPassed:
+            codexDogfoodGraduationReview.verdict?.controlledDogfoodGraduationReviewPassed,
+          memoryNoiseStepResolved: codexDogfoodGraduationReview.verdict?.memoryNoiseStepResolved,
+          relevanceRetrievalAndWriteLogicAccepted:
+            codexDogfoodGraduationReview.verdict?.relevanceRetrievalAndWriteLogicAccepted,
+          controlledCodexLaneCanContinue: codexDogfoodGraduationReview.verdict?.controlledCodexLaneCanContinue,
+          publicLaunchAllowed: codexDogfoodGraduationReview.verdict?.publicLaunchAllowed,
+          countsAsBenchmarkEvidence: codexDogfoodGraduationReview.verdict?.countsAsBenchmarkEvidence,
+          broaderRolloutAllowed: codexDogfoodGraduationReview.verdict?.broaderRolloutAllowed,
+          productionDefaultAllowed: codexDogfoodGraduationReview.verdict?.productionDefaultAllowed,
         },
         budgetedBaselineReviewerIntake: {
           ok: budgetedBaselineReviewerIntakeReport.ok,

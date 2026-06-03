@@ -84,7 +84,19 @@ node packages/bench/codex-memory-dogfood-evidence-check.mjs \
 
 That evidence may show the controlled Codex memory lane is ready for graduation
 review. It still does not authorize public launch, SOTA claims, or broader
-automatic recall rollout.
+rollout. Run the compact graduation review gate before treating the noise,
+relevance, retrieval, and write-logic step as reviewed:
+
+```bash
+node packages/bench/codex-memory-dogfood-graduation-review.mjs \
+  --output reviews/<review-dir>/codex-memory-dogfood-graduation-review-current.json \
+  --markdown-output reviews/<review-dir>/codex-memory-dogfood-graduation-review-current.md \
+  --strict
+```
+
+That review may pass controlled dogfood graduation while still keeping
+`publicLaunchAllowed`, `countsAsBenchmarkEvidence`, `broaderRolloutAllowed`,
+and `productionDefaultAllowed` false.
 
 If the monitor reports noisy or confusing context, keep or turn automatic
 injection off, fix the ranking, write, dedupe, or pruning method, and rerun the
