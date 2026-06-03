@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-context-synthesis-diagnostic",
+  "generatedAt": "2026-06-03T16:01:21.504Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "readsPrivateMaterializedInputs": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "benchmark": "longmemeval",
+  "queryShard": {
+    "answerQuality": {
+      "startIndex": 150,
+      "endIndexExclusive": 155,
+      "requestedLimit": 5,
+      "sameRawQuerySelectionAcrossMethods": true,
+      "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+    },
+    "retrievalAutopsy": {
+      "startIndex": 150,
+      "endIndexExclusive": 155,
+      "requestedLimit": 5,
+      "sameRawQuerySelectionAcrossMethods": true
+    },
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+  },
+  "methods": {
+    "baseline": "session-v1",
+    "challenger": "contextual-source-chunk-v1",
+    "strategy": "bm25-lite"
+  },
+  "evidence": {
+    "answerQualityPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-extractive-query-window-deepseek-flash-20260603.json",
+    "answerQualityHash": "sha256:f31c66c6ac67deb5bac343edaa6f2898d3b36fc7c6567b369acf0eb13d4582a5",
+    "retrievalAutopsyPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-retrieval-autopsy-20260603.json",
+    "retrievalAutopsyHash": "sha256:275d19958779d62751a2a90190068330932198c7d48d241f742e233d5d501a01",
+    "resultGatePath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-extractive-query-window-result-gate-20260603.json",
+    "resultGateHash": "sha256:827d182f2de1ff74db28fd1303e353e60a20c18183fbcb713a8f187ad4c0f344",
+    "resultGateStatus": "BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT",
+    "resultGateBlockers": [
+      "best-challenger-does-not-clear-baseline-delta",
+      "best-overall-method-is-still-baseline"
+    ]
+  },
+  "status": "READY_FOR_CONTEXT_SYNTHESIS_FIX_LOOP",
+  "blockers": [],
+  "reason": "Retrieval support improved for the challenger, but answer-quality did not improve; the next bounded loop should repair context packaging or answer synthesis before expanding benchmark scope.",
+  "comparison": {
+    "retrievalHitRateLift": 0.2,
+    "answerQualityDelta": 0,
+    "baseline": {
+      "answerQuality": 20,
+      "correctRate": 0.2,
+      "hitRate": 0.6,
+      "hitQueryCount": 3,
+      "missQueryCount": 2,
+      "contextTokensAvg": 800
+    },
+    "challenger": {
+      "answerQuality": 20,
+      "correctRate": 0.2,
+      "hitRate": 0.8,
+      "hitQueryCount": 4,
+      "missQueryCount": 1,
+      "contextTokensAvg": 769
+    },
+    "conversion": {
+      "baselineHitToCorrectRate": 0.333333,
+      "challengerHitToCorrectRate": 0.25,
+      "challengerOnlyHitConvertedCount": 0,
+      "challengerOnlyHitCount": 1,
+      "bothHitBothWrongCount": 2,
+      "bothHitCount": 3
+    },
+    "repeatedWrongAnswerHashes": []
+  },
+  "failureClasses": {
+    "challenger-retrieved-support-but-answer-still-failed": 1,
+    "converted-to-correct": 1,
+    "retrieval-absence": 1,
+    "retrieved-support-not-converted": 2
+  },
+  "pairedQueries": [
+    {
+      "queryIdHash": "105d9d75bd95eb01",
+      "queryHash": "e46e10ac1aaa2919",
+      "retrievalOutcome": "challenger-only-hit",
+      "failureClass": "challenger-retrieved-support-but-answer-still-failed",
+      "scoreDelta": 0,
+      "sameCandidateAnswerHash": false,
+      "baseline": {
+        "hit": false,
+        "firstHitRank": null,
+        "hitCount": 0,
+        "expectedRefCount": 2,
+        "supportCoverage": 0,
+        "responseResultCount": 1,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 1,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:cc679c1cd9a71ecc6c78b299ab914cd2302a1e4dc667eb71fd8b6b15c85ea2df",
+        "judgeDecisionHash": "sha256:5850fa9f77ae0bb58fc0b6d4423954e2057208521385635204c25e2cb38047de"
+      },
+      "challenger": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 1,
+        "expectedRefCount": 10,
+        "supportCoverage": 0.1,
+        "responseResultCount": 4,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 4,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:040897bbde67d0cdcc6de4f70049a6bcb56566a5afbd22a81148a802b46fcb07",
+        "judgeDecisionHash": "sha256:cded47c847c0578493ab923c010e0c1d5be60b8847e00832d4ba13bb23b5a818"
+      }
+    },
+    {
+      "queryIdHash": "3633dab7d4fb856d",
+      "queryHash": "9a59dd7164b4d42f",
+      "retrievalOutcome": "both-hit",
+      "failureClass": "converted-to-correct",
+      "scoreDelta": 0,
+      "sameCandidateAnswerHash": true,
+      "baseline": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 1,
+        "expectedRefCount": 4,
+        "supportCoverage": 0.25,
+        "responseResultCount": 1,
+        "responseTotalBeforeBudget": 5,
+        "score": 100,
+        "correct": true,
+        "contextResultCount": 1,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:3abec44081ace2d5ad5ef5b5a2276f0a070e647156fa1ef63406b1b4dac9e41f",
+        "judgeDecisionHash": "sha256:16eb22a2d9d1ad07c3224e1e31346eae081d59fa6f067ea797665c5c6b3b2091"
+      },
+      "challenger": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 4,
+        "expectedRefCount": 22,
+        "supportCoverage": 0.181818,
+        "responseResultCount": 5,
+        "responseTotalBeforeBudget": 5,
+        "score": 100,
+        "correct": true,
+        "contextResultCount": 5,
+        "contextTokens": 711,
+        "candidateAnswerHash": "sha256:3abec44081ace2d5ad5ef5b5a2276f0a070e647156fa1ef63406b1b4dac9e41f",
+        "judgeDecisionHash": "sha256:16eb22a2d9d1ad07c3224e1e31346eae081d59fa6f067ea797665c5c6b3b2091"
+      }
+    },
+    {
+      "queryIdHash": "4c8f2730ce3cc21e",
+      "queryHash": "c9ffb16bd8ce9be7",
+      "retrievalOutcome": "both-miss",
+      "failureClass": "retrieval-absence",
+      "scoreDelta": 0,
+      "sameCandidateAnswerHash": false,
+      "baseline": {
+        "hit": false,
+        "firstHitRank": null,
+        "hitCount": 0,
+        "expectedRefCount": 2,
+        "supportCoverage": 0,
+        "responseResultCount": 1,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 1,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:9dcd5b96672daa8031b38b7931fabcfc4814fa17bb5f73f3971e163c10e5929d",
+        "judgeDecisionHash": "sha256:665d0ab5f94ead54dd4c4edbd2e5a1fec429de01a8efbd20b11efd75f357bf67"
+      },
+      "challenger": {
+        "hit": false,
+        "firstHitRank": null,
+        "hitCount": 0,
+        "expectedRefCount": 12,
+        "supportCoverage": 0,
+        "responseResultCount": 3,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 3,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:3ff2e01f800496a54b0bcf87bd4f7fc368a85417e3812e10ee0799d86e502909",
+        "judgeDecisionHash": "sha256:e8a6b30f501ffe34a0d62b95cef4864cbbe83bf521ab57aa4490e54abad11019"
+      }
+    },
+    {
+      "queryIdHash": "af8624005b641336",
+      "queryHash": "20debea01721fe36",
+      "retrievalOutcome": "both-hit",
+      "failureClass": "retrieved-support-not-converted",
+      "scoreDelta": 0,
+      "sameCandidateAnswerHash": false,
+      "baseline": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 1,
+        "expectedRefCount": 4,
+        "supportCoverage": 0.25,
+        "responseResultCount": 1,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 1,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:8bd0de089b597b9d99035c1285af248ee5d685bfdb1c6de207ba90b67da5e3ff",
+        "judgeDecisionHash": "sha256:39c84bdaf02ef37549c428b26bbbcab344d92de7868a0ffbee7d26b7f332085c"
+      },
+      "challenger": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 3,
+        "expectedRefCount": 22,
+        "supportCoverage": 0.136364,
+        "responseResultCount": 3,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 3,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:eb766eb74e2ebe64bc518fa62a854c55e1ca34f299a1255ff56f1d756e47b727",
+        "judgeDecisionHash": "sha256:62df3824f64f52b61853df1cb67a31519c2bd96b02f2cdb896a4b26119850cde"
+      }
+    },
+    {
+      "queryIdHash": "b250d558a3617fba",
+      "queryHash": "7fc50bb80f9f5a5d",
+      "retrievalOutcome": "both-hit",
+      "failureClass": "retrieved-support-not-converted",
+      "scoreDelta": 0,
+      "sameCandidateAnswerHash": false,
+      "baseline": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 1,
+        "expectedRefCount": 4,
+        "supportCoverage": 0.25,
+        "responseResultCount": 1,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 1,
+        "contextTokens": 800,
+        "candidateAnswerHash": "sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "judgeDecisionHash": "sha256:6b64f0d900b930f155f37830bf0ebcdc6f16d058d56f4e176a61c06951ebe131"
+      },
+      "challenger": {
+        "hit": true,
+        "firstHitRank": 1,
+        "hitCount": 3,
+        "expectedRefCount": 22,
+        "supportCoverage": 0.136364,
+        "responseResultCount": 5,
+        "responseTotalBeforeBudget": 5,
+        "score": 0,
+        "correct": false,
+        "contextResultCount": 5,
+        "contextTokens": 735,
+        "candidateAnswerHash": "sha256:62ee56407eb54ca502c7811eb5ccf8f58670bb0a47101138c47a82c6b0fe110c",
+        "judgeDecisionHash": "sha256:c791e428ad06b49061efe9465a1f93582e964e4b742963214203cbcb1bb1a1ba"
+      }
+    }
+  ],
+  "nextActions": [
+    "Run a bounded fix loop on answer prompt packaging and context selection for the challenger-only-hit query before a larger scorer run.",
+    "Prioritize support conversion: retrieved expected support should produce a non-unknown candidate answer and a positive judge score.",
+    "After a concrete context/synthesis change, rerun the same q150-q155 method ladder and result gate; do not claim method promotion from retrieval lift alone."
+  ],
+  "countsAsRetrievalLayerEvidence": true,
+  "countsAsAnswerQualityEvidence": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "countsAsProductionRolloutEvidence": false
+}

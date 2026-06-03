@@ -33,6 +33,9 @@ const modelMatchPolicy = String(
 const answerPromptPolicy = normalizeAnswerPromptPolicy(
   args.answerPromptPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_PROMPT_POLICY ?? "strict-unknown-v1",
 );
+const contextPackagingPolicy = normalizeContextPackagingPolicy(
+  args.contextPackagingPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTEXT_PACKAGING_POLICY ?? "ranked-prefix-v1",
+);
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const continueOnCallError = truthy(args.continueOnCallError ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTINUE_ON_CALL_ERROR ?? "");
 
@@ -147,6 +150,7 @@ for (const method of methods) {
         claimScope,
         modelMatchPolicy,
         answerPromptPolicy,
+        contextPackagingPolicy,
         methodArmSpecs,
         answerQualityPath,
         continueOnCallError,
@@ -192,6 +196,7 @@ const report = {
   claimScope,
   modelMatchPolicy,
   answerPromptPolicy,
+  contextPackagingPolicy,
   queryShard: {
     startIndex: queryOffset,
     endIndexExclusive: maxQueries ? queryOffset + maxQueries : null,
@@ -291,6 +296,8 @@ function answerQualityCommandArgs(input) {
     input.modelMatchPolicy,
     "--answer-prompt-policy",
     input.answerPromptPolicy,
+    "--context-packaging-policy",
+    input.contextPackagingPolicy,
     ...(input.continueOnCallError ? ["--continue-on-call-error"] : []),
     ...input.methodArmSpecs.flatMap((spec) => ["--arm", spec]),
     "--output",
@@ -305,6 +312,7 @@ function runContinueOnCallErrorSmoke() {
     claimScope: "model-challenger",
     modelMatchPolicy: "challenger-model-allowed",
     answerPromptPolicy: "strict-unknown-v1",
+    contextPackagingPolicy: "ranked-prefix-v1",
     methodArmSpecs: ["bm25-lite=/tmp/bm25.json", "full-hybrid-rerank=/tmp/hybrid.json"],
     answerQualityPath: "/tmp/answer-quality.json",
     continueOnCallError: true,
@@ -315,6 +323,7 @@ function runContinueOnCallErrorSmoke() {
     claimScope: "model-challenger",
     modelMatchPolicy: "challenger-model-allowed",
     answerPromptPolicy: "strict-unknown-v1",
+    contextPackagingPolicy: "ranked-prefix-v1",
     methodArmSpecs: ["bm25-lite=/tmp/bm25.json"],
     answerQualityPath: "/tmp/answer-quality.json",
     continueOnCallError: false,
@@ -356,19 +365,24 @@ function runAnswerPromptPolicySmoke() {
     methodDir: "/tmp/method",
     claimScope: "model-challenger",
     modelMatchPolicy: "challenger-model-allowed",
-    answerPromptPolicy: "support-aware-v1",
+    answerPromptPolicy: "extractive-support-v1",
+    contextPackagingPolicy: "query-overlap-window-v1",
     methodArmSpecs: ["bm25-lite=/tmp/bm25.json"],
     answerQualityPath: "/tmp/answer-quality.json",
     continueOnCallError: false,
   });
   const policyIndex = command.indexOf("--answer-prompt-policy");
   assert.ok(policyIndex > 0, "answer prompt policy flag is forwarded");
-  assert.equal(command[policyIndex + 1], "support-aware-v1");
+  assert.equal(command[policyIndex + 1], "extractive-support-v1");
+  const contextPolicyIndex = command.indexOf("--context-packaging-policy");
+  assert.ok(contextPolicyIndex > 0, "context packaging policy flag is forwarded");
+  assert.equal(command[contextPolicyIndex + 1], "query-overlap-window-v1");
   process.stdout.write(
     `${JSON.stringify({
       ok: true,
       mode: "answer-quality-method-ladder-answer-prompt-policy-smoke",
       forwardsAnswerPromptPolicy: true,
+      forwardsContextPackagingPolicy: true,
     })}\n`,
   );
 }
@@ -417,6 +431,7 @@ function answerQualitySummary(input) {
     claimScope: input.answerQuality.claimScope,
     modelMatchPolicy: input.answerQuality.scoringPolicy?.modelMatchPolicy ?? null,
     answerPromptPolicy: input.answerQuality.scoringPolicy?.answerPromptPolicy ?? null,
+    contextPackagingPolicy: input.answerQuality.scoringPolicy?.contextPackagingPolicy ?? null,
     countsAsLocalFullBenchmarkEvidence: input.answerQuality.scoringPolicy?.countsAsLocalFullBenchmarkEvidence ?? false,
     countsAsModelChallengerBenchmarkEvidence: input.answerQuality.scoringPolicy?.countsAsModelChallengerBenchmarkEvidence ?? false,
     callsMade: input.answerQuality.provider?.callsMade ?? null,
@@ -444,6 +459,7 @@ function renderMarkdown(value) {
     `- Claim scope: ${value.claimScope}`,
     `- Model match policy: ${value.modelMatchPolicy}`,
     `- Answer prompt policy: ${value.answerPromptPolicy}`,
+    `- Context packaging policy: ${value.contextPackagingPolicy}`,
     `- Query shard: ${value.queryShard.startIndex} to ${value.queryShard.endIndexExclusive ?? "end"}`,
     `- Same raw query selection: ${value.queryShard.sameRawQuerySelectionAcrossMethods}`,
     `- Claim boundary: ${value.claimBoundary}`,
@@ -582,7 +598,13 @@ function truthy(value) {
 
 function normalizeAnswerPromptPolicy(policy) {
   const value = String(policy ?? "").trim() || "strict-unknown-v1";
-  assert.ok(["strict-unknown-v1", "support-aware-v1"].includes(value), `unknown answer prompt policy: ${value}`);
+  assert.ok(["strict-unknown-v1", "support-aware-v1", "extractive-support-v1"].includes(value), `unknown answer prompt policy: ${value}`);
+  return value;
+}
+
+function normalizeContextPackagingPolicy(policy) {
+  const value = String(policy ?? "").trim() || "ranked-prefix-v1";
+  assert.ok(["ranked-prefix-v1", "query-overlap-window-v1"].includes(value), `unknown context packaging policy: ${value}`);
   return value;
 }
 

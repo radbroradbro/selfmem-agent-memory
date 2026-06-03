@@ -23,6 +23,9 @@ const modelMatchPolicy = String(
 const answerPromptPolicy = normalizeAnswerPromptPolicy(
   args.answerPromptPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_PROMPT_POLICY ?? "strict-unknown-v1",
 );
+const contextPackagingPolicy = normalizeContextPackagingPolicy(
+  args.contextPackagingPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTEXT_PACKAGING_POLICY ?? "ranked-prefix-v1",
+);
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_MEMORYBENCH_QUERY_OFFSET ?? 0, "query offset");
 const maxContextChars = optionalPositiveInt(args.maxContextChars ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_CONTEXT_CHARS ?? 12000, "max context chars");
@@ -46,6 +49,10 @@ const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 if (args.deepseekThinkingSmoke === true) {
   runDeepSeekThinkingSmoke();
+  process.exit(0);
+}
+if (args.contextPackagingPolicySmoke === true) {
+  runContextPackagingPolicySmoke();
   process.exit(0);
 }
 
@@ -235,7 +242,7 @@ function scoreArm({ strategy, responses, querySelection, queries, memories, labe
   const selectedQueries = querySelection?.queries ?? selectQueries(queries).queries;
   const scored = selectedQueries.map((query) => {
     const response = responses[query.id] ?? emptyResponse();
-    const contextItems = contextFor(response, memoryIndex);
+    const contextItems = contextFor(response, memoryIndex, query);
     const expected = labelsByQueryId.get(query.id);
     assert.ok(expected, `missing answer label for query ${query.id}`);
     const candidateAnswer = fixtureAnswer(query, expected, contextItems);
@@ -256,7 +263,7 @@ async function scoreArmAsync({ strategy, responses, querySelection, queries, mem
   for (let queryIndex = 0; queryIndex < selectedQueries.length; queryIndex += 1) {
     const query = selectedQueries[queryIndex];
     const response = responses[query.id] ?? emptyResponse();
-    const contextItems = contextFor(response, memoryIndex);
+    const contextItems = contextFor(response, memoryIndex, query);
     const expected = labelsByQueryId.get(query.id);
     assert.ok(expected, `missing answer label for query ${query.id}`);
     const started = performance.now();
@@ -352,6 +359,7 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
       claimScope,
       modelMatchPolicy,
       answerPromptPolicy,
+      contextPackagingPolicy,
       exactTargetModelsRequired: modelMatchPolicy === "exact-target-required",
       localDiagnosticModelAllowed: modelMatchPolicy === "local-diagnostic-allowed",
       challengerModelAllowed: modelMatchPolicy === "challenger-model-allowed",
@@ -497,6 +505,14 @@ function answerPrompt({ query, context }) {
           "If one or more context items support an answer, give the best supported answer.",
           "Say \"unknown\" only when the provided context does not support any answer.",
         ]
+      : answerPromptPolicy === "extractive-support-v1"
+        ? [
+            "Answer the memory benchmark question using only the provided context.",
+            "Scan all context items for a directly supported answer phrase before deciding the answer is unsupported.",
+            "If any context item contains a plausible answer, return the shortest exact supported phrase from the context.",
+            "Do not answer with \"unknown\" unless no context item contains a plausible answer.",
+            "Do not answer with a bare number unless the question specifically asks for a count, rank, or numeric value.",
+          ]
       : [
           "Answer the memory benchmark question using only the provided context.",
           "If the answer is not supported, say \"unknown\".",
@@ -575,8 +591,91 @@ function isDeepSeekModelOrEndpoint(model, endpoint) {
 
 function normalizeAnswerPromptPolicy(policy) {
   const value = String(policy ?? "").trim() || "strict-unknown-v1";
-  assert.ok(["strict-unknown-v1", "support-aware-v1"].includes(value), `unknown answer prompt policy: ${value}`);
+  assert.ok(["strict-unknown-v1", "support-aware-v1", "extractive-support-v1"].includes(value), `unknown answer prompt policy: ${value}`);
   return value;
+}
+
+function normalizeContextPackagingPolicy(policy) {
+  const value = String(policy ?? "").trim() || "ranked-prefix-v1";
+  assert.ok(["ranked-prefix-v1", "query-overlap-window-v1"].includes(value), `unknown context packaging policy: ${value}`);
+  return value;
+}
+
+function packageContextContent({ content, query, maxChars }) {
+  const text = String(content ?? "");
+  if (text.length <= maxChars) return text;
+  if (contextPackagingPolicy === "ranked-prefix-v1") return text.slice(0, maxChars);
+  const terms = queryTerms(query);
+  if (terms.length === 0) return text.slice(0, maxChars);
+  return bestQueryWindow(text, terms, maxChars);
+}
+
+function queryTerms(query) {
+  const value = String(typeof query === "string" ? query : query?.q ?? "");
+  const stop = new Set([
+    "about",
+    "after",
+    "answer",
+    "before",
+    "being",
+    "could",
+    "does",
+    "from",
+    "have",
+    "into",
+    "memory",
+    "question",
+    "said",
+    "that",
+    "their",
+    "there",
+    "this",
+    "what",
+    "when",
+    "where",
+    "which",
+    "while",
+    "with",
+  ]);
+  return [...new Set(value.toLowerCase().match(/[a-z0-9][a-z0-9_-]{2,}/g) ?? [])].filter((term) => !stop.has(term)).slice(0, 24);
+}
+
+function bestQueryWindow(text, terms, maxChars) {
+  const lower = text.toLowerCase();
+  const maxStart = Math.max(0, text.length - maxChars);
+  const candidateStarts = new Set([0, maxStart]);
+  for (const term of terms) {
+    let cursor = lower.indexOf(term);
+    let guard = 0;
+    while (cursor >= 0 && guard < 24) {
+      candidateStarts.add(clamp(cursor - Math.floor(maxChars * 0.35), 0, maxStart));
+      cursor = lower.indexOf(term, cursor + Math.max(1, term.length));
+      guard += 1;
+    }
+  }
+  let best = { score: -Infinity, start: 0 };
+  for (const start of candidateStarts) {
+    const window = lower.slice(start, start + maxChars);
+    const uniqueHits = terms.filter((term) => window.includes(term)).length;
+    const totalHits = terms.reduce((count, term) => count + countOccurrences(window, term), 0);
+    const score = uniqueHits * 100 + totalHits * 5 - start / Math.max(1, text.length * 100);
+    if (score > best.score) best = { score, start };
+  }
+  return text.slice(best.start, best.start + maxChars);
+}
+
+function countOccurrences(text, needle) {
+  let count = 0;
+  let cursor = text.indexOf(needle);
+  while (cursor >= 0) {
+    count += 1;
+    cursor = text.indexOf(needle, cursor + Math.max(1, needle.length));
+  }
+  return count;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function runDeepSeekThinkingSmoke() {
@@ -609,6 +708,25 @@ function runDeepSeekThinkingSmoke() {
       disablesByModel: true,
       disablesByEndpoint: true,
       leavesNonDeepSeekUnchanged: true,
+    })}\n`,
+  );
+}
+
+function runContextPackagingPolicySmoke() {
+  const content = [
+    "Opening filler without the answer.",
+    "More unrelated setup.",
+    "The user's benchmark question asks about synthesis conversion.",
+    "The synthesis conversion fix is the question anchored window.",
+  ].join(" ".repeat(80));
+  const packaged = bestQueryWindow(content, queryTerms({ q: "What is the synthesis conversion fix?" }), 120);
+  assert.match(packaged, /synthesis conversion fix/);
+  assert.doesNotMatch(content.slice(0, 120), /synthesis conversion fix/);
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "answer-quality-context-packaging-policy-smoke",
+      queryOverlapWindowFindsQuestionTerms: true,
     })}\n`,
   );
 }
@@ -695,20 +813,20 @@ function fixtureJudge(candidateAnswer, expectedAnswer) {
   return { score: correct ? 100 : 0, correct, rationaleHash: shortHash(`${candidate}:${expected}`) };
 }
 
-function contextFor(response, index) {
+function contextFor(response, index, query = null) {
   return (response.results ?? [])
-    .map((result) => contextItemForResult(result, index))
+    .map((result) => contextItemForResult(result, index, query))
     .filter(Boolean);
 }
 
-function contextItemForResult(result, index) {
+function contextItemForResult(result, index, query) {
   const memory = index.byId.get(String(result.id ?? "")) ?? index.byHash.get(String(result.contentHash ?? ""));
   if (!memory) return null;
   const estimatedTokens = Number(result.estimatedTokens ?? 0);
   if (!Number.isFinite(estimatedTokens) || estimatedTokens <= 0) return memory;
   const maxChars = Math.max(1, Math.round(estimatedTokens * 4));
   if (memory.content.length <= maxChars) return memory;
-  return { ...memory, content: memory.content.slice(0, maxChars) };
+  return { ...memory, content: packageContextContent({ content: memory.content, query, maxChars }) };
 }
 
 function boundedContext(items) {
@@ -785,6 +903,7 @@ function renderMarkdown(value) {
     `- Claim scope: ${value.claimScope}`,
     `- Model match policy: ${value.scoringPolicy.modelMatchPolicy}`,
     `- Answer prompt policy: ${value.scoringPolicy.answerPromptPolicy}`,
+    `- Context packaging policy: ${value.scoringPolicy.contextPackagingPolicy}`,
     `- Counts as model-challenger benchmark evidence: ${value.scoringPolicy.countsAsModelChallengerBenchmarkEvidence}`,
     `- Query count: ${value.input.queryCount}`,
     `- Scored query count: ${value.input.scoredQueryCount}`,
