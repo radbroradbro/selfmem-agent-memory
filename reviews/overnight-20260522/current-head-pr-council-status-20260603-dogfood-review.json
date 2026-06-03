@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "mode": "current-head-pr-council-status",
+  "generatedAt": "2026-06-03T14:04:24.703Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "printsCredentials": false,
+  "branch": "feat/nucleus-wiki-native-contract",
+  "head": "12f92cebba12283635365552ff6da435b518049a",
+  "headAtEvidenceCapture": "12f92cebba12283635365552ff6da435b518049a",
+  "reviewedCodeHead": "12f92cebba12283635365552ff6da435b518049a",
+  "currentHeadSafeAfterReview": true,
+  "baseRef": "a1f6f59",
+  "baseHead": "a1f6f598cc3e2e8f1aaca7626e44c44e8208b133",
+  "gateDetection": {
+    "changedFileCount": 2,
+    "requiredGates": [
+      "security",
+      "architecture",
+      "ui",
+      "code",
+      "integration",
+      "final"
+    ],
+    "headRef": "12f92ce"
+  },
+  "verification": {
+    "finalDryRunPacketBuilt": true,
+    "reviewRunId": "20260603T140321Z-final-council-12f92ce",
+    "reviewCreatedAt": "2026-06-03T14:03:37.302650Z",
+    "reviewHeadRef": "12f92ce",
+    "reviewedCodeHeadMatchesReviewRun": true,
+    "reviewFreshForReviewedCodeHead": true,
+    "finalGateVerdict": "CLEAN",
+    "finalGateReviewerVendor": "council",
+    "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
+    "finalGateConfidence": "high",
+    "routedReviewerVendor": "anthropic",
+    "routedReviewerModel": "claude-opus-4-7",
+    "implementerVendor": "openai",
+    "implementerModel": "gpt-5.5",
+    "reviewerCrossVendor": true,
+    "deepseekFinalGateVerdict": "not-routed-this-run",
+    "deepseekReviewerVendor": "",
+    "deepseekReviewerModel": "",
+    "deepseekConfidence": "",
+    "normalChecks": [],
+    "requiredCheckFailures": [],
+    "claudeReviewStatus": "blocked-budget-cap-exceeded-before-output",
+    "ghCliStatus": "unavailable-in-local-shell-but-github-api-live-sync-passed",
+    "githubLiveSyncStatus": "pass",
+    "githubLiveSyncMode": "github-live-sync-check",
+    "pullRequestNumber": 5,
+    "issueNumber": 6,
+    "pullRequestOpen": true,
+    "issueOpen": true,
+    "pullRequestHeadMatches": true,
+    "pullRequestBodyMatchesDraft": true,
+    "issueTitleMatchesDraft": true,
+    "issueBodyMatchesDraft": true,
+    "liveUpdatedAt": {
+      "pullRequest": "2026-06-03T14:03:55Z",
+      "issue": "2026-06-03T11:05:19Z"
+    },
+    "remoteBranchHead": "12f92cebba12283635365552ff6da435b518049a",
+    "remotePullRequestHead": "12f92cebba12283635365552ff6da435b518049a",
+    "remotePullRequestMergeRef": "2600ed372a9f3ce3c2549d1af68f123eeb6778dd",
+    "remoteBranchHeadMatchesCurrentHead": true,
+    "remotePullRequestHeadMatchesCurrentHead": true
+  },
+  "postReviewChangePolicy": {
+    "onlyPublicEvidenceSinceReviewedCodeHead": true,
+    "publicEvidencePathRule": "reviews/** only",
+    "changedFileCountSinceReviewedCodeHead": 0,
+    "nonEvidenceFileCountSinceReviewedCodeHead": 0,
+    "changedFilesSinceReviewedCodeHead": [],
+    "nonEvidenceFilesSinceReviewedCodeHead": []
+  },
+  "evidence": {
+    "brainUiEvidence": "reviews/overnight-20260522/ui-evidence/brain-ui-20260603-browser-evidence.json",
+    "brainUiGitHead": "bef6143935853eb01f48b04f1f65b774fa3ed6a1",
+    "targetLock": "reviews/overnight-20260522/benchmark-target-lock-20260601.json",
+    "targetLockStatus": "READY_BENCHMARK_TARGET_LOCK",
+    "providerAdapterRegistry": "reviews/overnight-20260522/provider-adapter-registry-20260601.json",
+    "providerAdapterRegistryStatus": "READY_PROVIDER_ADAPTER_REGISTRY",
+    "methodLadderGate": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
+    "githubLiveSync": "reviews/overnight-20260522/github-live-sync-current-head-20260603-dogfood-review.json",
+    "githubLiveSyncStatus": "pass",
+    "remotePrHeadMatchesCurrentHead": true
+  },
+  "claimBoundary": {
+    "currentStatus": "not-production-complete",
+    "releaseVerdict": "hold-for-full-run-or-owner-approved-personal-canary",
+    "mayClaim": "the reviewed implementation head has a fresh cross-vendor final-gate council review, any later commits are public evidence only, PR #5 and issue #6 matched checked-in public-safe drafts at capture time, and the branch keeps BM25 as floor/control instead of a research destination",
+    "mayNotClaim": [
+      "RecallWeave beats Supermemory",
+      "RecallWeave is SOTA",
+      "dry-run review packet is external approval",
+      "PR merge/public launch is complete",
+      "stale council evidence applies to later substantive code changes"
+    ]
+  },
+  "nextActions": [
+    "Keep current-head checks live in release:check so future code commits invalidate stale council evidence.",
+    "Use BM25 as the floor/control while improving hybrid/rerank/chunking/context policy on same-data whole-harness runs.",
+    "Keep the Codex memory dogfood monitor running for noise, usefulness, retrieval breadth, and explicit write/direct lookup behavior."
+  ]
+}
