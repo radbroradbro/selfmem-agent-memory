@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T11:06:00.338Z",
+  "generatedAt": "2026-06-03T11:09:55.018Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,9 +10,9 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "0946bd441b8d1d3a8895c9396a3c79ffbac57e9d",
-  "headAtEvidenceCapture": "0946bd441b8d1d3a8895c9396a3c79ffbac57e9d",
-  "reviewedCodeHead": "1593222fadff2742fdc5e5e3c53c07b9ee20fefd",
+  "head": "37b5bf60cb28848b4272a7492735666c3054ecd5",
+  "headAtEvidenceCapture": "37b5bf60cb28848b4272a7492735666c3054ecd5",
+  "reviewedCodeHead": "37b5bf60cb28848b4272a7492735666c3054ecd5",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
@@ -26,13 +26,13 @@
       "integration",
       "final"
     ],
-    "headRef": "0946bd4"
+    "headRef": "37b5bf6"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T105623Z-final-council-1593222",
-    "reviewCreatedAt": "2026-06-03T10:56:50.079088Z",
-    "reviewHeadRef": "1593222",
+    "reviewRunId": "20260603T110922Z-final-council-37b5bf6",
+    "reviewCreatedAt": "2026-06-03T11:09:39.885556Z",
+    "reviewHeadRef": "37b5bf6",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
@@ -69,19 +69,15 @@
     "remoteBranchHead": "0946bd441b8d1d3a8895c9396a3c79ffbac57e9d",
     "remotePullRequestHead": "0946bd441b8d1d3a8895c9396a3c79ffbac57e9d",
     "remotePullRequestMergeRef": "a4c26cf1cebf832082cc3c87ea74dc758e0af32c",
-    "remoteBranchHeadMatchesCurrentHead": true,
-    "remotePullRequestHeadMatchesCurrentHead": true
+    "remoteBranchHeadMatchesCurrentHead": false,
+    "remotePullRequestHeadMatchesCurrentHead": false
   },
   "postReviewChangePolicy": {
     "onlyPublicEvidenceSinceReviewedCodeHead": true,
     "publicEvidencePathRule": "reviews/** only",
-    "changedFileCountSinceReviewedCodeHead": 3,
+    "changedFileCountSinceReviewedCodeHead": 0,
     "nonEvidenceFileCountSinceReviewedCodeHead": 0,
-    "changedFilesSinceReviewedCodeHead": [
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.json",
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.md",
-      "reviews/overnight-20260522/github-live-sync-current-head-20260601.json"
-    ],
+    "changedFilesSinceReviewedCodeHead": [],
     "nonEvidenceFilesSinceReviewedCodeHead": []
   },
   "evidence": {
@@ -94,7 +90,7 @@
     "methodLadderGate": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     "githubLiveSync": "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
     "githubLiveSyncStatus": "pass",
-    "remotePrHeadMatchesCurrentHead": true
+    "remotePrHeadMatchesCurrentHead": false
   },
   "claimBoundary": {
     "currentStatus": "not-production-complete",
