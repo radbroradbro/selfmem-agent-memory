@@ -129,7 +129,7 @@ const output = {
         ]
       : [
           "Keep waiting for a returned metrics-only production canary evidence packet.",
-          "Do not count handoff packets, diagnostic bundles, or unknown zips as production canary evidence.",
+          "Do not count canary request packets, diagnostic bundles, or unknown zips as production canary evidence.",
           "Run canary:returned-inbox with --expose-labels only for local operator-only file location.",
         ],
 };
@@ -218,7 +218,7 @@ function toMarkdown(report) {
     `Status: ${report.status}`,
     `Production evidence packets: ${counts.productionEvidencePackets ?? 0}`,
     `Returned evidence packets: ${counts.returnedEvidencePackets ?? 0}`,
-    `Handoff packets: ${counts.handoffPackets ?? 0}`,
+    `Canary request packets: ${counts.handoffPackets ?? 0}`,
     `Diagnostic bundles: ${counts.diagnosticBundles ?? 0}`,
     `Unknown packets: ${counts.unknownPackets ?? 0}`,
     `Unreadable packets: ${counts.unreadablePackets ?? 0}`,

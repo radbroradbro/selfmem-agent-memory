@@ -35,7 +35,7 @@
       "id": "single-agent",
       "label": "Apply to one agent before fleet rollout",
       "status": "required",
-      "evidence": "release handoff one-agent canary rule"
+      "evidence": "update-flow one-agent canary rule"
     },
     {
       "id": "sanitized-logs",

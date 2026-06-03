@@ -78,7 +78,7 @@ const output = {
       ]
     : [
         "Keep waiting for a returned metrics-only canary evidence packet.",
-        "Do not count handoff packets, diagnostic bundles, or unknown zips as production canary evidence.",
+        "Do not count canary request packets, diagnostic bundles, or unknown zips as production canary evidence.",
         "Use canary:returned-inbox with --expose-labels only for local operator-only review if a human needs to locate a file.",
       ],
 };

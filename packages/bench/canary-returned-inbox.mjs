@@ -98,7 +98,7 @@ try {
         ]
       : [
           "Do not count this inbox as production canary evidence.",
-          "If the folder contains only handoff packets, send the handoff packet to the target agent and wait for a returned evidence packet.",
+          "If the folder contains only canary request packets, run one request against the target agent and wait for a returned evidence packet.",
           "If a returned evidence packet is present, run canary:returned-packet on that packet and inspect failedChecks.",
         ],
   };
@@ -199,7 +199,7 @@ function inspectCandidate(candidate) {
       review: {
         ok: false,
         failedChecks: ["not-returned-evidence-packet"],
-        strictFailureReason: "handoff packets must be executed by an agent before they can count as returned canary evidence",
+        strictFailureReason: "canary request packets must be executed by an agent before they can count as returned canary evidence",
       },
     };
   }

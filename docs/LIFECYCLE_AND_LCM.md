@@ -56,6 +56,10 @@ current safe audit target is:
 - `UserPromptSubmit` runs local recall before the prompt is finalized.
 - `Stop` runs local flush after the turn and stores distilled durable
   candidates.
+- an explicit local store/write command is available, so the agent can write a
+  durable memory intentionally instead of relying only on automatic extraction.
+- the lifecycle doctor reports duplicate/noise health before benchmark or
+  release claims.
 - Raw transcripts stay local and public reports print only counts, hashes, and
   policy flags.
 - Hosted Supermemory write-back stays off unless the operator explicitly
@@ -87,6 +91,26 @@ The write gate should prefer durable facts, preferences, decisions, procedures, 
 - unbounded full-session dumps.
 
 Full raw evidence may remain in a local redacted raw-events file for audit, but prompt recall should use distilled memory by default.
+
+## Long-Agent Canary
+
+A RecallWeave production-readiness loop must include at least one real
+long-agent workflow canary. The actor should use the active memory plugin while
+doing the work, not inspect memory only after the run. The canary should prove:
+
+- the current agent runtime is loading the current RecallWeave/Selfmem bridge,
+- recall runs before substantive task phases,
+- the agent can intentionally store durable memories through an explicit
+  memory write path,
+- those memories can be retrieved after a session boundary or compaction
+  surrogate,
+- sub-agents or follow-up agents receive the same container contract when they
+  are part of the workflow,
+- post-run log health passes: low duplicate rate, no secret-shaped local
+  backlog, bounded transcript volume, and understandable write errors.
+
+Component retrieval benchmarks can guide method choices, but they do not prove
+this agent workflow by themselves.
 
 ## Sleep Cycle
 

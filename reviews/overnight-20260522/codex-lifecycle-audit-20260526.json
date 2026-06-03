@@ -4,7 +4,7 @@
   "mode": "codex-lifecycle-audit",
   "status": "READY_CODEX_PROMPT_STOP_LIFECYCLE_AUDIT",
   "fixtureOnly": true,
-  "generatedAt": "2026-05-26T15:37:08.889Z",
+  "generatedAt": "2026-06-02T15:16:44.924Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -24,6 +24,7 @@
   "countsAsBenchmarkEvidence": false,
   "publicBenchmarkClaimsAllowed": false,
   "promptStopReady": true,
+  "explicitWriteReady": true,
   "hooks": {
     "hooksFilePresent": true,
     "eventNames": [
@@ -45,6 +46,8 @@
   },
   "bridge": {
     "bridgeRootPresent": true,
+    "bridgeSourcePresent": true,
+    "explicitStoreModeAvailable": true,
     "configPresent": true,
     "configParseOk": true,
     "enabled": true,
@@ -64,8 +67,9 @@
     "distilledMemoryPathPrinted": false
   },
   "lifecycle": {
-    "eventCount": 4,
+    "eventCount": 5,
     "eventTypes": [
+      "explicit-store",
       "prompt",
       "recall-run",
       "recall-skip",
@@ -75,29 +79,41 @@
       "prompt": 1,
       "recall-run": 1,
       "recall-skip": 1,
-      "stop": 1
+      "stop": 1,
+      "explicit-store": 1
     },
     "recallRunCount": 1,
     "recallSkipCount": 1,
     "stopCount": 1,
-    "writtenMemoryCount": 2,
+    "explicitStoreCount": 1,
+    "writtenMemoryCount": 3,
+    "duplicateSuppressedCount": 1,
     "redactionCount": 1,
-    "latestEventAt": "2026-05-26T12:10:00.000Z",
+    "latestEventAt": "2026-05-26T12:11:00.000Z",
     "hasPromptLifecycle": true,
     "hasStopLifecycle": true,
     "preCompactEventCount": 0,
     "rawPromptTextPrinted": false,
     "rawTranscriptTextPrinted": false
   },
+  "duplicateHealth": {
+    "memoryCount": 3,
+    "duplicateGroupCount": 0,
+    "duplicateItemCount": 0,
+    "duplicateRate": 0,
+    "threshold": 0.02,
+    "rawDuplicateTextPrinted": false
+  },
   "store": {
-    "memoryCount": 2,
+    "memoryCount": 3,
     "distilledMemoryCount": 1,
     "transcriptCopyCount": 1,
     "transcriptTotalBytes": 152,
     "maxTranscriptBytes": 152,
-    "transcriptFileHashes": [
+    "transcriptFileHashSample": [
       "sha256:fa47148198e7d1e6c37eeb78d456052d227e679966cb315ae150404be589be84"
     ],
+    "transcriptFileHashCount": 1,
     "transcriptTextPrinted": false
   },
   "lcm": {

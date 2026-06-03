@@ -212,7 +212,7 @@ applies into fake runtime directories, verifies adapter backups, preserves the
 container mapping, confirms copied local key files use `0600`, and exercises the
 canary report/intake path against a fixture diagnostic export.
 
-To generate one paste-ready handoff for an agent operator, run:
+To generate one paste-ready canary request for an agent operator, run:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:operator-packet
@@ -289,17 +289,17 @@ fresh-window, strict intake, diagnosis, and packet commands for one agent only.
 If the selected candidate is fixture-only or privacy is not clean, the planner
 says so instead of pretending the evidence is production-ready.
 
-To send the work to one live operator, build a packet and require live-ready
+To request one live operator run, build a packet and require live-ready
 evidence:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --allow-failed-inputs --require-ready --expected-commit <approved-commit> --output /tmp/recallweave-next-agent-handoff.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --allow-failed-inputs --require-ready --expected-commit <approved-commit> --output /tmp/recallweave-next-agent-request.zip
 ```
 
 The packet stays metrics-only. It includes a fresh-window contract, return
-checklist, deterministic drill instructions, and `readyForLiveHandoff`.
+checklist, deterministic drill instructions, and readiness status.
 `--require-ready` rejects fixture/demo packets, so use it for real agent
-handoffs.
+canary requests.
 
 When the selected agent returns a canary evidence packet, run:
 
@@ -308,7 +308,7 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/retur
 ```
 
 If the agent sent a folder of zips, scan the inbox first. This classifies real
-returned evidence separately from handoff packets, diagnostics, and unrelated
+returned evidence separately from canary request packets, diagnostics, and unrelated
 zips. Folder scans redact candidate file names by default and use hash labels;
 add `--expose-labels` only for a local operator-only review:
 
@@ -506,7 +506,7 @@ source-match, source-alignment, and source-gap reports. If
 hosted source content, rebuilt local-source labels, or collectable content
 hashes.
 
-For a paste-ready handoff after a blocked source-gap report, reload that report
+For a paste-ready repair packet after a blocked source-gap report, reload that report
 into the operator packet. It prints only hashed query fingerprints, counts, and
 repair actions:
 

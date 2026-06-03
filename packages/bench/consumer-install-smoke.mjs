@@ -144,7 +144,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-returned-downloads.mjs", "--skip-defaults"], "returned downloads scanner"));
   checks.push(run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"], "canary diagnostic batch audit"));
   checks.push(run("node", ["packages/bench/canary-next-agent-plan.mjs"], "canary next agent plan"));
-  checks.push(run("node", ["packages/bench/canary-next-agent-packet.mjs"], "canary next agent handoff packet"));
+  checks.push(run("node", ["packages/bench/canary-next-agent-packet.mjs"], "canary next agent request packet"));
   checks.push(run("node", ["packages/bench/baseline-queryset-inspect.mjs"], "baseline query-set inspect"));
   checks.push(run("node", ["packages/bench/baseline-source-match-preflight.mjs", "--fixture"], "baseline source-match preflight"));
   checks.push(run("node", ["packages/bench/baseline-source-alignment.mjs"], "baseline source-alignment gate"));

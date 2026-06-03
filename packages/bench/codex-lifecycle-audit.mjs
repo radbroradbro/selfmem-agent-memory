@@ -44,6 +44,7 @@ assert.ok(["json", "markdown"].includes(format), "--format must be json or markd
 
 const hooksRaw = readOptional(hooksPath);
 const configRaw = readOptional(configPath);
+const bridgeSourceRaw = readOptional(join(bridgeRoot, "bridge.js"));
 const hooks = parseJsonOrNull(hooksRaw.text);
 const config = parseJsonOrNull(configRaw.text);
 const events = readJsonl(join(storeRoot, "events.jsonl"));
@@ -53,21 +54,34 @@ const transcriptState = inspectTranscripts(join(storeRoot, "transcripts"));
 const hookState = inspectHooks(hooks);
 const bridgeState = inspectBridge(config, {
   bridgeRootPresent: existsSync(bridgeRoot),
+  bridgeSourcePresent: bridgeSourceRaw.present,
+  bridgeSourceHasExplicitStore: /mode\s*===\s*["']store["']|case\s+["']store["']|function\s+store\s*\(/.test(bridgeSourceRaw.text),
   configPresent: configRaw.present,
   configParseOk: configRaw.present ? Boolean(config) : null,
 });
 const lifecycleState = inspectLifecycle(events);
+const duplicateState = inspectDuplicateHealth(memories);
 const privacyState = inspectPrivacy({ hooksRaw, configRaw, events, memories, distilled, transcriptState });
 const lcmState = inspectLcm({ hookState, config });
 
 const promptStopReady = hookState.userPromptSubmitRecallHook && hookState.stopFlushHook && bridgeState.configPresent && bridgeState.configParseOk;
-const ok = promptStopReady && privacyState.privateLeakCount === 0 && bridgeState.hostedWriteBackDisabled;
+const explicitWriteReady = bridgeState.explicitStoreModeAvailable || lifecycleState.explicitStoreCount > 0;
+const ok =
+  promptStopReady &&
+  explicitWriteReady &&
+  duplicateState.duplicateRate <= 0.02 &&
+  privacyState.privateLeakCount === 0 &&
+  transcriptState.unsafeHitCount === 0 &&
+  bridgeState.hostedWriteBackDisabled;
 const blockers = [
   !hookState.hooksPresent ? "codex-hooks-file-missing-or-invalid" : null,
   !hookState.userPromptSubmitRecallHook ? "codex-user-prompt-recall-hook-missing" : null,
   !hookState.stopFlushHook ? "codex-stop-flush-hook-missing" : null,
   !bridgeState.configPresent ? "codex-selfmem-bridge-config-missing" : null,
   bridgeState.configPresent && !bridgeState.configParseOk ? "codex-selfmem-bridge-config-invalid" : null,
+  !explicitWriteReady ? "codex-explicit-memory-store-missing" : null,
+  duplicateState.duplicateRate > 0.02 ? "codex-memory-duplicate-rate-too-high" : null,
+  transcriptState.unsafeHitCount > 0 ? "codex-transcript-secret-shaped-text-present" : null,
   !bridgeState.hostedWriteBackDisabled ? "hosted-write-back-enabled" : null,
   privacyState.privateLeakCount > 0 ? "public-report-privacy-leak" : null,
 ].filter(Boolean);
@@ -98,16 +112,19 @@ const report = {
   countsAsBenchmarkEvidence: false,
   publicBenchmarkClaimsAllowed: false,
   promptStopReady,
+  explicitWriteReady,
   hooks: hookState.public,
   bridge: bridgeState.public,
   lifecycle: lifecycleState,
+  duplicateHealth: duplicateState,
   store: {
     memoryCount: memories.length,
     distilledMemoryCount: distilled.length,
     transcriptCopyCount: transcriptState.count,
     transcriptTotalBytes: transcriptState.totalBytes,
     maxTranscriptBytes: transcriptState.maxBytes,
-    transcriptFileHashes: transcriptState.fileHashes,
+    transcriptFileHashSample: transcriptState.fileHashSample,
+    transcriptFileHashCount: transcriptState.fileHashCount,
     transcriptTextPrinted: false,
   },
   lcm: lcmState,
@@ -123,8 +140,12 @@ assertSafePublicText(markdownText, "codex lifecycle audit markdown");
 if (strict) {
   assert.equal(report.ok, true, jsonText);
   assert.equal(report.privacy.privateLeakCount, 0, jsonText);
+  assert.equal(report.privacy.unsafeTranscriptHitCount, 0, jsonText);
   assert.equal(report.hooks.userPromptSubmitRecallHook, true, jsonText);
   assert.equal(report.hooks.stopFlushHook, true, jsonText);
+  assert.equal(report.explicitWriteReady, true, jsonText);
+  assert.equal(report.bridge.explicitStoreModeAvailable, true, jsonText);
+  assert.ok(report.duplicateHealth.duplicateRate <= 0.02, jsonText);
   assert.equal(report.bridge.hostedWriteBackDisabled, true, jsonText);
   assert.equal(report.lcm.deepseekFlashCompressionArm.defaultEnabled, false, jsonText);
   assert.equal(report.modifiesBenchmarkRetrieval, false, jsonText);
@@ -184,9 +205,12 @@ function inspectBridge(value, state) {
   const enabled = value?.enabled !== false;
   return {
     ...state,
+    explicitStoreModeAvailable: Boolean(state.bridgeSourceHasExplicitStore),
     hostedWriteBackDisabled: !mirrorWritesToSupermemory,
     public: {
       bridgeRootPresent: state.bridgeRootPresent,
+      bridgeSourcePresent: state.bridgeSourcePresent,
+      explicitStoreModeAvailable: Boolean(state.bridgeSourceHasExplicitStore),
       configPresent: state.configPresent,
       configParseOk: state.configParseOk,
       enabled,
@@ -215,6 +239,8 @@ function inspectLifecycle(events) {
   let stopCount = 0;
   let writtenMemoryCount = 0;
   let redactionCount = 0;
+  let explicitStoreCount = 0;
+  let duplicateSuppressedCount = 0;
   let latestEventAt = null;
   for (const event of events) {
     const type = String(event?.type ?? "unknown");
@@ -222,7 +248,9 @@ function inspectLifecycle(events) {
     if (type === "recall-run") recallRunCount += 1;
     if (type === "recall-skip") recallSkipCount += 1;
     if (type === "stop") stopCount += 1;
+    if (type === "explicit-store") explicitStoreCount += 1;
     writtenMemoryCount += Number.isFinite(Number(event?.written)) ? Number(event.written) : 0;
+    duplicateSuppressedCount += Number.isFinite(Number(event?.duplicateSuppressed)) ? Number(event.duplicateSuppressed) : 0;
     redactionCount += Number.isFinite(Number(event?.redactions)) ? Number(event.redactions) : 0;
     if (event?.at && (!latestEventAt || new Date(event.at) > new Date(latestEventAt))) latestEventAt = event.at;
   }
@@ -233,7 +261,9 @@ function inspectLifecycle(events) {
     recallRunCount,
     recallSkipCount,
     stopCount,
+    explicitStoreCount,
     writtenMemoryCount,
+    duplicateSuppressedCount,
     redactionCount,
     latestEventAt,
     hasPromptLifecycle: typeCounts.prompt > 0 || recallRunCount > 0 || recallSkipCount > 0,
@@ -246,8 +276,30 @@ function inspectLifecycle(events) {
   };
 }
 
+function inspectDuplicateHealth(memories) {
+  const counts = new Map();
+  for (const item of memories) {
+    const key = String(item?.normalizedHash || normalizedHash(item?.text || ""));
+    if (!key) continue;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const duplicateGroups = [...counts.values()].filter((count) => count > 1);
+  const duplicateItemCount = duplicateGroups.reduce((sum, count) => sum + count - 1, 0);
+  const duplicateRate = memories.length ? Number((duplicateItemCount / memories.length).toFixed(4)) : 0;
+  return {
+    memoryCount: memories.length,
+    duplicateGroupCount: duplicateGroups.length,
+    duplicateItemCount,
+    duplicateRate,
+    threshold: 0.02,
+    rawDuplicateTextPrinted: false,
+  };
+}
+
 function inspectTranscripts(transcriptsDir) {
-  if (!existsSync(transcriptsDir)) return { count: 0, totalBytes: 0, maxBytes: 0, fileHashes: [], unsafeHitCount: 0 };
+  if (!existsSync(transcriptsDir)) {
+    return { count: 0, totalBytes: 0, maxBytes: 0, fileHashSample: [], fileHashCount: 0, unsafeHitCount: 0 };
+  }
   const files = readdirSync(transcriptsDir).filter((name) => name.endsWith(".jsonl")).sort();
   const records = files.map((name) => {
     const file = join(transcriptsDir, name);
@@ -262,7 +314,8 @@ function inspectTranscripts(transcriptsDir) {
     count: records.length,
     totalBytes: records.reduce((sum, item) => sum + item.bytes, 0),
     maxBytes: Math.max(0, ...records.map((item) => item.bytes)),
-    fileHashes: records.map((item) => item.hash),
+    fileHashSample: records.slice(0, 12).map((item) => item.hash),
+    fileHashCount: records.length,
     unsafeHitCount: records.reduce((sum, item) => sum + item.unsafeHits, 0),
   };
 }
@@ -277,7 +330,8 @@ function inspectPrivacy({ hooksRaw, configRaw, events, memories, distilled, tran
     memoryCount: memories.length,
     distilledMemoryCount: distilled.length,
     transcriptCount: transcriptState.count,
-    transcriptHashes: transcriptState.fileHashes,
+    transcriptHashSample: transcriptState.fileHashSample,
+    transcriptHashCount: transcriptState.fileHashCount,
   });
   const unsafePublic = countUnsafeText(publicSerialized);
   const unsafeStore =
@@ -341,6 +395,9 @@ function buildNextActions({ ok: ready, hookState, bridgeState, lcmState }) {
   const actions = [];
   if (!hookState.userPromptSubmitRecallHook) actions.push("Install or repair the Codex UserPromptSubmit recall hook.");
   if (!hookState.stopFlushHook) actions.push("Install or repair the Codex Stop flush hook.");
+  if (!bridgeState.explicitStoreModeAvailable) {
+    actions.push("Install or repair an explicit Codex memory store mode so agents can intentionally write durable memories.");
+  }
   if (!bridgeState.configPresent || !bridgeState.configParseOk) actions.push("Restore a valid local Codex selfmem bridge config.");
   if (!bridgeState.hostedWriteBackDisabled) actions.push("Disable hosted write-back unless the owner explicitly approves it.");
   if (!lcmState.codexPreCompactHookObserved) {
@@ -358,8 +415,10 @@ function renderMarkdown(value) {
     `- Status: ${value.status}`,
     `- Fixture only: ${value.fixtureOnly}`,
     `- Prompt/Stop lifecycle ready: ${value.promptStopReady}`,
+    `- Explicit memory write ready: ${value.explicitWriteReady}`,
     `- User prompt recall hook: ${value.hooks.userPromptSubmitRecallHook}`,
     `- Stop flush hook: ${value.hooks.stopFlushHook}`,
+    `- Explicit store mode available: ${value.bridge.explicitStoreModeAvailable}`,
     `- Codex pre-compact hook observed: ${value.lcm.codexPreCompactHookObserved}`,
     `- Codex pre-compact status: ${value.lcm.codexPreCompactStatus}`,
     `- Hosted write-back disabled: ${value.bridge.hostedWriteBackDisabled}`,
@@ -368,6 +427,8 @@ function renderMarkdown(value) {
     `- Recall skip count: ${value.lifecycle.recallSkipCount}`,
     `- Stop count: ${value.lifecycle.stopCount}`,
     `- Stored memory count: ${value.store.memoryCount}`,
+    `- Duplicate memory rate: ${value.duplicateHealth.duplicateRate}`,
+    `- Duplicate text printed: ${value.duplicateHealth.rawDuplicateTextPrinted}`,
     `- Distilled memory count: ${value.store.distilledMemoryCount}`,
     `- Transcript copy count: ${value.store.transcriptCopyCount}`,
     `- Transcript text printed: ${value.store.transcriptTextPrinted}`,
@@ -405,6 +466,7 @@ function createFixtureState() {
   mkdirSync(transcriptRoot, { recursive: true, mode: 0o700 });
   const hooksPath = join(tempRoot, "hooks.json");
   const configPath = join(bridgeRoot, "config.json");
+  const bridgePath = join(bridgeRoot, "bridge.js");
   writeJsonFile(hooksPath, {
     hooks: {
       UserPromptSubmit: [{ hooks: [{ type: "command", command: "node /example/.codex/selfmem-bridge/bridge.js recall", timeout: 30 }] }],
@@ -427,6 +489,7 @@ function createFixtureState() {
     useDistilledRecall: true,
     maxTranscriptBytes: 5000000,
   });
+  writeFileSync(bridgePath, "function store() {}\nif (mode === \"store\") return store();\n", "utf8");
   writeJsonl(join(storeRoot, "events.jsonl"), [
     { type: "prompt", at: "2026-05-26T12:00:00.000Z", promptHash: "fixture-prompt-hash", redactions: 0, length: 1200 },
     { type: "recall-run", at: "2026-05-26T12:00:01.000Z", promptHash: "fixture-prompt-hash", reason: "long-prompt", promptCount: 8, matches: 3 },
@@ -441,10 +504,20 @@ function createFixtureState() {
       candidates: 3,
       written: 2,
     },
+    {
+      type: "explicit-store",
+      at: "2026-05-26T12:11:00.000Z",
+      sourceId: "codex-explicit-store-fixture",
+      inputHash: "fixture-explicit-store-hash",
+      written: 1,
+      duplicateSuppressed: 1,
+      rejected: 0,
+    },
   ]);
   writeJsonl(join(storeRoot, "memories.jsonl"), [
-    { id: "mem_fixture_1", kind: "conversation", text: "Procedure: keep Codex memory writes local-first.", scope: "codex_global" },
-    { id: "mem_fixture_2", kind: "conversation", text: "Decision: use distilled recall by default.", scope: "codex_global" },
+    { id: "mem_fixture_1", kind: "conversation", text: "Procedure: keep Codex memory writes local-first.", normalizedHash: normalizedHash("Procedure: keep Codex memory writes local-first."), scope: "codex_global" },
+    { id: "mem_fixture_2", kind: "conversation", text: "Decision: use distilled recall by default.", normalizedHash: normalizedHash("Decision: use distilled recall by default."), scope: "codex_global" },
+    { id: "mem_fixture_3", kind: "manual", text: "Decision: explicit memory store is required for agent-facing Codex readiness.", normalizedHash: normalizedHash("Decision: explicit memory store is required for agent-facing Codex readiness."), scope: "codex_global" },
   ]);
   writeJsonl(join(storeRoot, "distilled-memories.jsonl"), [
     { id: "distilled_fixture_1", kind: "Procedure", text: "Use prompt-submit recall and stop flush lifecycle hooks." },
@@ -534,6 +607,17 @@ function numberOrNull(value) {
 
 function sha256(value) {
   return createHash("sha256").update(String(value)).digest("hex");
+}
+
+function normalizedHash(value) {
+  return sha256(
+    String(value ?? "")
+      .toLowerCase()
+      .replace(/\[[^\]]*redacted[^\]]*\]/gi, "[redacted]")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
 }
 
 function countUnsafeText(text) {
