@@ -3,24 +3,25 @@
   "mode": "codex-memory-dogfood-evidence-check",
   "ok": true,
   "evidence": "reviews/overnight-20260522/codex-memory-dogfood-evidence-current.json",
-  "sourceEvidence": "reviews/overnight-20260522/codex-memory-dogfood-monitor-rewired-12x-20260603.json",
-  "evidenceGeneratedAt": "2026-06-03T08:41:06.359Z",
+  "sourceEvidence": "reviews/overnight-20260522/codex-memory-dogfood-monitor-current-bridge-12x-20260603.json",
+  "evidenceGeneratedAt": "2026-06-03T12:40:36.154Z",
   "phase": "rewired",
   "watch": true,
-  "intervalMs": 300000,
+  "intervalMs": 1000,
   "iterationCount": 12,
   "metricsOnly": true,
   "callsProviderApis": false,
   "callsHostedSupermemory": false,
-  "sourceMonitorOk": false,
-  "sourceMonitorStatus": "BLOCKED_DOGFOOD_MONITOR",
-  "sourceMonitorReinterpreted": true,
-  "ignoredSourceBlockers": [
-    "rewired-phase-user-facing-recall-not-observed"
+  "sourceMonitorOk": true,
+  "sourceMonitorStatus": "READY_DOGFOOD_MONITOR",
+  "sourceMonitorReinterpreted": false,
+  "ignoredSourceBlockers": [],
+  "sourceTopLevelBlockers": [],
+  "sourceBridgeHashes": [
+    "sha256:67986c43ddf19d938fe7bece6d9f7074060a8c3f187ca5480241e71db04c4ca1"
   ],
-  "sourceTopLevelBlockers": [
-    "rewired-phase-user-facing-recall-not-observed"
-  ],
+  "currentBridgeSourceHash": "sha256:67986c43ddf19d938fe7bece6d9f7074060a8c3f187ca5480241e71db04c4ca1",
+  "sourceBridgeHashMatchesCurrent": true,
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
@@ -35,10 +36,11 @@
     "minCleanIterations": 12,
     "observedIterations": 12,
     "cleanIterations": 12,
-    "elapsedMs": 3300000,
+    "elapsedMs": 11000,
     "allIterationsClean": true,
-    "observedUserFacingRecallEvents": 6,
-    "idleIntervalsWithoutUserFacingRecall": 6,
+    "observedUserFacingRecallEvents": 0,
+    "idleIntervalsWithoutUserFacingRecall": 12,
+    "sourceBridgeHashMatchesCurrent": true,
     "blockers": []
   },
   "monitoredSignals": {

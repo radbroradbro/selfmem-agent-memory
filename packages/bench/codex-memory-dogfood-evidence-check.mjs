@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { readdir } from "node:fs/promises";
@@ -31,8 +32,15 @@ const ignoredIdleBlocker = "rewired-phase-user-facing-recall-not-observed";
 const sourceIterationBlockers = iterations.flatMap((iteration) => Array.isArray(iteration?.blockers) ? iteration.blockers.map(String) : []);
 const sourceTopLevelBlockers = Array.isArray(evidence.blockers) ? evidence.blockers.map(String) : [];
 const sourceOnlyIdlePromptWindowBlockers =
+  (sourceTopLevelBlockers.length > 0 || sourceIterationBlockers.length > 0)
+  &&
   sourceTopLevelBlockers.every((blocker) => blocker === ignoredIdleBlocker)
   && sourceIterationBlockers.every((blocker) => blocker === ignoredIdleBlocker);
+const sourceBridgeHashes = unique([
+  ...asStringArray(evidence.sourceBridgeHashes),
+  ...iterations.map((iteration) => iteration?.bridge?.sourceHash),
+].filter(Boolean));
+const currentBridgeSourceHash = currentInstalledBridgeSourceHash();
 const failedIterationIndexes = iterations
   .filter((iteration) => !iterationEffectivelyClean(iteration))
   .map((iteration) => Number(iteration?.index ?? -1));
@@ -72,6 +80,9 @@ const checks = [
   (Array.isArray(gate.blockers) && gate.blockers.length === 0) || sourceOnlyIdlePromptWindowBlockers ? null : "graduation-gate-blocked",
   failedIterationIndexes.length === 0 ? null : "monitor-iteration-failed",
   confusingIterationIndexes.length === 0 ? null : "monitor-iteration-confusing",
+  sourceBridgeHashes.length > 0 ? null : "source-bridge-hash-missing",
+  sourceBridgeHashes.length <= 1 ? null : "source-bridge-hash-not-stable",
+  currentBridgeSourceHash && sourceBridgeHashes[0] === currentBridgeSourceHash ? null : "source-bridge-hash-stale",
 ].filter(Boolean);
 
 const report = {
@@ -93,6 +104,9 @@ const report = {
   sourceMonitorReinterpreted: sourceOnlyIdlePromptWindowBlockers,
   ignoredSourceBlockers: sourceOnlyIdlePromptWindowBlockers ? [ignoredIdleBlocker] : [],
   sourceTopLevelBlockers,
+  sourceBridgeHashes,
+  currentBridgeSourceHash,
+  sourceBridgeHashMatchesCurrent: sourceBridgeHashes.length === 1 && sourceBridgeHashes[0] === currentBridgeSourceHash,
   rawMemoryIncluded: evidence.rawMemoryIncluded === true,
   rawTranscriptIncluded: evidence.rawTranscriptIncluded === true,
   rawPromptIncluded: evidence.rawPromptIncluded === true,
@@ -111,6 +125,7 @@ const report = {
     allIterationsClean: effectiveCleanIterations === iterations.length,
     observedUserFacingRecallEvents,
     idleIntervalsWithoutUserFacingRecall,
+    sourceBridgeHashMatchesCurrent: sourceBridgeHashes.length === 1 && sourceBridgeHashes[0] === currentBridgeSourceHash,
     blockers: checks,
   },
   monitoredSignals: {
@@ -140,6 +155,8 @@ emitReport(report);
 function buildSummaryReport(summary, evidencePathForReport) {
   const gate = summary.graduationGate ?? {};
   const signals = summary.monitoredSignals ?? {};
+  const sourceBridgeHashes = asStringArray(summary.sourceBridgeHashes);
+  const currentBridgeSourceHash = currentInstalledBridgeSourceHash();
   const checks = [
     summary.ok === true ? null : "summary-not-ok",
     summary.phase === "rewired" ? null : "rewired-phase-required",
@@ -178,11 +195,16 @@ function buildSummaryReport(summary, evidencePathForReport) {
       : "monitor-iteration-confusing",
     summary.claimBoundary?.publicLaunchAllowed === false ? null : "claim-boundary-public-launch-allowed",
     summary.claimBoundary?.countsAsBenchmarkEvidence === false ? null : "claim-boundary-counts-as-benchmark",
+    sourceBridgeHashes.length > 0 ? null : "source-bridge-hash-missing",
+    sourceBridgeHashes.length <= 1 ? null : "source-bridge-hash-not-stable",
+    currentBridgeSourceHash && sourceBridgeHashes[0] === currentBridgeSourceHash ? null : "source-bridge-hash-stale",
   ].filter(Boolean);
   return {
     ...summary,
     evidence: evidencePathForReport,
     sourceEvidenceMode: "summary",
+    currentBridgeSourceHash,
+    sourceBridgeHashMatchesCurrent: sourceBridgeHashes.length === 1 && sourceBridgeHashes[0] === currentBridgeSourceHash,
     ok: checks.length === 0,
     blockers: checks,
     writesRealFiles: Boolean(outputPath),
@@ -227,6 +249,26 @@ function iterationOnlyHasIdlePromptWindowBlocker(iteration) {
 
 function sum(values) {
   return values.reduce((total, value) => total + Number(value || 0), 0);
+}
+
+function asStringArray(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => String(item || "")).filter(Boolean);
+}
+
+function currentInstalledBridgeSourceHash() {
+  const result = spawnSync("node", ["packages/bench/codex-memory-reset-health.mjs", "--strict"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `codex-memory-reset-health failed\n${result.stderr}\n${result.stdout}`);
+  const report = JSON.parse(result.stdout);
+  return String(report.bridge?.sourceHash ?? "");
+}
+
+function unique(values) {
+  return [...new Set(values.filter(Boolean))];
 }
 
 function writeOutput(path, text) {

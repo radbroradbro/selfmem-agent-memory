@@ -26,11 +26,18 @@ for (let index = 0; index < maxIterations; index += 1) {
     healthHash: `sha256:${sha256(JSON.stringify({
       status: health.status,
       injection: health.injection,
+      bridge: health.bridge,
       contextQuality: health.contextQuality,
       dogfoodMonitor: health.dogfoodMonitor,
       blockers: health.blockers,
       release: health.release,
     }))}`,
+    bridge: {
+      sourceHash: String(health.bridge?.sourceHash ?? ""),
+      doctorOk: health.bridge?.doctorOk === true,
+      hostedWriteBackDisabled: health.bridge?.hostedWriteBackDisabled === true,
+      recallPolicy: String(health.bridge?.recallPolicy ?? ""),
+    },
     status: evaluation.status,
     ok: evaluation.ok,
     phase,
@@ -74,6 +81,8 @@ const report = {
   rawContextIncluded: false,
   autoFixesApplied: false,
   autoRecallExpansionAllowed: false,
+  currentBridgeSourceHash: String(iterations.at(-1)?.bridge?.sourceHash ?? ""),
+  sourceBridgeHashes: unique(iterations.map((item) => item.bridge?.sourceHash)),
   fixPolicy:
     "If monitoring detects noisy or confusing context, keep or turn automatic injection off, repair ranking/dedupe/write policy, rerun this monitor, and only then continue dogfood.",
   graduationGate,

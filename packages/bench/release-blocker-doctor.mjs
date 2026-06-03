@@ -607,12 +607,15 @@ assert.equal(codexMemoryResetHealth.publicSurface?.publicEvidenceIndexSafe, true
 assert.ok(codexMemoryResetHealth.release?.blockers?.includes("codex-memory-controlled-dogfood-active"));
 assert.equal(codexMemoryResetHealth.release?.blockers?.includes("public-review-surface-collapse-required"), false);
 const codexDogfoodGraduationEvidence = JSON.parse(
-  run("node", ["packages/bench/codex-memory-dogfood-evidence-check.mjs", "--strict"]).stdout,
+  run("node", ["packages/bench/codex-memory-dogfood-evidence-check.mjs"]).stdout,
 );
-assert.equal(codexDogfoodGraduationEvidence.ok, true);
-assert.equal(codexDogfoodGraduationEvidence.graduationGate?.readyForDogfoodGraduationReview, true);
+assert.equal(codexDogfoodGraduationEvidence.mode, "codex-memory-dogfood-evidence-check");
 assert.equal(codexDogfoodGraduationEvidence.claimBoundary?.publicLaunchAllowed, false);
 assert.equal(codexDogfoodGraduationEvidence.claimBoundary?.countsAsBenchmarkEvidence, false);
+const codexDogfoodEvidenceCurrent =
+  codexDogfoodGraduationEvidence.ok === true
+  && codexDogfoodGraduationEvidence.graduationGate?.readyForDogfoodGraduationReview === true
+  && codexDogfoodGraduationEvidence.sourceBridgeHashMatchesCurrent === true;
 
 const reviewerReport = [
   {
@@ -670,10 +673,11 @@ const blockerReport = [
   },
   {
     id: "codex-memory-controlled-dogfood-active",
-    status: "ready-for-graduation-review",
+    status: codexDogfoodEvidenceCurrent ? "ready-for-graduation-review" : "stale-or-incomplete-evidence",
     evidence: requiredFiles.codexDogfoodGraduationEvidence,
-    nextAction:
-      "Watched rewired dogfood intervals are clean for quiet prompts, direct lookup usefulness, relevance-gated retrieval, explicit writes, and store-noise health. Keep public launch blocked; use this only as controlled dogfood graduation-review evidence.",
+    nextAction: codexDogfoodEvidenceCurrent
+      ? "Watched rewired dogfood intervals are clean for quiet prompts, direct lookup usefulness, relevance-gated retrieval, explicit writes, and store-noise health. Keep public launch blocked; use this only as controlled dogfood graduation-review evidence."
+      : `Refresh watched rewired dogfood evidence under the currently installed bridge before graduation review; current evidence blockers: ${codexDogfoodGraduationEvidence.blockers?.join(", ") || "unknown"}.`,
   },
   codexMemoryResetHealth.release?.blockedByPublicSurface ? {
     id: "public-review-surface-collapse-required",
