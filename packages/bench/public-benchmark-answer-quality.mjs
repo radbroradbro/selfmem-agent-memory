@@ -20,6 +20,9 @@ const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_MEMORYBENCH
 const modelMatchPolicy = String(
   args.modelMatchPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY ?? defaultModelMatchPolicy(claimScope),
 ).trim();
+const answerPromptPolicy = normalizeAnswerPromptPolicy(
+  args.answerPromptPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_PROMPT_POLICY ?? "strict-unknown-v1",
+);
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_MEMORYBENCH_QUERY_OFFSET ?? 0, "query offset");
 const maxContextChars = optionalPositiveInt(args.maxContextChars ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_CONTEXT_CHARS ?? 12000, "max context chars");
@@ -348,6 +351,7 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
     scoringPolicy: {
       claimScope,
       modelMatchPolicy,
+      answerPromptPolicy,
       exactTargetModelsRequired: modelMatchPolicy === "exact-target-required",
       localDiagnosticModelAllowed: modelMatchPolicy === "local-diagnostic-allowed",
       challengerModelAllowed: modelMatchPolicy === "challenger-model-allowed",
@@ -479,17 +483,32 @@ function parentShardCoordinates(materializationShard, localTotalQueryCount) {
 
 async function callAnswerModel({ query, contextItems }) {
   const context = boundedContext(contextItems);
-  const prompt = [
-    "Answer the memory benchmark question using only the provided context.",
-    "If the answer is not supported, say \"unknown\".",
+  const prompt = answerPrompt({ query, context });
+  assertNoUnsafePrompt(prompt, "answer prompt");
+  return callOpenAiCompatible({ model: answerModel, prompt, system: "Return only the answer text. Be concise." });
+}
+
+function answerPrompt({ query, context }) {
+  const policyLines =
+    answerPromptPolicy === "support-aware-v1"
+      ? [
+          "Answer the memory benchmark question using only the provided context.",
+          "Look for directly supporting facts in the context before deciding the answer is unsupported.",
+          "If one or more context items support an answer, give the best supported answer.",
+          "Say \"unknown\" only when the provided context does not support any answer.",
+        ]
+      : [
+          "Answer the memory benchmark question using only the provided context.",
+          "If the answer is not supported, say \"unknown\".",
+        ];
+  return [
+    ...policyLines,
     "",
     `Question: ${query.q}`,
     "",
     "Context:",
     context,
   ].join("\n");
-  assertNoUnsafePrompt(prompt, "answer prompt");
-  return callOpenAiCompatible({ model: answerModel, prompt, system: "Return only the answer text. Be concise." });
 }
 
 async function callJudgeModel({ query, expectedAnswer, candidateAnswer }) {
@@ -552,6 +571,12 @@ function isDeepSeekModelOrEndpoint(model, endpoint) {
   const modelText = String(model ?? "").toLowerCase();
   const endpointText = String(endpoint ?? "").toLowerCase();
   return modelText.includes("deepseek") || endpointText.includes("deepseek");
+}
+
+function normalizeAnswerPromptPolicy(policy) {
+  const value = String(policy ?? "").trim() || "strict-unknown-v1";
+  assert.ok(["strict-unknown-v1", "support-aware-v1"].includes(value), `unknown answer prompt policy: ${value}`);
+  return value;
 }
 
 function runDeepSeekThinkingSmoke() {
@@ -759,6 +784,7 @@ function renderMarkdown(value) {
     `- Benchmark: ${value.benchmark}`,
     `- Claim scope: ${value.claimScope}`,
     `- Model match policy: ${value.scoringPolicy.modelMatchPolicy}`,
+    `- Answer prompt policy: ${value.scoringPolicy.answerPromptPolicy}`,
     `- Counts as model-challenger benchmark evidence: ${value.scoringPolicy.countsAsModelChallengerBenchmarkEvidence}`,
     `- Query count: ${value.input.queryCount}`,
     `- Scored query count: ${value.input.scoredQueryCount}`,

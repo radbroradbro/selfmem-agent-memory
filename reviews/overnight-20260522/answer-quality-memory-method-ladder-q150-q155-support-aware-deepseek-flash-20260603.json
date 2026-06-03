@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-memory-method-ladder",
+  "generatedAt": "2026-06-03T15:45:43.805Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "benchmark": "longmemeval",
+  "fixtureOnly": false,
+  "executeRequested": true,
+  "readyForExecution": true,
+  "readiness": {
+    "ready": true,
+    "blockers": [],
+    "callsAllowed": true,
+    "publicDataConfirmed": true,
+    "noRawOutputGuard": true,
+    "baseUrlPresent": true,
+    "endpointLabel": "https://api.deepseek.com",
+    "endpointIsLocal": false,
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "cloudApiKeyPresent": true
+  },
+  "claimBoundary": "same-shard answer-quality method diagnostic; not production or SOTA evidence without the normal gates",
+  "claimScope": "model-challenger",
+  "modelMatchPolicy": "challenger-model-allowed",
+  "answerPromptPolicy": "support-aware-v1",
+  "queryShard": {
+    "startIndex": 150,
+    "endIndexExclusive": 155,
+    "requestedLimit": 5,
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+  },
+  "contextTokenBudget": 800,
+  "limit": 5,
+  "continueOnCallError": true,
+  "methods": [
+    "session-v1",
+    "contextual-source-chunk-v1"
+  ],
+  "strategies": [
+    "bm25-lite"
+  ],
+  "materializations": [
+    {
+      "method": "session-v1",
+      "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754",
+      "queryCount": 5,
+      "haystackSessionCount": 232,
+      "memoryRecordCount": 232,
+      "contextualSourceChunkCount": 0,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 0,
+      "expectedResultRefCount": 16,
+      "querySetHash": "sha256:a50586c479e309c0f9cf70f516aca823749913e9a47f62196c2f8d9eb3fb5ac4",
+      "collectorCompatibleQuerySetHash": "sha256:4e62ce21e041794f591ec37f00af8bd267730e2d9248ec2902accf726b72bcbe",
+      "memoriesFileHash": "sha256:412192c414eddffd386365dfbcae7fd501582ab1ed68744b82ca801a0d6c6d50",
+      "answerLabelsFileHash": "sha256:6730957af7f6cad41518f82240d3828316aa4a82daf416eb5a7d79874a05183e"
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754",
+      "queryCount": 5,
+      "haystackSessionCount": 232,
+      "memoryRecordCount": 1749,
+      "contextualSourceChunkCount": 1749,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 0,
+      "expectedResultRefCount": 88,
+      "querySetHash": "sha256:914797b63cbc599ce1b0d0941e1d3b35555fdde76409441226ff023ced6c6dfc",
+      "collectorCompatibleQuerySetHash": "sha256:55b8e020fbd7dbeb6ebc77ff6535c99856fee7d8e33a1338c957c11ad9083dc3",
+      "memoriesFileHash": "sha256:e9a76cdec546c71b7665bb7b6ffc6e16f69e80856176db1bace11c20afc03ece",
+      "answerLabelsFileHash": "sha256:6730957af7f6cad41518f82240d3828316aa4a82daf416eb5a7d79874a05183e"
+    }
+  ],
+  "responseArms": [
+    {
+      "method": "session-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 5,
+      "querySetHash": "sha256:4e62ce21e041794f591ec37f00af8bd267730e2d9248ec2902accf726b72bcbe",
+      "responsesHash": "sha256:43ea284330c68e39201737567d5bcfce8ae3f87b525a7a67184df00f95e302b9",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 5,
+      "querySetHash": "sha256:55b8e020fbd7dbeb6ebc77ff6535c99856fee7d8e33a1338c957c11ad9083dc3",
+      "responsesHash": "sha256:d87c6cc38e40fdee7c78a7def6b5a9cd4ce20bfb19f9753f320e5e538ee8ef12",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    }
+  ],
+  "answerQualityReports": [
+    {
+      "method": "session-v1",
+      "reportHash": "sha256:ff7d5637153d034f09b5f7d322990bb99fcc57b785584adfe64f178bba1ce214",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "answerPromptPolicy": "support-aware-v1",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 10,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "bm25-lite",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1982
+      },
+      "metrics": {
+        "answerQuality": 20,
+        "memoryScore": 20,
+        "longmemevalScore": 20,
+        "quality": 0.2,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1982,
+        "answerLatencyP95Ms": 2258,
+        "contextTokensAvg": 800
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 20,
+          "judgeCorrectRate": 0.2,
+          "answerLatencyP50Ms": 1982,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "4c8f2730ce3cc21e",
+              "queryHash": "c9ffb16bd8ce9be7",
+              "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+              "judgeDecisionHash": "sha256:0496d2c64ce3ba75808fe3268352c3c6244879f29c9f99d09801e3bc12e4892e",
+              "contextResultCount": 1,
+              "responseTotal": 1,
+              "elapsedMs": 1989,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "105d9d75bd95eb01",
+              "queryHash": "e46e10ac1aaa2919",
+              "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+              "judgeDecisionHash": "sha256:5dae48c521675c66f0905354c342a7138bd043581c8d0455c649123286106920",
+              "contextResultCount": 1,
+              "responseTotal": 1,
+              "elapsedMs": 1982,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "af8624005b641336",
+              "queryHash": "20debea01721fe36",
+              "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+              "judgeDecisionHash": "sha256:39c84bdaf02ef37549c428b26bbbcab344d92de7868a0ffbee7d26b7f332085c",
+              "contextResultCount": 1,
+              "responseTotal": 1,
+              "elapsedMs": 1864,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "b250d558a3617fba",
+              "queryHash": "7fc50bb80f9f5a5d",
+              "candidateAnswerHash": "sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+              "judgeDecisionHash": "sha256:6b64f0d900b930f155f37830bf0ebcdc6f16d058d56f4e176a61c06951ebe131",
+              "contextResultCount": 1,
+              "responseTotal": 1,
+              "elapsedMs": 2258,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "3633dab7d4fb856d",
+              "queryHash": "9a59dd7164b4d42f",
+              "candidateAnswerHash": "sha256:4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+              "judgeDecisionHash": "sha256:16eb22a2d9d1ad07c3224e1e31346eae081d59fa6f067ea797665c5c6b3b2091",
+              "contextResultCount": 1,
+              "responseTotal": 1,
+              "elapsedMs": 1820,
+              "contextTokens": 800,
+              "score": 100,
+              "correct": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "reportHash": "sha256:db2be32a62ef5d59a8171bb9426c80c42712c5a399294d2e03fc1d8f4f3f823e",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "answerPromptPolicy": "support-aware-v1",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 10,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "bm25-lite",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1957
+      },
+      "metrics": {
+        "answerQuality": 20,
+        "memoryScore": 20,
+        "longmemevalScore": 20,
+        "quality": 0.2,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1957,
+        "answerLatencyP95Ms": 2425,
+        "contextTokensAvg": 769
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 20,
+          "judgeCorrectRate": 0.2,
+          "answerLatencyP50Ms": 1957,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "4c8f2730ce3cc21e",
+              "queryHash": "c9ffb16bd8ce9be7",
+              "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+              "judgeDecisionHash": "sha256:0496d2c64ce3ba75808fe3268352c3c6244879f29c9f99d09801e3bc12e4892e",
+              "contextResultCount": 3,
+              "responseTotal": 3,
+              "elapsedMs": 2425,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "105d9d75bd95eb01",
+              "queryHash": "e46e10ac1aaa2919",
+              "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+              "judgeDecisionHash": "sha256:10156adb281c5b3f1c8fff3b9510a8d39d805f02bd8c6722e6883d3fb42ce907",
+              "contextResultCount": 4,
+              "responseTotal": 4,
+              "elapsedMs": 2360,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "af8624005b641336",
+              "queryHash": "20debea01721fe36",
+              "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+              "judgeDecisionHash": "sha256:39c84bdaf02ef37549c428b26bbbcab344d92de7868a0ffbee7d26b7f332085c",
+              "contextResultCount": 3,
+              "responseTotal": 3,
+              "elapsedMs": 1833,
+              "contextTokens": 800,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "b250d558a3617fba",
+              "queryHash": "7fc50bb80f9f5a5d",
+              "candidateAnswerHash": "sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+              "judgeDecisionHash": "sha256:6b64f0d900b930f155f37830bf0ebcdc6f16d058d56f4e176a61c06951ebe131",
+              "contextResultCount": 5,
+              "responseTotal": 5,
+              "elapsedMs": 1957,
+              "contextTokens": 735,
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "3633dab7d4fb856d",
+              "queryHash": "9a59dd7164b4d42f",
+              "candidateAnswerHash": "sha256:e1639257158460ce087f180ddf6a0f4d6547645437f17ad85760e5d226e67956",
+              "judgeDecisionHash": "sha256:16eb22a2d9d1ad07c3224e1e31346eae081d59fa6f067ea797665c5c6b3b2091",
+              "contextResultCount": 5,
+              "responseTotal": 5,
+              "elapsedMs": 1742,
+              "contextTokens": 711,
+              "score": 100,
+              "correct": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "method": "session-v1",
+    "reportHash": "sha256:ff7d5637153d034f09b5f7d322990bb99fcc57b785584adfe64f178bba1ce214",
+    "readyForEndToEndMemoryScoreGate": true,
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "answerPromptPolicy": "support-aware-v1",
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsModelChallengerBenchmarkEvidence": true,
+    "callsMade": 10,
+    "endpointLabel": "https://api.deepseek.com",
+    "winner": {
+      "strategy": "bm25-lite",
+      "answerQuality": 20,
+      "judgeCorrectRate": 0.2,
+      "answerLatencyP50Ms": 1982
+    },
+    "metrics": {
+      "answerQuality": 20,
+      "memoryScore": 20,
+      "longmemevalScore": 20,
+      "quality": 0.2,
+      "judgeCorrectRate": 0.2,
+      "answerLatencyP50Ms": 1982,
+      "answerLatencyP95Ms": 2258,
+      "contextTokensAvg": 800
+    },
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1982,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "4c8f2730ce3cc21e",
+            "queryHash": "c9ffb16bd8ce9be7",
+            "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+            "judgeDecisionHash": "sha256:0496d2c64ce3ba75808fe3268352c3c6244879f29c9f99d09801e3bc12e4892e",
+            "contextResultCount": 1,
+            "responseTotal": 1,
+            "elapsedMs": 1989,
+            "contextTokens": 800,
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "105d9d75bd95eb01",
+            "queryHash": "e46e10ac1aaa2919",
+            "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+            "judgeDecisionHash": "sha256:5dae48c521675c66f0905354c342a7138bd043581c8d0455c649123286106920",
+            "contextResultCount": 1,
+            "responseTotal": 1,
+            "elapsedMs": 1982,
+            "contextTokens": 800,
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "af8624005b641336",
+            "queryHash": "20debea01721fe36",
+            "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+            "judgeDecisionHash": "sha256:39c84bdaf02ef37549c428b26bbbcab344d92de7868a0ffbee7d26b7f332085c",
+            "contextResultCount": 1,
+            "responseTotal": 1,
+            "elapsedMs": 1864,
+            "contextTokens": 800,
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "b250d558a3617fba",
+            "queryHash": "7fc50bb80f9f5a5d",
+            "candidateAnswerHash": "sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+            "judgeDecisionHash": "sha256:6b64f0d900b930f155f37830bf0ebcdc6f16d058d56f4e176a61c06951ebe131",
+            "contextResultCount": 1,
+            "responseTotal": 1,
+            "elapsedMs": 2258,
+            "contextTokens": 800,
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "3633dab7d4fb856d",
+            "queryHash": "9a59dd7164b4d42f",
+            "candidateAnswerHash": "sha256:4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+            "judgeDecisionHash": "sha256:16eb22a2d9d1ad07c3224e1e31346eae081d59fa6f067ea797665c5c6b3b2091",
+            "contextResultCount": 1,
+            "responseTotal": 1,
+            "elapsedMs": 1820,
+            "contextTokens": 800,
+            "score": 100,
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "nextActions": [
+    "Treat session-v1 with bm25-lite as a baseline/control winner for this slice, not as a challenger promotion.",
+    "Do not combine or promote this slice unless the standard result gate proves a non-session challenger beats session-v1 under failure-accounted answer-quality scoring.",
+    "Check answer and judge failure counts before interpreting zero-score or baseline-winning slices as retrieval evidence."
+  ]
+}

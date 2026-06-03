@@ -1,0 +1,392 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-method-ladder-result-gate",
+  "status": "BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT",
+  "generatedAt": "2026-06-03T15:45:52.663Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsMethodLadderEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "reason": "Method-ladder result is missing, unsafe, unscored, not same-shard, or does not prove a challenger over the session baseline.",
+  "thresholds": {
+    "baselineMethod": "session-v1",
+    "minDelta": 1,
+    "maxWinnerArmFailures": 0,
+    "maxTotalFailureRate": 0.01,
+    "requirePairedBootstrap": false,
+    "minPairedMeanDelta": 1,
+    "minPairedBootstrapLowerBound": 0,
+    "pairedBootstrapSamples": 1000,
+    "promotionMinQueryCount": 75,
+    "promotionMaxWinnerArmFailures": 0,
+    "promotionMaxTotalFailureRate": 0.01
+  },
+  "result": {
+    "source": "result-file",
+    "hash": "sha256:fe400893983fd2d0e6209f0ff69142aba363c5e7361f186ba3198e41968ed384",
+    "fixtureOnly": false,
+    "mode": "answer-quality-memory-method-ladder",
+    "benchmark": "longmemeval",
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "queryShard": {
+      "startIndex": 150,
+      "endIndexExclusive": 155,
+      "requestedLimit": 5,
+      "sameRawQuerySelectionAcrossMethods": true,
+      "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+    },
+    "continueOnCallError": true,
+    "methodCount": 2,
+    "totalCalls": 20,
+    "totalFailures": 0,
+    "totalFailureRate": 0
+  },
+  "baseline": {
+    "method": "session-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 20,
+    "judgeCorrectRate": 0.2,
+    "callsMade": 10,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1982,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "4c8f2730ce3cc21e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "105d9d75bd95eb01",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "af8624005b641336",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "b250d558a3617fba",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "3633dab7d4fb856d",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "bestChallenger": {
+    "method": "contextual-source-chunk-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 20,
+    "judgeCorrectRate": 0.2,
+    "callsMade": 10,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1957,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "4c8f2730ce3cc21e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "105d9d75bd95eb01",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "af8624005b641336",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "b250d558a3617fba",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "3633dab7d4fb856d",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "bestOverall": {
+    "method": "session-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 20,
+    "judgeCorrectRate": 0.2,
+    "callsMade": 10,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 20,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1982,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": [
+          {
+            "queryIdHash": "4c8f2730ce3cc21e",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "105d9d75bd95eb01",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "af8624005b641336",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "b250d558a3617fba",
+            "score": 0,
+            "correct": false
+          },
+          {
+            "queryIdHash": "3633dab7d4fb856d",
+            "score": 100,
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "deltaVsBaseline": 0,
+    "winnerArmFailures": 0,
+    "winningArm": {
+      "strategy": "bm25-lite",
+      "answerQuality": 20,
+      "judgeCorrectRate": 0.2,
+      "answerFailures": 0,
+      "judgeFailures": 0
+    },
+    "pairedBootstrap": {
+      "required": false,
+      "available": true,
+      "baselineFingerprintCount": 5,
+      "challengerFingerprintCount": 5,
+      "commonQueryCount": 5,
+      "meanDelta": 0,
+      "lowerBound95": 0,
+      "upperBound95": 0,
+      "minMeanDelta": 1,
+      "minLowerBound": 0
+    }
+  },
+  "promotion": {
+    "scope": "next-larger-slice-challenger-only",
+    "status": "BLOCKED_NEXT_LARGER_SLICE_CHALLENGER",
+    "readyForNextLargerSlice": false,
+    "productionDefaultAllowed": false,
+    "publicSotaClaimAllowed": false,
+    "challenger": "contextual-source-chunk-v1:bm25-lite",
+    "checks": {
+      "methodEvidenceReady": false,
+      "queryCountMinimum": false,
+      "pairedBootstrapAvailable": true,
+      "pairedBootstrapMeanDelta": false,
+      "pairedBootstrapLowerBound": true,
+      "failureAccountedWinnerArm": true,
+      "failureAccountedTotalRate": true,
+      "sameShardAndPrivacyReady": true
+    },
+    "blockers": [
+      "method-ladder-evidence-not-ready",
+      "promotion-query-count-below-minimum",
+      "promotion-paired-bootstrap-mean-delta-below-threshold"
+    ],
+    "warnings": [
+      "does-not-promote-production-default",
+      "does-not-count-as-full-memory-sota-evidence"
+    ],
+    "failureAccounting": {
+      "winnerArmFailures": 0,
+      "totalFailureRate": 0,
+      "maxWinnerArmFailures": 0,
+      "maxTotalFailureRate": 0.01
+    },
+    "pairedBootstrap": {
+      "requiredForPromotion": true,
+      "available": true,
+      "commonQueryCount": 5,
+      "meanDelta": 0,
+      "lowerBound95": 0,
+      "upperBound95": 0,
+      "minMeanDelta": 1,
+      "minLowerBound": 0
+    }
+  },
+  "rows": [
+    {
+      "method": "session-v1",
+      "winnerStrategy": "bm25-lite",
+      "answerQuality": 20,
+      "judgeCorrectRate": 0.2,
+      "callsMade": 10,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 20,
+          "judgeCorrectRate": 0.2,
+          "answerLatencyP50Ms": 1982,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "4c8f2730ce3cc21e",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "105d9d75bd95eb01",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "af8624005b641336",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "b250d558a3617fba",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "3633dab7d4fb856d",
+              "score": 100,
+              "correct": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "winnerStrategy": "bm25-lite",
+      "answerQuality": 20,
+      "judgeCorrectRate": 0.2,
+      "callsMade": 10,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 20,
+          "judgeCorrectRate": 0.2,
+          "answerLatencyP50Ms": 1957,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": [
+            {
+              "queryIdHash": "4c8f2730ce3cc21e",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "105d9d75bd95eb01",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "af8624005b641336",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "b250d558a3617fba",
+              "score": 0,
+              "correct": false
+            },
+            {
+              "queryIdHash": "3633dab7d4fb856d",
+              "score": 100,
+              "correct": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "resultExists": true,
+    "modeRecognized": true,
+    "metricsOnly": true,
+    "publicSafe": true,
+    "fixtureOnlyFalse": true,
+    "executeRequested": true,
+    "answerQualityMode": true,
+    "publicClaimsDisabled": true,
+    "rawQuestionsExcluded": true,
+    "rawAnswersExcluded": true,
+    "rawMemoryExcluded": true,
+    "rawTranscriptExcluded": true,
+    "sameRawQuerySelection": true,
+    "querySelectionHashPresent": true,
+    "baselinePresent": true,
+    "challengerPresent": true,
+    "challengerBeatsBaseline": false,
+    "bestOverallIsChallenger": false,
+    "winnerArmFailureLimit": true,
+    "totalFailureRateLimit": true,
+    "privacyLeakCountersClear": true,
+    "pairedBootstrapAvailable": true,
+    "pairedBootstrapMeanDelta": true,
+    "pairedBootstrapLowerBound": true
+  },
+  "blockers": [
+    "best-challenger-does-not-clear-baseline-delta",
+    "best-overall-method-is-still-baseline"
+  ],
+  "nextActions": [
+    "Re-run the method ladder with the same raw query selection, answer-quality execution enabled, and failure accounting enabled.",
+    "Keep session-v1 as the baseline and require the challenger winner to beat it before promoting any materializer.",
+    "Do not attach this result to public SOTA claims until the standard full-memory gates pass."
+  ]
+}

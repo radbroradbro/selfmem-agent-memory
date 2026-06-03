@@ -30,6 +30,9 @@ const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_MEMORYBENCH
 const modelMatchPolicy = String(
   args.modelMatchPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY ?? (claimScope === "local-full" ? "local-diagnostic-allowed" : "challenger-model-allowed"),
 ).trim();
+const answerPromptPolicy = normalizeAnswerPromptPolicy(
+  args.answerPromptPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_PROMPT_POLICY ?? "strict-unknown-v1",
+);
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const continueOnCallError = truthy(args.continueOnCallError ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTINUE_ON_CALL_ERROR ?? "");
 
@@ -47,6 +50,10 @@ if (args.continueOnCallErrorSmoke === true) {
 }
 if (args.sessionBaselineNextActionsSmoke === true) {
   runSessionBaselineNextActionsSmoke();
+  process.exit(0);
+}
+if (args.answerPromptPolicySmoke === true) {
+  runAnswerPromptPolicySmoke();
   process.exit(0);
 }
 
@@ -139,6 +146,7 @@ for (const method of methods) {
         methodDir,
         claimScope,
         modelMatchPolicy,
+        answerPromptPolicy,
         methodArmSpecs,
         answerQualityPath,
         continueOnCallError,
@@ -183,6 +191,7 @@ const report = {
     : "answer-quality method-ladder workorder only; response arms are exported but no model-scored answer-quality calls were made",
   claimScope,
   modelMatchPolicy,
+  answerPromptPolicy,
   queryShard: {
     startIndex: queryOffset,
     endIndexExclusive: maxQueries ? queryOffset + maxQueries : null,
@@ -280,6 +289,8 @@ function answerQualityCommandArgs(input) {
     input.claimScope,
     "--model-match-policy",
     input.modelMatchPolicy,
+    "--answer-prompt-policy",
+    input.answerPromptPolicy,
     ...(input.continueOnCallError ? ["--continue-on-call-error"] : []),
     ...input.methodArmSpecs.flatMap((spec) => ["--arm", spec]),
     "--output",
@@ -293,6 +304,7 @@ function runContinueOnCallErrorSmoke() {
     methodDir: "/tmp/method",
     claimScope: "model-challenger",
     modelMatchPolicy: "challenger-model-allowed",
+    answerPromptPolicy: "strict-unknown-v1",
     methodArmSpecs: ["bm25-lite=/tmp/bm25.json", "full-hybrid-rerank=/tmp/hybrid.json"],
     answerQualityPath: "/tmp/answer-quality.json",
     continueOnCallError: true,
@@ -302,6 +314,7 @@ function runContinueOnCallErrorSmoke() {
     methodDir: "/tmp/method",
     claimScope: "model-challenger",
     modelMatchPolicy: "challenger-model-allowed",
+    answerPromptPolicy: "strict-unknown-v1",
     methodArmSpecs: ["bm25-lite=/tmp/bm25.json"],
     answerQualityPath: "/tmp/answer-quality.json",
     continueOnCallError: false,
@@ -333,6 +346,29 @@ function runSessionBaselineNextActionsSmoke() {
       ok: true,
       mode: "answer-quality-method-ladder-session-baseline-next-actions-smoke",
       baselineWinnerDoesNotPromoteChallenger: true,
+    })}\n`,
+  );
+}
+
+function runAnswerPromptPolicySmoke() {
+  const command = answerQualityCommandArgs({
+    targetPath: "/tmp/target.json",
+    methodDir: "/tmp/method",
+    claimScope: "model-challenger",
+    modelMatchPolicy: "challenger-model-allowed",
+    answerPromptPolicy: "support-aware-v1",
+    methodArmSpecs: ["bm25-lite=/tmp/bm25.json"],
+    answerQualityPath: "/tmp/answer-quality.json",
+    continueOnCallError: false,
+  });
+  const policyIndex = command.indexOf("--answer-prompt-policy");
+  assert.ok(policyIndex > 0, "answer prompt policy flag is forwarded");
+  assert.equal(command[policyIndex + 1], "support-aware-v1");
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "answer-quality-method-ladder-answer-prompt-policy-smoke",
+      forwardsAnswerPromptPolicy: true,
     })}\n`,
   );
 }
@@ -380,6 +416,7 @@ function answerQualitySummary(input) {
     readyForEndToEndMemoryScoreGate: input.answerQuality.readyForEndToEndMemoryScoreGate,
     claimScope: input.answerQuality.claimScope,
     modelMatchPolicy: input.answerQuality.scoringPolicy?.modelMatchPolicy ?? null,
+    answerPromptPolicy: input.answerQuality.scoringPolicy?.answerPromptPolicy ?? null,
     countsAsLocalFullBenchmarkEvidence: input.answerQuality.scoringPolicy?.countsAsLocalFullBenchmarkEvidence ?? false,
     countsAsModelChallengerBenchmarkEvidence: input.answerQuality.scoringPolicy?.countsAsModelChallengerBenchmarkEvidence ?? false,
     callsMade: input.answerQuality.provider?.callsMade ?? null,
@@ -406,6 +443,7 @@ function renderMarkdown(value) {
     `- Ready for execution: ${value.readyForExecution}`,
     `- Claim scope: ${value.claimScope}`,
     `- Model match policy: ${value.modelMatchPolicy}`,
+    `- Answer prompt policy: ${value.answerPromptPolicy}`,
     `- Query shard: ${value.queryShard.startIndex} to ${value.queryShard.endIndexExclusive ?? "end"}`,
     `- Same raw query selection: ${value.queryShard.sameRawQuerySelectionAcrossMethods}`,
     `- Claim boundary: ${value.claimBoundary}`,
@@ -540,6 +578,12 @@ function optionalNonNegativeInt(value, label) {
 
 function truthy(value) {
   return value === true || ["1", "true", "yes", "on"].includes(String(value ?? "").trim().toLowerCase());
+}
+
+function normalizeAnswerPromptPolicy(policy) {
+  const value = String(policy ?? "").trim() || "strict-unknown-v1";
+  assert.ok(["strict-unknown-v1", "support-aware-v1"].includes(value), `unknown answer prompt policy: ${value}`);
+  return value;
 }
 
 function parseArgs(argv) {
