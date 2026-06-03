@@ -4,7 +4,7 @@
 - Pull request: #5
 - Issue: #6
 - Local branch: `feat/nucleus-wiki-native-contract`
-- Local head at evidence capture: `6dd1de49e28177dd87ef94c0109edeabf4b3cc9d`
+- Local head at evidence capture: `f1b64bcf3e31d1f7c5502e933602872ac721bcf8`
 - PR open: true
 - Issue open: true
 - PR head branch matches expected: true
@@ -14,10 +14,10 @@
 - PR body matches checked-in draft: true
 - Issue title matches checked-in draft: true
 - Issue body matches checked-in draft: true
-- Branch head at evidence capture: `6dd1de49e28177dd87ef94c0109edeabf4b3cc9d`
-- PR head at evidence capture: `6dd1de49e28177dd87ef94c0109edeabf4b3cc9d`
-- PR merge ref at evidence capture: `4e0e30e9a03a5256cd4eb91f5604e047a1a760c4`
-- Live PR updated at: 2026-06-03T01:20:15Z
+- Branch head at evidence capture: `f1b64bcf3e31d1f7c5502e933602872ac721bcf8`
+- PR head at evidence capture: `f1b64bcf3e31d1f7c5502e933602872ac721bcf8`
+- PR merge ref at evidence capture: `ecb7fc7471164aea7e4c3da178aad74569cd64a6`
+- Live PR updated at: 2026-06-03T02:11:09Z
 - Live issue updated at: 2026-06-01T20:31:49Z
 
 ## Safety

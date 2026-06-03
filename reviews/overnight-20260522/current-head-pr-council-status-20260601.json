@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T01:20:23.281Z",
+  "generatedAt": "2026-06-03T02:14:04.398Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,14 +10,14 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "6dd1de49e28177dd87ef94c0109edeabf4b3cc9d",
-  "headAtEvidenceCapture": "6dd1de49e28177dd87ef94c0109edeabf4b3cc9d",
-  "reviewedCodeHead": "3e1bbf51e0dfe0b9b519bf6193b58f65a0386a11",
+  "head": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
+  "headAtEvidenceCapture": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
+  "reviewedCodeHead": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
   "gateDetection": {
-    "changedFileCount": 1449,
+    "changedFileCount": 1450,
     "requiredGates": [
       "security",
       "architecture",
@@ -26,19 +26,19 @@
       "integration",
       "final"
     ],
-    "headRef": "6dd1de4"
+    "headRef": "f1b64bc"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T011809Z-final-council-3e1bbf5",
-    "reviewCreatedAt": "2026-06-03T01:18:54.660566Z",
-    "reviewHeadRef": "3e1bbf5",
+    "reviewRunId": "20260603T021133Z-final-council-f1b64bc",
+    "reviewCreatedAt": "2026-06-03T02:11:50.411827Z",
+    "reviewHeadRef": "f1b64bc",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
     "finalGateReviewerVendor": "council",
     "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
-    "finalGateConfidence": "medium",
+    "finalGateConfidence": "low",
     "routedReviewerVendor": "anthropic",
     "routedReviewerModel": "claude-opus-4-7",
     "implementerVendor": "openai",
@@ -63,26 +63,21 @@
     "issueTitleMatchesDraft": true,
     "issueBodyMatchesDraft": true,
     "liveUpdatedAt": {
-      "pullRequest": "2026-06-03T01:20:15Z",
+      "pullRequest": "2026-06-03T02:11:09Z",
       "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "6dd1de49e28177dd87ef94c0109edeabf4b3cc9d",
-    "remotePullRequestHead": "6dd1de49e28177dd87ef94c0109edeabf4b3cc9d",
-    "remotePullRequestMergeRef": "4e0e30e9a03a5256cd4eb91f5604e047a1a760c4",
+    "remoteBranchHead": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
+    "remotePullRequestHead": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
+    "remotePullRequestMergeRef": "ecb7fc7471164aea7e4c3da178aad74569cd64a6",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },
   "postReviewChangePolicy": {
     "onlyPublicEvidenceSinceReviewedCodeHead": true,
     "publicEvidencePathRule": "reviews/** only",
-    "changedFileCountSinceReviewedCodeHead": 4,
+    "changedFileCountSinceReviewedCodeHead": 0,
     "nonEvidenceFileCountSinceReviewedCodeHead": 0,
-    "changedFilesSinceReviewedCodeHead": [
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.json",
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.md",
-      "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
-      "reviews/overnight-20260522/github-live-sync-current-head-20260601.md"
-    ],
+    "changedFilesSinceReviewedCodeHead": [],
     "nonEvidenceFilesSinceReviewedCodeHead": []
   },
   "evidence": {
