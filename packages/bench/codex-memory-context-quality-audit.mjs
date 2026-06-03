@@ -32,12 +32,30 @@ const scenarios = [
     prompt: "RecallWeave selfmem live prompt-context quality memory system noisy agent drift release blocker retrieval policy.",
     expected: [
       /live prompt-context quality/i,
-      /canaries is not enough|write\/read canaries/i,
+      /write logic|explicit write|writes?/i,
       /release blocker/i,
+      /noisy|noise|drift|context quality/i,
     ],
     forbidden: [
       ["canvas-source-rule", /\bCanvas\/course-material|professor-uploaded Canvas files|reconstructed book extracts\b/i],
       ["canary-memory", /\bcobalt\b|\bMeridian\b|\bcodex-runtime-|codex-live-/i],
+      ["provider-key-fragment", /\b(api key|keys work with|raw key|credential)\b/i],
+      ["private-path", /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//i],
+    ],
+    maxContextItems: 3,
+  },
+  {
+    id: "memory-plugin-noise-no-benchmark-artifacts",
+    prompt: "Memory plugin dogfood check: has the plugin gotten less polluted, and is recall useful for retrieval and write logic?",
+    expected: [
+      /recall remains relevant|retrieval policy|retrieval/i,
+      /write logic|explicit write|writes?/i,
+      /release blocker|noisy|noise|polluted|drift/i,
+    ],
+    forbidden: [
+      ["benchmark-artifact", /\b(75Q|500Q|answer-quality|BM25|full-memory-sota|LongMemEval|memory-score|model challenger|provider arms?|reported target|shard-\d+|SOTA ladder)\b/i],
+      ["canary-artifact", /\b(codex-runtime-|codex-live-|strict-real canary|canary packet|returned canary|canary diagnostic|one-agent canary|postwatch canary)\b/i],
+      ["canvas-source-rule", /\bCanvas\/course-material|professor-uploaded Canvas files|reconstructed book extracts\b/i],
       ["provider-key-fragment", /\b(api key|keys work with|raw key|credential)\b/i],
       ["private-path", /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//i],
     ],
@@ -133,6 +151,10 @@ function runFixtureAudit() {
     "recallweave-live-context-quality": [
       "[SELFMEM BRIDGE CONTEXT]",
       "- Decision: RecallWeave selfmem must treat live prompt-context quality as the main product gate. Passing write/read canaries is not enough; the injected context must improve Codex/Claude/OpenClaw agent behavior on real tasks. If memory recall is noisy, missing explicit write tooling, or causing agent drift, that is a release blocker.",
+    ].join("\n"),
+    "memory-plugin-noise-no-benchmark-artifacts": [
+      "[SELFMEM BRIDGE CONTEXT]",
+      "- Decision: RecallWeave selfmem must treat live prompt-context quality as the main product gate and treat noisy or polluted recall as a release blocker. Passing write/read canaries is not enough; recall remains relevant only when retrieval policy, direct lookup, and write logic keep unrelated benchmark artifacts out of normal memory-plugin dogfood prompts.",
     ].join("\n"),
     "actor-default": [
       "[SELFMEM BRIDGE CONTEXT]",

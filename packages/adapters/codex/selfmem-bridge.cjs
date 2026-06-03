@@ -446,7 +446,8 @@ function scoreMemory(queryTokens, memory) {
   const credentialRequested = credentialRecallRequested(queryTokens);
   if (isCredentialAdjacent(text) && !credentialRequested) return -100;
   if (isPathProcedure(text) && !pathRecallRequested(queryTokens)) return -30;
-  if (isCanaryMemory(memory) && !canaryRecallRequested(queryTokens)) return -25;
+  if (isCanaryArtifactMemory(memory) && !canaryRecallRequested(queryTokens)) return -25;
+  if (isBenchmarkArtifactMemory(memory) && !benchmarkArtifactRecallRequested(queryTokens)) return -25;
   const domain = queryDomain(queryTokens);
   const memoryDomainValue = memoryDomain(text);
   if (domain && memoryDomainValue && memoryDomainValue !== domain) return -100;
@@ -665,7 +666,8 @@ function diversifyRecallItems(items, config, queryTokens = new Set()) {
     if (isOperationalNoiseMemory(text)) continue;
     if (config.suppressCredentialAdjacentRecall !== false && isCredentialAdjacent(text) && !credentialRecallRequested(queryTokens)) continue;
     if (isPathProcedure(text) && !pathRecallRequested(queryTokens)) continue;
-    if (isCanaryMemory(item) && !canaryRecallRequested(queryTokens)) continue;
+    if (isCanaryArtifactMemory(item) && !canaryRecallRequested(queryTokens)) continue;
+    if (isBenchmarkArtifactMemory(item) && !benchmarkArtifactRecallRequested(queryTokens)) continue;
     const family = sourceFamily(item);
     if (family === "transcript" && !transcriptRecallRequested(queryTokens)) continue;
     if (family === "export" && !exportRecallRequested(queryTokens)) continue;
@@ -726,10 +728,20 @@ function isCredentialAdjacent(text) {
     && /\b(actual|raw|value|values|load|rotate|given|lost|mapped|send|paste)\b/i.test(value);
 }
 
-function isCanaryMemory(item) {
+function isCanaryArtifactMemory(item) {
   const text = String(item.text || "");
   const sourceId = String(item.sourceId || item.id || "");
-  return /\bcanary\b/i.test(text) || /\bcanary\b/i.test(sourceId);
+  const value = `${sourceId}\n${text}`;
+  if (/\bcanar(?:y|ies)\b/i.test(sourceId)) return true;
+  return /\bcanar(?:y|ies)\b/i.test(text)
+    && /\b(adapter|agent|commit|container|diagnostic|drill|evidence|handoff|intake|operator|packet|postwatch|returned|rollout|runtime|strict-real|supervisor|watch|window)\b/i.test(value);
+}
+
+function isBenchmarkArtifactMemory(item) {
+  const text = String(item.text || "");
+  const sourceId = String(item.sourceId || item.id || "");
+  const value = `${sourceId}\n${text}`;
+  return /\b(75q|500q|answer-quality|answer quality|benchmark:|bm25|full-memory-sota|longmemeval|memory-score|model challenger|provider arm|provider arms|reported target|shard-\d+|sota ladder)\b/i.test(value);
 }
 
 function canaryRecallRequested(queryTokens) {
@@ -737,6 +749,26 @@ function canaryRecallRequested(queryTokens) {
     || queryTokens.has("canaries")
     || (queryTokens.has("strict") && queryTokens.has("rollout"))
     || (queryTokens.has("production") && queryTokens.has("rollout"));
+}
+
+function benchmarkArtifactRecallRequested(queryTokens) {
+  return queryTokens.has("benchmark")
+    || queryTokens.has("benchmarks")
+    || queryTokens.has("bm25")
+    || queryTokens.has("shard")
+    || queryTokens.has("shards")
+    || queryTokens.has("provider")
+    || queryTokens.has("providers")
+    || queryTokens.has("answer")
+    || queryTokens.has("quality")
+    || queryTokens.has("judge")
+    || queryTokens.has("judges")
+    || queryTokens.has("score")
+    || queryTokens.has("scores")
+    || queryTokens.has("sota")
+    || queryTokens.has("longmemeval")
+    || queryTokens.has("model")
+    || queryTokens.has("challenger");
 }
 
 function credentialRecallRequested(queryTokens) {

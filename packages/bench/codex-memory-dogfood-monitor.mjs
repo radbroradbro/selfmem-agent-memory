@@ -179,7 +179,8 @@ function evaluateHealth(health, { phase }) {
 function buildGraduationGate(iterations, { watch, intervalMs, minCleanIterations, phase }) {
   const cleanIterations = iterations.filter((item) => item.ok === true);
   const allClean = cleanIterations.length === iterations.length;
-  const enoughIterations = cleanIterations.length >= minCleanIterations;
+  const graduationMinCleanIterations = Math.max(12, minCleanIterations);
+  const enoughIterations = cleanIterations.length >= graduationMinCleanIterations;
   const watchedIntervals = watch === true && iterations.length > 1;
   const elapsedMs = watchedIntervals ? Math.max(0, iterations.length - 1) * intervalMs : 0;
   const observedUserFacingRecallEvents = sum(iterations.map((item) => Number(item.retrieval?.userFacingRecallRunEvents ?? 0)));
@@ -200,7 +201,8 @@ function buildGraduationGate(iterations, { watch, intervalMs, minCleanIterations
     countsAsBenchmarkEvidence: false,
     phase,
     requiresWatch: true,
-    minCleanIterations,
+    minCleanIterations: graduationMinCleanIterations,
+    requestedMinCleanIterations: minCleanIterations,
     observedIterations: iterations.length,
     cleanIterations: cleanIterations.length,
     elapsedMs,

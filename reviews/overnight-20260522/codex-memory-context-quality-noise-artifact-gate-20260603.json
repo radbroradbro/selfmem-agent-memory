@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "mode": "codex-memory-context-quality-audit",
+  "status": "READY_CONTEXT_QUALITY",
+  "ok": true,
+  "generatedAt": "2026-06-03T12:34:40.940Z",
+  "fixtureOnly": false,
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "rawContextIncluded": false,
+  "privatePathIncluded": false,
+  "secretPatternHits": 0,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "countsAsBenchmarkEvidence": false,
+  "countsAsSupermemoryReplacementEvidence": false,
+  "contextQualityGate": true,
+  "bridge": {
+    "actor": "codex-selfmem-bridge",
+    "sourceHash": "sha256:67986c43ddf19d938fe7bece6d9f7074060a8c3f187ca5480241e71db04c4ca1"
+  },
+  "scenarios": [
+    {
+      "id": "canvas-source-of-truth",
+      "ok": true,
+      "contextHash": "sha256:1ff67edbf8238e90b1a841c204bda22aab4635eb544f270d1f5c6b5fa16aca2e",
+      "contextLength": 653,
+      "itemCount": 1,
+      "expectedMatched": {
+        "professor-uploaded-Canvas-files": true,
+        "controlling-source-of-truth": true,
+        "do-not-substitute": true
+      },
+      "forbiddenHits": [],
+      "maxContextItems": 2
+    },
+    {
+      "id": "recallweave-live-context-quality",
+      "ok": true,
+      "contextHash": "sha256:b42682f78228695eca5aaec4e13d92c6402a76ff4e48d66b7744512a204da408",
+      "contextLength": 1062,
+      "itemCount": 3,
+      "expectedMatched": {
+        "live-prompt-context-quality": true,
+        "write-logic-explicit-write-writes": true,
+        "release-blocker": true,
+        "noisy-noise-drift-context-quality": true
+      },
+      "forbiddenHits": [],
+      "maxContextItems": 3
+    },
+    {
+      "id": "memory-plugin-noise-no-benchmark-artifacts",
+      "ok": true,
+      "contextHash": "sha256:823e8e22f3a7e6ff02d345c93209e36f8523d0e1d6b0fdfc925c2447bfa54be1",
+      "contextLength": 1046,
+      "itemCount": 3,
+      "expectedMatched": {
+        "recall-remains-relevant-retrieval-policy-retrieval": true,
+        "write-logic-explicit-write-writes": true,
+        "release-blocker-noisy-noise-polluted-drift": true
+      },
+      "forbiddenHits": [],
+      "maxContextItems": 3
+    },
+    {
+      "id": "actor-default",
+      "ok": true,
+      "contextHash": "sha256:72b3f88c56a41b0081706da2fc6ff09a77995719ba7dccdd35b9c9eed9a1c575",
+      "contextLength": 570,
+      "itemCount": 1,
+      "expectedMatched": {
+        "Codex-CLI": true,
+        "local-OAuth": true,
+        "DeepSeek-fallback-fallback-DeepSeek": true
+      },
+      "forbiddenHits": [],
+      "maxContextItems": 2
+    },
+    {
+      "id": "unrelated-default-noise",
+      "ok": true,
+      "contextHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contextLength": 0,
+      "itemCount": 0,
+      "expectedMatched": {},
+      "forbiddenHits": [],
+      "maxContextItems": 0
+    },
+    {
+      "id": "tiny-continuation-go-no-anchor-no-noise",
+      "ok": true,
+      "contextHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contextLength": 0,
+      "itemCount": 0,
+      "expectedMatched": {},
+      "forbiddenHits": [],
+      "maxContextItems": 0
+    },
+    {
+      "id": "tiny-continuation-question-no-anchor-no-noise",
+      "ok": true,
+      "contextHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contextLength": 0,
+      "itemCount": 0,
+      "expectedMatched": {},
+      "forbiddenHits": [],
+      "maxContextItems": 0
+    }
+  ],
+  "failedScenarios": [],
+  "blockers": []
+}
