@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const format = String(args.format ?? "json");
+const outputPath = args.output ? resolve(String(args.output)) : null;
+const markdownOutputPath = args.markdownOutput ? resolve(String(args.markdownOutput)) : null;
 const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir());
 const repository = "radbroradbro/selfmem-agent-memory";
 const pullRequest = 5;
@@ -77,7 +79,7 @@ assert.equal(livePrHeadShaMatchesCurrentHead, true, "GitHub API PR head sha diff
 const report = {
   ok: true,
   mode: "github-live-sync-check",
-  writesRealFiles: false,
+  writesRealFiles: Boolean(outputPath || markdownOutputPath),
   callsGitHubApi: true,
   repository,
   pullRequest,
@@ -118,13 +120,19 @@ const report = {
 const serialized = JSON.stringify(report, null, 2);
 assert.doesNotMatch(serialized, secretPattern);
 assert.doesNotMatch(serialized, privatePathPattern);
+const markdown = markdownReport(report);
+assert.doesNotMatch(markdown, secretPattern);
+assert.doesNotMatch(markdown, privatePathPattern);
 
 if (format === "markdown") {
-  process.stdout.write(markdownReport(report));
+  process.stdout.write(markdown);
 } else {
   assert.equal(format, "json", "format must be json or markdown");
   console.log(serialized);
 }
+
+if (outputPath) writeSafeText(outputPath, `${serialized}\n`);
+if (markdownOutputPath) writeSafeText(markdownOutputPath, markdown);
 
 async function githubJson(apiPath) {
   const authHeader = gitCredentialAuthHeader();
@@ -236,6 +244,12 @@ function parseArgs(argv) {
     }
   }
   return parsed;
+}
+
+function writeSafeText(path, text) {
+  assert.notEqual(path, "true", "output paths must be explicit file paths");
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, text);
 }
 
 function markdownReport(report) {
