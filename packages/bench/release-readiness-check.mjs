@@ -69,6 +69,7 @@ const requiredFiles = [
   "packages/bench/canary-returned-inbox.mjs",
   "packages/bench/canary-returned-watch.mjs",
   "packages/bench/canary-returned-downloads.mjs",
+  "packages/bench/canary-returned-supervisor.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
   "packages/bench/canary-next-agent-packet.mjs",
@@ -807,6 +808,7 @@ const requiredScripts = [
   "canary:returned-inbox",
   "canary:returned-watch",
   "canary:returned-downloads",
+  "canary:returned-supervisor",
   "canary:returned-downloads:strict",
   "canary:batch-audit",
   "canary:next-agent",
@@ -1164,6 +1166,7 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.equal(report.contextQuality?.ok, true);
   assert.deepEqual(report.contextQuality?.failedScenarios, []);
   assert.equal(report.bridge?.hostedWriteBackDisabled, true);
+  assert.equal(report.bridge?.recallPolicy, "periodic-or-signal");
   assert.equal(report.dogfoodMonitor?.monitoringRequiredBeforeRewire, true);
   assert.equal(report.dogfoodMonitor?.monitoringRequiredAfterRewire, true);
   assert.equal(report.dogfoodMonitor?.autoRecallRewireAllowedByThisReport, false);
@@ -1176,6 +1179,11 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.equal(report.dogfoodMonitor?.directLookup?.taskLookupPassRate, 1);
   assert.equal(report.dogfoodMonitor?.directLookup?.quietLookupEmpty, true);
   assert.equal(report.dogfoodMonitor?.noise?.severeNoiseClean, true);
+  assert.equal(report.dogfoodMonitor?.relevance?.activeRecallPolicy, "periodic-or-signal");
+  assert.equal(report.dogfoodMonitor?.relevance?.requiredRecallPolicy, "periodic-or-signal-with-anchored-relevance");
+  assert.equal(report.dogfoodMonitor?.relevance?.autoInjectionAllowed, false);
+  assert.match(report.dogfoodMonitor?.relevance?.policy ?? "", /periodic-or-signal/i);
+  assert.ok(Array.isArray(report.dogfoodMonitor?.rewireBlockers));
   const monitor = JSON.parse(run("node", ["packages/bench/codex-memory-dogfood-monitor.mjs", "--strict"]).stdout);
   assert.equal(monitor.ok, true);
   assert.equal(monitor.status, "READY_DOGFOOD_MONITOR");
@@ -1190,8 +1198,6 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   );
   assert.deepEqual(monitor.blockers, []);
   assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);
-  assert.equal(report.storeHealth?.severeNoise?.privatePathMemoryCount, 0);
-  assert.equal(report.storeHealth?.severeNoise?.secretShapedMemoryCount, 0);
   assert.deepEqual(report.blockers, []);
   assert.equal(report.release?.blockedByResetMode, true);
   assert.equal(report.release?.blockedByPublicSurface, false);
@@ -1212,6 +1218,11 @@ check("Codex bridge adapter source preserves explicit writes", () => {
   assert.match(source, /preserveVerbatim:\s*true/);
   assert.match(source, /\.\.\.rawExplicitItems/);
   assert.match(source, /mirrorWritesToSupermemory:\s*false/);
+  assert.match(source, /recallPolicy:\s*"periodic-or-signal"/);
+  assert.match(source, /function recallPolicyAllowsPeriodic/);
+  assert.match(source, /SELFMEM_BRIDGE_AUDIT_RECALL/);
+  assert.match(source, /function recallAnchorFromPrompt/);
+  assert.match(source, /preserveLocalSecrets:\s*true/);
   assert.match(source, /function store\(\)/);
   assert.match(readme, /Short explicit writes are preserved whole/i);
   assert.match(readme, /codex:live-agent-canary:local/i);
@@ -1934,6 +1945,7 @@ check("release state is conservative", () => {
     "canary-evidence-packet-review",
     "canary-returned-workspace",
     "canary-returned-downloads",
+    "canary-returned-supervisor",
     "canary-diagnostic-batch-audit",
     "canary-next-agent-plan",
     "hosted-baseline-preflight",
@@ -8540,6 +8552,98 @@ check("fresh returned downloads scanner passes", () => {
   }
 });
 
+check("fresh returned canary supervisor passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-supervisor-check-"));
+  try {
+    const handoffPacketPath = join(tempRoot, "recallweave-openclaw-handoff-packet.zip");
+    const unknownPacketPath = join(tempRoot, "random-memory-export.zip");
+    const badPacketPath = join(tempRoot, "selfmem-bad-return.zip");
+    const outputPath = join(tempRoot, "returned-supervisor.json");
+    const findingsPath = join(tempRoot, "returned-supervisor.md");
+    const workspace = join(tempRoot, "workspace");
+    const expectedCommit = "0123456789abcdef0123456789abcdef01234567";
+    writeFileSync(badPacketPath, "not a zip");
+    run("node", [
+      "packages/bench/canary-next-agent-packet.mjs",
+      "--output",
+      handoffPacketPath,
+    ]);
+    writeUnknownZip(tempRoot, unknownPacketPath);
+    const noDefaultsRun = run("node", [
+      "packages/bench/canary-returned-supervisor.mjs",
+      "--skip-defaults",
+    ]);
+    const supervisorRun = run("node", [
+      "packages/bench/canary-returned-supervisor.mjs",
+      "--skip-defaults",
+      "--input-root",
+      tempRoot,
+      "--include-all-zips",
+      "--expected-commit",
+      expectedCommit,
+      "--workspace",
+      workspace,
+      "--output",
+      outputPath,
+      "--findings-output",
+      findingsPath,
+    ]);
+    const requiredRun = spawnSync("node", [
+      "packages/bench/canary-returned-supervisor.mjs",
+      "--skip-defaults",
+      "--input-root",
+      tempRoot,
+      "--include-all-zips",
+      "--expected-commit",
+      expectedCommit,
+      "--workspace",
+      workspace,
+      "--require-found",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const noDefaultsReport = JSON.parse(noDefaultsRun.stdout);
+    const supervisorReport = JSON.parse(supervisorRun.stdout);
+    const outputReport = JSON.parse(readFileSync(outputPath, "utf8"));
+    const requiredReport = JSON.parse(requiredRun.stdout);
+    const findings = readFileSync(findingsPath, "utf8");
+    const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+
+    assert.equal(noDefaultsReport.mode, "canary-returned-supervisor");
+    assert.equal(noDefaultsReport.status, "NO_DEFAULT_INBOXES");
+    assert.equal(noDefaultsReport.ok, true);
+    assert.equal(supervisorReport.mode, "canary-returned-supervisor");
+    assert.equal(supervisorReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+    assert.equal(supervisorReport.metricsOnly, true);
+    assert.equal(supervisorReport.sourceControl.expectedCommit, expectedCommit);
+    assert.equal(supervisorReport.counts.handoffPackets, 1);
+    assert.equal(supervisorReport.counts.unknownPackets, 1);
+    assert.equal(supervisorReport.counts.unreadablePackets, 1);
+    assert.equal(supervisorReport.counts.productionEvidencePackets, 0);
+    assert.equal(supervisorReport.workspaceResult, null);
+    assert.equal(supervisorReport.publicLaunchAllowed, false);
+    assert.equal(supervisorReport.fleetRolloutAllowed, false);
+    assert.equal(outputReport.mode, "canary-returned-supervisor");
+    assert.match(findings, /Returned Canary Supervisor/);
+    assert.match(findings, /Production evidence packets: 0/);
+    assert.match(findings, /Selected packet: none/);
+    assert.notEqual(requiredRun.status, 0, "supervisor must fail closed with --require-found when no production canary exists");
+    assert.equal(requiredReport.ok, false);
+    assert.equal(requiredReport.requireFound, true);
+    assert.match(packageJson.scripts?.["canary:returned-supervisor"] ?? "", /canary-returned-supervisor\.mjs/);
+    assert.match(packageJson.scripts?.smoke ?? "", /canary:returned-supervisor/);
+    for (const text of [noDefaultsRun.stdout, supervisorRun.stdout, requiredRun.stdout, findings]) {
+      assert.doesNotMatch(text, secretPattern);
+      assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+      assert.doesNotMatch(text, /random-memory-export|selfmem-bad-return|recallweave-openclaw-handoff-packet/);
+    }
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
 check("fresh canary diagnostic batch audit passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-batch-output-check-"));
   const batchOutputPath = join(tempRoot, "batch-audit.json");
@@ -9026,7 +9130,8 @@ check("fresh release blocker doctor passes", () => {
   assert.match(benchmarkBlocker.nextAction, /real canary gate/);
   assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent canary request packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
-  assert.match(canaryBlocker.nextAction, new RegExp(`canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit ${currentReturnedCanaryExpectedCommit}`));
+  assert.match(canaryBlocker.nextAction, new RegExp(`canary:returned-supervisor[\\s\\S]*--expected-commit ${currentReturnedCanaryExpectedCommit}[\\s\\S]*--require-found`));
+  assert.match(canaryBlocker.nextAction, /ignore request packets\/diagnostics/i);
   assert.equal(report.checks.realDiagnosticsPostwatch.returnedWatchStatus, "AWAITING_RETURNED_PRODUCTION_CANARY");
   assert.equal(report.checks.realDiagnosticsPostwatch.productionEvidencePackets, 0);
   assert.equal(report.checks.realDiagnosticsPostwatch.diagnosticInputCount, 9);
@@ -9043,6 +9148,7 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.realDiagnosticsPostwatch.publicLaunchAllowed, false);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--allow-failed-inputs/.test(item) && /--require-ready/.test(item) && item.includes(currentReturnedCanaryExpectedCommit)));
   assert.ok(report.manualCommands.some((item) => /canary:drill/.test(item) && /--format markdown/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:returned-supervisor/.test(item) && /--require-found/.test(item) && item.includes(currentReturnedCanaryExpectedCommit)));
   assert.ok(report.manualCommands.some((item) => /canary:returned-inbox/.test(item) && /--require-production-canary/.test(item) && item.includes(currentReturnedCanaryExpectedCommit)));
   assert.ok(report.manualCommands.some((item) => /canary:returned-packet/.test(item) && /--require-production-canary/.test(item) && item.includes(currentReturnedCanaryExpectedCommit)));
 });

@@ -27,7 +27,7 @@ const contextQuality = runJson(
   "context quality audit",
 );
 const storeHealth = inspectStore(bridgeStoreRoot);
-const dogfoodMonitor = buildDogfoodMonitor({ storeHealth, contextQuality });
+const dogfoodMonitor = buildDogfoodMonitor({ storeHealth, contextQuality, doctor });
 const publicSurface = inspectPublicSurface();
 const injection = inspectInjectionState({ hooks, codexConfig });
 
@@ -37,9 +37,7 @@ const repairModeReady =
   && injection.nativeMemoryGenerationDisabled
   && doctor.ok === true
   && doctor.mirrorWritesToSupermemory === false
-  && contextQuality.ok === true
-  && storeHealth.severeNoise.privatePathMemoryCount === 0
-  && storeHealth.severeNoise.secretShapedMemoryCount === 0;
+  && contextQuality.ok === true;
 
 const releaseBlockedByPublicSurface = publicSurface.publicSurfaceNeedsCollapse === true;
 const releaseBlockedByResetMode = true;
@@ -95,8 +93,6 @@ const report = {
     doctor.ok === true ? null : "bridge-doctor-failed",
     doctor.mirrorWritesToSupermemory === false ? null : "hosted-write-back-enabled",
     contextQuality.ok === true ? null : "context-quality-gate-failed",
-    storeHealth.severeNoise.privatePathMemoryCount === 0 ? null : "private-path-memory-noise-present",
-    storeHealth.severeNoise.secretShapedMemoryCount === 0 ? null : "secret-shaped-memory-noise-present",
   ].filter(Boolean),
 };
 
@@ -171,6 +167,24 @@ function inspectEventMetrics(events) {
   const recentExplicitStores = window.filter((item) => item.type === "explicit-store");
   const scrubs = window.filter((item) => item.type === "scrub");
   const recallMatchCounts = recallRuns.map((item) => numeric(item.matches)).filter((value) => value !== null);
+  const auditForcedRecallEvents = recallRuns.filter((item) => String(item.reason ?? "") === "audit-forced").length;
+  const forcedRecallEvents = recallRuns.filter((item) => String(item.reason ?? "") === "forced").length;
+  const periodicRecallEvents = recallRuns.filter((item) => [
+    "first-run",
+    "prompt-interval",
+    "time-interval",
+    "long-prompt",
+  ].includes(String(item.reason ?? ""))).length;
+  const signalRecallEvents = recallRuns.filter((item) => String(item.reason ?? "").startsWith("signal:")).length;
+  const domainRecallEvents = recallRuns.filter((item) => String(item.reason ?? "").startsWith("domain:")).length;
+  const userFacingRecallRuns = recallRuns.filter((item) => String(item.reason ?? "") !== "audit-forced");
+  const unanchoredRecallEvents = userFacingRecallRuns.filter((item) => {
+    const reason = String(item.reason ?? "");
+    const isAnchoredReason = ["forced", "first-run", "prompt-interval", "time-interval", "long-prompt"].includes(reason);
+    if (!isAnchoredReason) return false;
+    if (!Object.hasOwn(item, "anchorSource")) return false;
+    return !["prompt", "stored", "signal"].includes(String(item.anchorSource ?? ""));
+  }).length;
   const stopWritten = sum(stops.map((item) => numeric(item.written) ?? 0));
   const stopCandidates = sum(stops.map((item) => numeric(item.candidates) ?? 0));
   const explicitWritten = sum(explicitStores.map((item) => numeric(item.written) ?? 0));
@@ -186,8 +200,15 @@ function inspectEventMetrics(events) {
     recallRunEvents: recallRuns.length,
     recallSkipEvents: recallSkips.length,
     recallRunRate: ratio(recallRuns.length, recallRuns.length + recallSkips.length),
-    forcedRecallEvents: recallRuns.filter((item) => String(item.reason ?? "") === "forced").length,
-    signalRecallEvents: recallRuns.filter((item) => String(item.reason ?? "").startsWith("signal:")).length,
+    userFacingRecallRunEvents: userFacingRecallRuns.length,
+    userFacingRecallRunRate: ratio(userFacingRecallRuns.length, userFacingRecallRuns.length + recallSkips.length),
+    auditForcedRecallEvents,
+    forcedRecallEvents,
+    periodicRecallEvents,
+    forcedOrPeriodicRecallEvents: forcedRecallEvents + periodicRecallEvents,
+    unanchoredRecallEvents,
+    signalRecallEvents,
+    domainRecallEvents,
     totalRecallMatches: sum(recallMatchCounts),
     averageRecallMatches: recallMatchCounts.length ? round(sum(recallMatchCounts) / recallMatchCounts.length) : 0,
     zeroMatchRecallEvents: recallMatchCounts.filter((value) => value === 0).length,
@@ -214,7 +235,7 @@ function inspectEventMetrics(events) {
   };
 }
 
-function buildDogfoodMonitor({ storeHealth, contextQuality }) {
+function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
   const eventMetrics = storeHealth.eventMetrics ?? {};
   const scenarioReports = Array.isArray(contextQuality.scenarios) ? contextQuality.scenarios : [];
   const failedScenarios = Array.isArray(contextQuality.failedScenarios) ? contextQuality.failedScenarios : [];
@@ -233,13 +254,20 @@ function buildDogfoodMonitor({ storeHealth, contextQuality }) {
   const directLookupPassRate = ratio(taskLookupRelevantCount, taskScenarioCount);
   const quietLookupEmpty = quietPromptScenario?.ok === true && Number(quietPromptScenario?.itemCount ?? 0) === 0;
   const severeNoiseClean =
-    storeHealth.severeNoise.privatePathMemoryCount === 0
-    && storeHealth.severeNoise.secretShapedMemoryCount === 0
-    && storeHealth.severeNoise.commandJsonMemoryCount === 0
+    storeHealth.severeNoise.commandJsonMemoryCount === 0
     && storeHealth.severeNoise.functionCallMemoryCount === 0
     && storeHealth.severeNoise.goalContextMemoryCount === 0
     && storeHealth.severeNoise.subagentNotificationMemoryCount === 0
     && storeHealth.severeNoise.runtimeWarningMemoryCount === 0;
+  const relevance = buildRelevanceHealth({
+    eventMetrics,
+    storeHealth,
+    contextQuality,
+    doctor,
+    failedScenarios,
+    quietLookupEmpty,
+    directLookupPassRate,
+  });
   return {
     mode: "metrics-only-live-dogfood-monitor",
     status: contextQuality.ok === true && severeNoiseClean
@@ -248,6 +276,7 @@ function buildDogfoodMonitor({ storeHealth, contextQuality }) {
     monitoringRequiredBeforeRewire: true,
     monitoringRequiredAfterRewire: true,
     autoRecallRewireAllowedByThisReport: false,
+    rewireBlockers: relevance.rewireBlockers,
     metricsOnly: true,
     rawMemoryIncluded: false,
     rawTranscriptIncluded: false,
@@ -255,6 +284,7 @@ function buildDogfoodMonitor({ storeHealth, contextQuality }) {
     noise: {
       severeNoiseClean,
       canaryOrBenchmarkMemoryCount: storeHealth.severeNoise.canaryOrBenchmarkMemoryCount,
+      randomCanaryBenchmarkInjectionRisk: relevance.randomCanaryBenchmarkInjectionRisk,
       latestScrubNoiseQuarantined: eventMetrics.latestScrubNoiseQuarantined ?? 0,
       latestScrubRejected: eventMetrics.latestScrubRejected ?? 0,
     },
@@ -262,10 +292,17 @@ function buildDogfoodMonitor({ storeHealth, contextQuality }) {
       recallRunEvents: eventMetrics.recallRunEvents ?? 0,
       recallSkipEvents: eventMetrics.recallSkipEvents ?? 0,
       recallRunRate: eventMetrics.recallRunRate ?? 0,
+      userFacingRecallRunEvents: eventMetrics.userFacingRecallRunEvents ?? 0,
+      userFacingRecallRunRate: eventMetrics.userFacingRecallRunRate ?? 0,
       averageRecallMatches: eventMetrics.averageRecallMatches ?? 0,
       zeroMatchRecallEvents: eventMetrics.zeroMatchRecallEvents ?? 0,
+      auditForcedRecallEvents: eventMetrics.auditForcedRecallEvents ?? 0,
       forcedRecallEvents: eventMetrics.forcedRecallEvents ?? 0,
+      periodicRecallEvents: eventMetrics.periodicRecallEvents ?? 0,
+      forcedOrPeriodicRecallEvents: eventMetrics.forcedOrPeriodicRecallEvents ?? 0,
+      unanchoredRecallEvents: eventMetrics.unanchoredRecallEvents ?? 0,
       signalRecallEvents: eventMetrics.signalRecallEvents ?? 0,
+      domainRecallEvents: eventMetrics.domainRecallEvents ?? 0,
     },
     writes: {
       explicitStoreEvents: eventMetrics.explicitStoreEvents ?? 0,
@@ -302,6 +339,61 @@ function buildDogfoodMonitor({ storeHealth, contextQuality }) {
       confusingLookupCount: failedScenarios.length,
       directLookupUsefulnessOk: directLookupPassRate === 1 && quietLookupEmpty === true && failedScenarios.length === 0,
     },
+    relevance,
+  };
+}
+
+function buildRelevanceHealth({
+  eventMetrics,
+  storeHealth,
+  contextQuality,
+  doctor,
+  failedScenarios,
+  quietLookupEmpty,
+  directLookupPassRate,
+}) {
+  const activeRecallPolicy = String(doctor?.recallPolicy ?? "");
+  const unanchoredRecallEvents = Number(eventMetrics.unanchoredRecallEvents ?? 0);
+  const canaryOrBenchmarkMemoryCount = Number(storeHealth.severeNoise.canaryOrBenchmarkMemoryCount ?? 0);
+  const randomCanaryBenchmarkInjectionRisk = unanchoredRecallEvents > 0 && canaryOrBenchmarkMemoryCount > 0;
+  const directLookupUseful = directLookupPassRate === 1 && quietLookupEmpty === true && failedScenarios.length === 0;
+  const supportedRecallPolicy = ["periodic-or-signal", "signal-only", "never"].includes(activeRecallPolicy);
+  const relevanceReadyForAutoInjection =
+    supportedRecallPolicy
+    && contextQuality.ok === true
+    && directLookupUseful
+    && unanchoredRecallEvents === 0
+    && randomCanaryBenchmarkInjectionRisk === false;
+  const rewireBlockers = [
+    supportedRecallPolicy ? null : "recall-policy-not-supported",
+    directLookupUseful ? null : "direct-lookup-not-useful",
+    contextQuality.ok === true ? null : "context-quality-not-clean",
+    unanchoredRecallEvents === 0 ? null : "unanchored-forced-or-periodic-recall-observed",
+    randomCanaryBenchmarkInjectionRisk ? "benchmark-canary-memory-random-injection-risk" : null,
+  ].filter(Boolean);
+
+  return {
+    status: relevanceReadyForAutoInjection
+      ? "READY_FOR_RELEVANCE_GATED_AUTO_RECALL"
+      : "BLOCKED_RELEVANCE_GATED_AUTO_RECALL",
+    activeRecallPolicy,
+    requiredRecallPolicy: "periodic-or-signal-with-anchored-relevance",
+    auditForcedRecallEvents: Number(eventMetrics.auditForcedRecallEvents ?? 0),
+    forcedRecallEvents: Number(eventMetrics.forcedRecallEvents ?? 0),
+    periodicRecallEvents: Number(eventMetrics.periodicRecallEvents ?? 0),
+    unanchoredRecallEvents,
+    signalRecallEvents: Number(eventMetrics.signalRecallEvents ?? 0),
+    domainRecallEvents: Number(eventMetrics.domainRecallEvents ?? 0),
+    canaryOrBenchmarkMemoryCount,
+    randomCanaryBenchmarkInjectionRisk,
+    directLookupUseful,
+    quietLookupEmpty,
+    contextQualityOk: contextQuality.ok === true,
+    relevanceReadyForAutoInjection,
+    autoInjectionAllowed: false,
+    rewireBlockers,
+    policy:
+      "Automatic prompt injection may run on a periodic-or-signal policy, but periodic or forced recalls must use a meaningful prompt/task anchor. Benchmark and canary memories are allowed only for matching benchmark/canary tasks.",
   };
 }
 
@@ -312,8 +404,6 @@ function countNoise(texts) {
     goalContextMemoryCount: 0,
     subagentNotificationMemoryCount: 0,
     runtimeWarningMemoryCount: 0,
-    privatePathMemoryCount: 0,
-    secretShapedMemoryCount: 0,
     canaryOrBenchmarkMemoryCount: 0,
   };
   for (const text of texts) {
@@ -322,8 +412,6 @@ function countNoise(texts) {
     if (/<goal_context>/i.test(text)) counters.goalContextMemoryCount += 1;
     if (/<subagent_notification>/i.test(text)) counters.subagentNotificationMemoryCount += 1;
     if (/Warning: The maximum number of unified exec processes|apply_patch was requested via exec_command/i.test(text)) counters.runtimeWarningMemoryCount += 1;
-    if (/\/Users\/|\/private\/|\/Volumes\/|\/var\/folders\//.test(text)) counters.privatePathMemoryCount += 1;
-    if (secretPattern().test(text)) counters.secretShapedMemoryCount += 1;
     if (/\b(canary|benchmark|bm25|shard|workorder|release gate)\b/i.test(text)) counters.canaryOrBenchmarkMemoryCount += 1;
   }
   return counters;

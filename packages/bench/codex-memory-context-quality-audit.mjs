@@ -179,7 +179,7 @@ function recallLiveContext(prompt) {
   const result = spawnSync("node", [bridgePath, "recall"], {
     input: `${JSON.stringify({ prompt })}\n`,
     encoding: "utf8",
-    env: { ...process.env, SELFMEM_BRIDGE_FORCE_RECALL: "1" },
+    env: { ...process.env, SELFMEM_BRIDGE_FORCE_RECALL: "1", SELFMEM_BRIDGE_AUDIT_RECALL: "1" },
     stdio: ["pipe", "pipe", "pipe"],
   });
   assert.equal(result.status, 0, "Codex selfmem bridge recall failed");

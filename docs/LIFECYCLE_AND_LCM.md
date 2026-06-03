@@ -45,7 +45,7 @@ Expected behavior:
 
 - `session_start` activates the agent's local container mapping.
 - `before_prompt_build` searches local RecallWeave plus optional hosted Supermemory history, then injects bounded context.
-- `agent_end` redacts, distills, deduplicates, and stores useful memory locally.
+- `agent_end` distills, deduplicates, and stores useful memory locally.
 - compression checkpoint events record compact evidence when available.
 
 ## Codex
@@ -60,8 +60,8 @@ current safe audit target is:
   durable memory intentionally instead of relying only on automatic extraction.
 - the lifecycle doctor reports duplicate/noise health before benchmark or
   release claims.
-- Raw transcripts stay local and public reports print only counts, hashes, and
-  policy flags.
+- Raw transcripts and any locally useful private or credential-bearing facts
+  stay local; public reports print only counts, hashes, and policy flags.
 - Hosted Supermemory write-back stays off unless the operator explicitly
   enables it.
 
@@ -77,20 +77,27 @@ retrieval or scoring evidence.
 
 ## Recall Gate
 
-The recall gate should skip maintenance traffic unless there is clear memory intent. Examples include status checks, diagnostics, heartbeat output, and update logs. This reduces provider spend and keeps prompt context cleaner.
+The recall gate may run periodically or on explicit memory signals. Periodic
+recall must still be relevance-gated: short prompts such as "go" or "???" use
+the current task anchor, not the literal short text, so unrelated benchmark,
+canary, or provider memories are not injected into ordinary turns.
 
 ## Write Gate
 
 The write gate should prefer durable facts, preferences, decisions, procedures, bugs, fixes, and methodology notes. It should reject:
 
-- fully private content,
-- key-shaped content,
 - duplicate content,
 - status-only content,
 - raw role markers,
 - unbounded full-session dumps.
 
-Full raw evidence may remain in a local redacted raw-events file for audit, but prompt recall should use distilled memory by default.
+Local memory is allowed to preserve private paths, keys, tokens, and credential
+facts when the operator intentionally gave them and they are useful for future
+work. Those facts should only be recalled for matching key, token, provider, or
+credential asks. Public and GitHub-facing artifacts remain leak-checked.
+
+Full raw evidence may remain in a local raw-events file for audit, but prompt
+recall should use distilled memory by default.
 
 ## Long-Agent Canary
 
@@ -106,8 +113,8 @@ doing the work, not inspect memory only after the run. The canary should prove:
   surrogate,
 - sub-agents or follow-up agents receive the same container contract when they
   are part of the workflow,
-- post-run log health passes: low duplicate rate, no secret-shaped local
-  backlog, bounded transcript volume, and understandable write errors.
+- post-run log health passes: low duplicate rate, no unrelated prompt-context
+  injection, bounded transcript volume, and understandable write errors.
 
 Component retrieval benchmarks can guide method choices, but they do not prove
 this agent workflow by themselves.

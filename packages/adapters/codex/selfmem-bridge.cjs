@@ -26,7 +26,7 @@ const DEFAULT_CONFIG = {
   recallPolicy: "periodic-or-signal",
   recallEveryPrompts: 8,
   recallMinIntervalMinutes: 20,
-  recallOnLongPromptChars: 1200,
+  recallOnLongPromptChars: 0,
   recallSignalPhrases: [
     "remember",
     "recall",
@@ -41,7 +41,12 @@ const DEFAULT_CONFIG = {
     "last time",
     "continue from",
     "supermemory key",
-    "memory container"
+    "memory container",
+    "api key",
+    "key",
+    "token",
+    "credential",
+    "secret"
   ],
   maxContextItems: 5,
   maxContextChars: 4000,
@@ -50,6 +55,7 @@ const DEFAULT_CONFIG = {
   maxTranscriptRecallItems: 1,
   maxExportRecallItems: 1,
   suppressCredentialAdjacentRecall: true,
+  preserveLocalSecrets: true,
   nearDuplicateTokenJaccard: 0.72,
   distilledMemoryPath: DISTILLED_PATH,
   maxTranscriptBytes: 5_000_000,
@@ -269,10 +275,37 @@ function recallSignalReason(prompt, config) {
   for (const phrase of config.recallSignalPhrases || []) {
     if (lower.includes(String(phrase).toLowerCase())) return `signal:${phrase}`;
   }
-  if (config.recallOnLongPromptChars > 0 && lower.length >= config.recallOnLongPromptChars) {
+  const domain = queryDomain(tokenize(lower));
+  if (domain) return `domain:${domain}`;
+  if (config.recallOnLongPromptChars > 0 && lower.length >= config.recallOnLongPromptChars && domain) {
     return "long-prompt";
   }
   return "";
+}
+
+function recallPolicyAllowsPeriodic(policy) {
+  return ["periodic-or-signal", "periodic-only"].includes(String(policy || "").toLowerCase());
+}
+
+function isPeriodicRecallReason(reason) {
+  return ["first-run", "prompt-interval", "time-interval", "long-prompt"].includes(String(reason || ""));
+}
+
+function recallAnchorFromPrompt(prompt) {
+  const text = String(prompt || "").trim();
+  const tokens = contentTokensForRecall(text);
+  const tokenSet = new Set(tokens);
+  if (credentialRecallRequested(tokenSet)) return text.slice(0, 1600);
+  if (queryDomain(tokenSet)) return text.slice(0, 1600);
+  if (tokens.length >= 3) return text.slice(0, 1600);
+  return "";
+}
+
+function contentTokensForRecall(text) {
+  return [...tokenize(text)]
+    .filter((token) => token.length >= 4)
+    .filter((token) => !STOP_TOKENS.has(token))
+    .filter((token) => !LOW_SIGNAL_PROMPT_TOKENS.has(token));
 }
 
 function shouldRunRecall(prompt, config) {
@@ -284,14 +317,28 @@ function shouldRunRecall(prompt, config) {
   const minIntervalMs = Math.max(0, Number(config.recallMinIntervalMinutes || 0)) * 60_000;
   const everyPrompts = Math.max(0, Number(config.recallEveryPrompts || 0));
   const signal = recallSignalReason(prompt, config);
+  const policy = String(config.recallPolicy || "periodic-or-signal").toLowerCase();
+  const periodicAllowed = recallPolicyAllowsPeriodic(policy);
+  const promptAnchor = recallAnchorFromPrompt(prompt);
+  const previousAnchor = String(previous.recentRecallAnchor || "");
+  const periodicAnchor = promptAnchor || previousAnchor;
   let reason = "";
 
-  if (process.env.SELFMEM_BRIDGE_FORCE_RECALL === "1") reason = "forced";
-  else if (config.recallPolicy === "never") reason = "";
-  else if (signal) reason = signal;
-  else if (!previous.lastRecallAt) reason = "first-run";
-  else if (everyPrompts && promptCount % everyPrompts === 0) reason = "prompt-interval";
-  else if (minIntervalMs && elapsedMs >= minIntervalMs) reason = "time-interval";
+  if (process.env.SELFMEM_BRIDGE_FORCE_RECALL === "1") {
+    reason = process.env.SELFMEM_BRIDGE_AUDIT_RECALL === "1" ? "audit-forced" : "forced";
+  } else if (policy === "never") reason = "";
+  else if (signal && policy !== "periodic-only") reason = signal;
+  else if (periodicAllowed && periodicAnchor && !previous.lastRecallAt) reason = "first-run";
+  else if (periodicAllowed && periodicAnchor && everyPrompts && promptCount % everyPrompts === 0) reason = "prompt-interval";
+  else if (periodicAllowed && periodicAnchor && minIntervalMs && elapsedMs >= minIntervalMs) reason = "time-interval";
+
+  const anchoredRecallReason = isPeriodicRecallReason(reason) || reason === "forced";
+  const anchorSource = signal ? "signal" : promptAnchor ? "prompt" : previousAnchor ? "stored" : "none";
+  const recallQuery = signal
+    ? prompt
+    : anchoredRecallReason
+      ? periodicAnchor
+      : promptAnchor || prompt;
 
   const next = {
     ...previous,
@@ -299,13 +346,29 @@ function shouldRunRecall(prompt, config) {
     lastPromptAt: new Date(now).toISOString(),
     lastPromptHash: sha256(prompt)
   };
+  if (promptAnchor) {
+    next.recentRecallAnchor = promptAnchor;
+    next.recentRecallAnchorAt = new Date(now).toISOString();
+    next.recentRecallAnchorPromptCount = promptCount;
+    next.recentRecallAnchorHash = sha256(promptAnchor);
+  }
   if (reason) {
     next.lastRecallAt = new Date(now).toISOString();
     next.lastRecallReason = reason;
     next.lastRecallPromptCount = promptCount;
+    next.lastRecallQueryHash = sha256(recallQuery);
+    next.lastRecallUsedStoredAnchor = Boolean(!signal && !promptAnchor && previousAnchor);
+    next.lastRecallAnchorSource = anchorSource;
   }
   writeJson(STATE_PATH, next);
-  return { run: Boolean(reason), reason: reason || "skipped", promptCount };
+  return {
+    run: Boolean(reason && recallQuery.trim()),
+    reason: reason || "skipped",
+    promptCount,
+    recallQuery,
+    usedStoredAnchor: Boolean(reason && !signal && !promptAnchor && previousAnchor),
+    anchorSource: reason ? anchorSource : "none"
+  };
 }
 
 function loadExportDocs(config) {
@@ -372,7 +435,8 @@ function loadDistilledDocs(config) {
 function scoreMemory(queryTokens, memory) {
   const text = String(memory.text || "");
   if (isOperationalNoiseMemory(text)) return -100;
-  if (isCredentialAdjacent(text)) return -100;
+  const credentialRequested = credentialRecallRequested(queryTokens);
+  if (isCredentialAdjacent(text) && !credentialRequested) return -100;
   if (isPathProcedure(text) && !pathRecallRequested(queryTokens)) return -30;
   if (isCanaryMemory(memory) && !canaryRecallRequested(queryTokens)) return -25;
   const domain = queryDomain(queryTokens);
@@ -392,6 +456,7 @@ function scoreMemory(queryTokens, memory) {
   const lower = text.toLowerCase();
   if (queryTokens.has("selfmem") && lower.includes("selfmem")) score += 2;
   if (queryTokens.has("supermemory") && /\b(quota|maxed|limit|depleted)\b/.test(lower)) score += 1;
+  if (credentialRequested && isCredentialAdjacent(text)) score += 5;
   const created = Date.parse(memory.createdAt || "") || 0;
   if (created) {
     const ageDays = Math.max(0, (Date.now() - created) / 86_400_000);
@@ -566,6 +631,21 @@ const STOP_TOKENS = new Set([
   "codex",
 ]);
 
+const LOW_SIGNAL_PROMPT_TOKENS = new Set([
+  "okay",
+  "yeah",
+  "yes",
+  "nope",
+  "wait",
+  "huh",
+  "lol",
+  "lmao",
+  "dude",
+  "go",
+  "continue",
+  "please",
+]);
+
 function diversifyRecallItems(items, config, queryTokens = new Set()) {
   const selected = [];
   const familyCounts = new Map();
@@ -575,7 +655,7 @@ function diversifyRecallItems(items, config, queryTokens = new Set()) {
     const text = String(item.text || "");
     if (!text.trim()) continue;
     if (isOperationalNoiseMemory(text)) continue;
-    if (config.suppressCredentialAdjacentRecall !== false && isCredentialAdjacent(text)) continue;
+    if (config.suppressCredentialAdjacentRecall !== false && isCredentialAdjacent(text) && !credentialRecallRequested(queryTokens)) continue;
     if (isPathProcedure(text) && !pathRecallRequested(queryTokens)) continue;
     if (isCanaryMemory(item) && !canaryRecallRequested(queryTokens)) continue;
     const family = sourceFamily(item);
@@ -645,7 +725,27 @@ function isCanaryMemory(item) {
 }
 
 function canaryRecallRequested(queryTokens) {
-  return queryTokens.has("canary") || queryTokens.has("runtime") || queryTokens.has("strict") || queryTokens.has("rollout");
+  return queryTokens.has("canary")
+    || queryTokens.has("canaries")
+    || (queryTokens.has("strict") && queryTokens.has("rollout"))
+    || (queryTokens.has("production") && queryTokens.has("rollout"));
+}
+
+function credentialRecallRequested(queryTokens) {
+  return queryTokens.has("key")
+    || queryTokens.has("keys")
+    || queryTokens.has("token")
+    || queryTokens.has("tokens")
+    || queryTokens.has("secret")
+    || queryTokens.has("secrets")
+    || queryTokens.has("credential")
+    || queryTokens.has("credentials")
+    || queryTokens.has("openrouter")
+    || queryTokens.has("deepseek")
+    || queryTokens.has("nvidia")
+    || queryTokens.has("supermemory")
+    || queryTokens.has("jina")
+    || queryTokens.has("voyage");
 }
 
 function transcriptRecallRequested(queryTokens) {
@@ -861,7 +961,8 @@ function recall() {
     return;
   }
 
-  const queryTokens = tokenize(prompt);
+  const recallQuery = String(recallDecision.recallQuery || prompt);
+  const queryTokens = tokenize(recallQuery);
   const preDistilled = loadDistilledDocs(config);
   const rawItems = [...readJsonl(MEMORIES_PATH), ...loadExportDocs(config)];
   const rawExplicitItems = rawItems.filter((item) => {
@@ -887,7 +988,10 @@ function recall() {
     promptHash: sha256(prompt),
     reason: recallDecision.reason,
     promptCount: recallDecision.promptCount,
-    matches: matches.length
+    matches: matches.length,
+    queryHash: sha256(recallQuery),
+    usedStoredAnchor: recallDecision.usedStoredAnchor === true,
+    anchorSource: recallDecision.anchorSource || "none"
   });
   process.stdout.write(`${JSON.stringify(hookResponse("UserPromptSubmit", context))}\n`);
 }
@@ -951,7 +1055,9 @@ function writeMemoryRecords(candidates, sourceId, options = {}) {
       ? null
       : selectDistillableStatements(candidate, tokenize(candidate), 1)[0];
     const candidateText = distilled ? `${distilled.kind}: ${distilled.text}` : candidate;
-    const clean = redact(candidateText).text.trim();
+    const clean = options.preserveLocalSecrets === true
+      ? String(candidateText).trim()
+      : redact(candidateText).text.trim();
     if (!clean || clean === "[REDACTED_PRIVATE]") {
       rejected += 1;
       continue;
@@ -982,10 +1088,12 @@ function writeMemoryRecords(candidates, sourceId, options = {}) {
 }
 
 function writeMemories(candidates, sourceId) {
-  return writeMemoryRecords(candidates, sourceId).written;
+  const config = loadConfig();
+  return writeMemoryRecords(candidates, sourceId, { preserveLocalSecrets: config.preserveLocalSecrets === true }).written;
 }
 
 function store() {
+  const config = loadConfig();
   const raw = safeReadStdin();
   const payload = parsePayload(raw);
   const argText = process.argv.slice(3).join(" ").trim();
@@ -993,7 +1101,12 @@ function store() {
   const kind = String(payload.kind || "manual").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "manual";
   const scope = String(payload.scope || "codex_global").replace(/[^a-z0-9_-]/gi, "").slice(0, 80) || "codex_global";
   const sourceId = `codex-explicit-store-${new Date().toISOString().replace(/[:.]/g, "-")}-${sha256(text).slice(0, 10)}`;
-  const result = writeMemoryRecords([text], sourceId, { kind, scope, preserveVerbatim: true });
+  const result = writeMemoryRecords([text], sourceId, {
+    kind,
+    scope,
+    preserveVerbatim: true,
+    preserveLocalSecrets: config.preserveLocalSecrets === true
+  });
   appendJsonl(EVENTS_PATH, {
     type: "explicit-store",
     at: new Date().toISOString(),
@@ -1017,11 +1130,11 @@ function store() {
 function flush() {
   const config = loadConfig();
   const raw = safeReadStdin();
-  const redactedRaw = redact(raw);
+  const redactedRaw = config.preserveLocalSecrets === true ? { text: raw, count: 0 } : redact(raw);
   const payload = parsePayload(redactedRaw.text);
   const transcriptPath = transcriptPathFromPayload(payload);
   const transcript = readTranscript(transcriptPath, config);
-  const transcriptRedacted = redact(transcript.text);
+  const transcriptRedacted = config.preserveLocalSecrets === true ? { text: transcript.text, count: 0 } : redact(transcript.text);
   const body = transcriptRedacted.text || redactedRaw.text;
   const sourceId = `codex-stop-${new Date().toISOString().replace(/[:.]/g, "-")}-${sha256(body).slice(0, 10)}`;
 
@@ -1090,6 +1203,8 @@ function doctor() {
     recallPolicy: config.recallPolicy,
     recallEveryPrompts: config.recallEveryPrompts,
     recallMinIntervalMinutes: config.recallMinIntervalMinutes,
+    recallOnLongPromptChars: config.recallOnLongPromptChars,
+    preserveLocalSecrets: config.preserveLocalSecrets,
     liveSupermemorySearch: config.liveSupermemorySearch,
     mirrorWritesToSupermemory: config.mirrorWritesToSupermemory,
     exportCachePath: config.exportCachePath || null,
@@ -1110,6 +1225,7 @@ function doctor() {
 }
 
 function scrub() {
+  const config = loadConfig();
   const transcriptFiles = fs.existsSync(TRANSCRIPTS)
     ? fs.readdirSync(TRANSCRIPTS).filter((name) => name.endsWith(".jsonl"))
     : [];
@@ -1126,8 +1242,8 @@ function scrub() {
     }
   }
 
-  const memoryResult = scrubMemoryFile(MEMORIES_PATH);
-  const distilledResult = scrubMemoryFile(DISTILLED_PATH);
+  const memoryResult = scrubMemoryFile(MEMORIES_PATH, config);
+  const distilledResult = scrubMemoryFile(DISTILLED_PATH, config);
   const memoryRedactions = memoryResult.memoryRedactions + distilledResult.memoryRedactions;
   const memoryDuplicatesRemoved = memoryResult.memoryDuplicatesRemoved + distilledResult.memoryDuplicatesRemoved;
   const memoryRejected = memoryResult.memoryRejected + distilledResult.memoryRejected;
@@ -1158,7 +1274,7 @@ function scrub() {
   }, null, 2)}\n`);
 }
 
-function scrubMemoryFile(file) {
+function scrubMemoryFile(file, config = {}) {
   const memoryItems = readJsonl(file);
   const seen = new Set();
   const cleaned = [];
@@ -1167,10 +1283,12 @@ function scrubMemoryFile(file) {
   let memoryRejected = 0;
   let memoryNoiseQuarantined = 0;
   for (const item of memoryItems) {
-    const redacted = redact(item.text || "");
+    const redacted = config.preserveLocalSecrets === true
+      ? { text: String(item.text || ""), count: 0 }
+      : redact(item.text || "");
     memoryRedactions += redacted.count;
     const text = redacted.text.trim();
-    if (!text || text === "[REDACTED_PRIVATE]" || text.includes("[REDACTED_SECRET]") || isOperationalNoiseMemory(text) || isPathProcedure(text)) {
+    if (!text || text === "[REDACTED_PRIVATE]" || (config.preserveLocalSecrets !== true && text.includes("[REDACTED_SECRET]")) || isOperationalNoiseMemory(text) || isPathProcedure(text)) {
       memoryRejected += 1;
       if (isOperationalNoiseMemory(text) || isPathProcedure(text)) memoryNoiseQuarantined += 1;
       continue;

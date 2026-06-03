@@ -43,6 +43,7 @@ for (let index = 0; index < maxIterations; index += 1) {
     writes: evaluation.writes,
     usefulness: evaluation.usefulness,
     directLookup: evaluation.directLookup,
+    relevance: evaluation.relevance,
     blockers: evaluation.blockers,
     nextActions: evaluation.nextActions,
   });
@@ -95,6 +96,7 @@ function evaluateHealth(health, { phase }) {
   const writes = dogfood.writes ?? {};
   const usefulness = dogfood.usefulness ?? {};
   const directLookup = dogfood.directLookup ?? {};
+  const relevance = dogfood.relevance ?? {};
   const blockers = [];
 
   if (dogfood.metricsOnly !== true) blockers.push("monitor-not-metrics-only");
@@ -117,6 +119,9 @@ function evaluateHealth(health, { phase }) {
     if (Number(injection.stopHookCount ?? 0) === 0) blockers.push("rewired-phase-stop-hook-missing");
     if (Number(retrieval.recallRunEvents ?? 0) === 0) blockers.push("rewired-phase-recall-not-observed");
     if (Number(retrieval.averageRecallMatches ?? 0) > 4) blockers.push("rewired-phase-recall-too-broad");
+    if (relevance.relevanceReadyForAutoInjection !== true) blockers.push("rewired-phase-recall-not-relevance-gated");
+    if (Number(relevance.unanchoredRecallEvents ?? 0) > 0) blockers.push("rewired-phase-unanchored-recall-observed");
+    if (relevance.randomCanaryBenchmarkInjectionRisk === true) blockers.push("rewired-phase-random-benchmark-canary-risk");
   } else if (phase !== "either") {
     blockers.push("unknown-monitor-phase");
   }
@@ -137,6 +142,12 @@ function evaluateHealth(health, { phase }) {
   if (blockers.includes("rewired-phase-recall-too-broad")) {
     nextActions.push("Tighten candidate limits, authority scoring, or domain filters before continuing live rewire.");
   }
+  if (blockers.includes("rewired-phase-recall-not-relevance-gated") || blockers.includes("rewired-phase-unanchored-recall-observed")) {
+    nextActions.push("Keep automatic injection disabled until periodic-or-signal recall is anchored to the active task and unrelated turns do not retrieve benchmark or canary context.");
+  }
+  if (blockers.includes("rewired-phase-random-benchmark-canary-risk")) {
+    nextActions.push("Treat benchmark/canary memories as task-scoped recall only; periodic or forced injection must require a matching task anchor.");
+  }
   if (blockers.some((item) => item.startsWith("rewired-phase"))) {
     nextActions.push("Keep rewire to one Codex lane and gather another monitored interval after repair.");
   }
@@ -149,6 +160,7 @@ function evaluateHealth(health, { phase }) {
     writes,
     usefulness,
     directLookup,
+    relevance,
     blockers,
     nextActions,
   };
