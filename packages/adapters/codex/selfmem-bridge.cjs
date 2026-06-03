@@ -129,6 +129,14 @@ function sha256(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
 }
 
+function currentBridgeSourceHash() {
+  try {
+    return `sha256:${sha256(fs.readFileSync(__filename))}`;
+  } catch {
+    return "";
+  }
+}
+
 function normalizedText(value) {
   return String(value ?? "")
     .toLowerCase()
@@ -985,6 +993,7 @@ function recall() {
   appendJsonl(EVENTS_PATH, {
     type: "recall-run",
     at: new Date().toISOString(),
+    bridgeHash: currentBridgeSourceHash(),
     promptHash: sha256(prompt),
     reason: recallDecision.reason,
     promptCount: recallDecision.promptCount,

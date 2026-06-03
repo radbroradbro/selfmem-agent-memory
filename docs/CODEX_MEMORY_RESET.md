@@ -45,7 +45,8 @@ after any rewire to track:
 - noise: severe noise counts, benchmark/canary-memory residue, and quarantine
   activity,
 - retrieval: recall run/skip rates, forced versus signal-triggered recall, and
-  average match counts,
+  average match counts; forced or periodic recall must carry a current-task
+  anchor, and missing anchor metadata counts as noise risk,
 - direct lookup: task prompts must retrieve bounded useful context while
   unrelated prompts retrieve nothing; the report carries hashes and counts, not
   raw retrieved memory,
@@ -66,6 +67,9 @@ npm exec --yes pnpm@10.23.0 -- codex:memory-dogfood-monitor:watch
 If the monitor reports noisy or confusing context, keep or turn automatic
 injection off, fix the ranking, write, dedupe, or pruning method, and rerun the
 monitor. Do not treat repeated noisy recall as an acceptable operator burden.
+This is not a local-secret scrub. Local memory may contain private operational
+facts when the operator wants that; the strict public-safety boundary applies to
+checked-in or release artifacts.
 
 ## Phase Order
 

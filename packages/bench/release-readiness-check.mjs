@@ -1192,6 +1192,9 @@ check("fresh Codex memory health gate passes for controlled dogfood", () => {
   assert.equal(report.dogfoodMonitor?.relevance?.activeRecallPolicy, "periodic-or-signal");
   assert.equal(report.dogfoodMonitor?.relevance?.requiredRecallPolicy, "periodic-or-signal-with-anchored-relevance");
   assert.equal(report.dogfoodMonitor?.relevance?.autoInjectionAllowed, false);
+  assert.equal(report.dogfoodMonitor?.relevance?.forcedOrPeriodicRecallAnchored, true);
+  assert.equal(report.dogfoodMonitor?.relevance?.missingAnchorForcedOrPeriodicRecallEvents, 0);
+  assert.equal(report.dogfoodMonitor?.relevance?.unanchoredRecallEvents, 0);
   assert.match(report.dogfoodMonitor?.relevance?.policy ?? "", /periodic-or-signal/i);
   assert.ok(Array.isArray(report.dogfoodMonitor?.rewireBlockers));
   const monitorArgs = report.phase === "rewired"
@@ -1208,6 +1211,14 @@ check("fresh Codex memory health gate passes for controlled dogfood", () => {
   assert.ok(
     monitor.iterations.every((iteration) => iteration.directLookup?.directLookupUsefulnessOk === true),
     "dogfood monitor must include direct lookup usefulness checks",
+  );
+  assert.ok(
+    monitor.iterations.every((iteration) => iteration.relevance?.forcedOrPeriodicRecallAnchored === true),
+    "dogfood monitor must fail forced or periodic recall without a current-task anchor",
+  );
+  assert.ok(
+    monitor.iterations.every((iteration) => Number(iteration.relevance?.missingAnchorForcedOrPeriodicRecallEvents ?? 0) === 0),
+    "dogfood monitor must treat missing forced/periodic recall anchors as noise risk",
   );
   assert.deepEqual(monitor.blockers, []);
   assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);

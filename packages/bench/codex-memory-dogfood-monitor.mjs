@@ -121,7 +121,11 @@ function evaluateHealth(health, { phase }) {
     if (Number(retrieval.userFacingRecallRunEvents ?? 0) === 0) blockers.push("rewired-phase-user-facing-recall-not-observed");
     if (Number(retrieval.averageRecallMatches ?? 0) > 4) blockers.push("rewired-phase-recall-too-broad");
     if (relevance.relevanceReadyForAutoInjection !== true) blockers.push("rewired-phase-recall-not-relevance-gated");
+    if (relevance.forcedOrPeriodicRecallAnchored !== true) blockers.push("rewired-phase-forced-periodic-anchor-missing");
     if (Number(relevance.unanchoredRecallEvents ?? 0) > 0) blockers.push("rewired-phase-unanchored-recall-observed");
+    if (Number(relevance.missingAnchorForcedOrPeriodicRecallEvents ?? 0) > 0) {
+      blockers.push("rewired-phase-forced-periodic-anchor-metadata-missing");
+    }
     if (relevance.randomCanaryBenchmarkInjectionRisk === true) blockers.push("rewired-phase-random-benchmark-canary-risk");
   } else if (phase !== "either") {
     blockers.push("unknown-monitor-phase");
@@ -145,6 +149,9 @@ function evaluateHealth(health, { phase }) {
   }
   if (blockers.includes("rewired-phase-recall-not-relevance-gated") || blockers.includes("rewired-phase-unanchored-recall-observed")) {
     nextActions.push("Keep automatic injection disabled until periodic-or-signal recall is anchored to the active task and unrelated turns do not retrieve benchmark or canary context.");
+  }
+  if (blockers.includes("rewired-phase-forced-periodic-anchor-missing") || blockers.includes("rewired-phase-forced-periodic-anchor-metadata-missing")) {
+    nextActions.push("Fix hook event telemetry so forced and periodic recalls carry prompt, stored, or signal anchors; missing anchors must be treated as noise risk, not as a clean recall.");
   }
   if (blockers.includes("rewired-phase-random-benchmark-canary-risk")) {
     nextActions.push("Treat benchmark/canary memories as task-scoped recall only; periodic or forced injection must require a matching task anchor.");

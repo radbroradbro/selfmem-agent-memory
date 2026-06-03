@@ -45,8 +45,10 @@ evidence index. Whole-harness benchmark runs should resume only after the
 memory product itself is quiet and useful in live work. After any
 automatic-recall rewire,
 monitor the memory system through the reset-health `dogfoodMonitor` block:
-noise, retrieval, writes, and usefulness must be tracked continuously, because
-a canary that writes and recalls once can still hide clutter that hurts agents.
+noise, retrieval, writes, and usefulness must be tracked continuously. Forced
+or periodic recall has to be anchored to the current task; missing anchor
+metadata is a noise risk, not a pass. A canary that writes and recalls once can
+still hide clutter that hurts agents.
 
 Solo RecallWeave runs are smoke tests only. They can prove the harness runs,
 privacy holds, latency is measurable, and the adapter does not fall over. They

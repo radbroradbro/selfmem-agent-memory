@@ -131,7 +131,8 @@ manual dogfood, but public release remains blocked until controlled dogfood and
 release evidence prove the injected context helps rather than clutters the
 agent. After any rewire, inspect `dogfoodMonitor` instead of relying on a
 single canary: the monitor must show quiet unrelated prompts, useful retrieval,
-healthy write paths, and no severe noise.
+healthy write paths, no severe noise, and forced or periodic recall anchored to
+the current task.
 
 ## Hybrid Search
 

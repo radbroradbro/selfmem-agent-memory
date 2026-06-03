@@ -21,12 +21,13 @@ const bridgeStoreRoot = resolve(String(args.store ?? `${homedir()}/.codex/selfme
 
 const hooks = readJsonOrNull(hooksPath);
 const codexConfig = readOptional(codexConfigPath);
+const installedBridgeSourceHash = existsSync(bridgePath) ? `sha256:${sha256(readFileSync(bridgePath))}` : "";
 const doctor = runJson(["node", bridgePath, "doctor"], "bridge doctor");
 const contextQuality = runJson(
   ["node", join(root, "packages/bench/codex-memory-context-quality-audit.mjs"), "--live"],
   "context quality audit",
 );
-const storeHealth = inspectStore(bridgeStoreRoot);
+const storeHealth = inspectStore(bridgeStoreRoot, { currentBridgeHash: installedBridgeSourceHash });
 const dogfoodMonitor = buildDogfoodMonitor({ storeHealth, contextQuality, doctor });
 const publicSurface = inspectPublicSurface();
 const injection = inspectInjectionState({ hooks, codexConfig });
@@ -77,7 +78,7 @@ const report = {
   injection,
   bridge: {
     present: existsSync(bridgePath),
-    sourceHash: existsSync(bridgePath) ? `sha256:${sha256(readFileSync(bridgePath))}` : "",
+    sourceHash: installedBridgeSourceHash,
     doctorOk: doctor.ok === true,
     enabled: doctor.enabled === true,
     explicitStoreMode: doctor.explicitStoreMode === true,
@@ -143,7 +144,7 @@ function countHookCommands(hooks, name) {
   return groups.flatMap((group) => Array.isArray(group?.hooks) ? group.hooks : []).length;
 }
 
-function inspectStore(storeRoot) {
+function inspectStore(storeRoot, { currentBridgeHash = "" } = {}) {
   const memories = readJsonl(join(storeRoot, "memories.jsonl"));
   const distilled = readJsonl(join(storeRoot, "distilled-memories.jsonl"));
   const events = readJsonl(join(storeRoot, "events.jsonl"));
@@ -166,17 +167,22 @@ function inspectStore(storeRoot) {
     recallSkipCount: events.filter((item) => item.type === "recall-skip").length,
     stopCount: events.filter((item) => item.type === "stop").length,
     kindCounts,
-    eventMetrics: inspectEventMetrics(events),
+    eventMetrics: inspectEventMetrics(events, { currentBridgeHash }),
     severeNoise,
     rawMemoryPrinted: false,
     rawTranscriptPrinted: false,
   };
 }
 
-function inspectEventMetrics(events) {
+function inspectEventMetrics(events, { currentBridgeHash = "" } = {}) {
   const windowSize = Math.min(events.length, 500);
   const window = events.slice(-windowSize);
-  const recallRuns = window.filter((item) => item.type === "recall-run");
+  const recallRunsRaw = window.filter((item) => item.type === "recall-run");
+  const bridgeScopedRecallRuns = currentBridgeHash
+    ? recallRunsRaw.filter((item) => item.bridgeHash === currentBridgeHash)
+    : [];
+  const recallRuns = bridgeScopedRecallRuns.length ? bridgeScopedRecallRuns : recallRunsRaw;
+  const recallEventScope = bridgeScopedRecallRuns.length ? "current-bridge-hash" : "rolling-window";
   const recallSkips = window.filter((item) => item.type === "recall-skip");
   const prompts = window.filter((item) => item.type === "prompt");
   const stops = window.filter((item) => item.type === "stop");
@@ -195,9 +201,13 @@ function inspectEventMetrics(events) {
   const signalRecallEvents = recallRuns.filter((item) => String(item.reason ?? "").startsWith("signal:")).length;
   const domainRecallEvents = recallRuns.filter((item) => String(item.reason ?? "").startsWith("domain:")).length;
   const userFacingRecallRuns = recallRuns.filter((item) => String(item.reason ?? "") !== "audit-forced");
-  const unanchoredRecallEvents = userFacingRecallRuns.filter((item) => {
+  const forcedOrPeriodicUserFacingRecallRuns = userFacingRecallRuns.filter((item) => isForcedOrPeriodicRecallReason(String(item.reason ?? "")));
+  const anchoredForcedOrPeriodicRecallEvents = forcedOrPeriodicUserFacingRecallRuns.filter((item) => hasUsefulRecallAnchor(item)).length;
+  const missingAnchorForcedOrPeriodicRecallEvents = forcedOrPeriodicUserFacingRecallRuns.filter((item) => !Object.hasOwn(item, "anchorSource")).length;
+  const unanchoredRecallEvents = forcedOrPeriodicUserFacingRecallRuns.filter((item) => !hasUsefulRecallAnchor(item)).length;
+  const legacyUnanchoredRecallEvents = userFacingRecallRuns.filter((item) => {
     const reason = String(item.reason ?? "");
-    const isAnchoredReason = ["forced", "first-run", "prompt-interval", "time-interval", "long-prompt"].includes(reason);
+    const isAnchoredReason = isForcedOrPeriodicRecallReason(reason);
     if (!isAnchoredReason) return false;
     if (!Object.hasOwn(item, "anchorSource")) return false;
     return !["prompt", "stored", "signal"].includes(String(item.anchorSource ?? ""));
@@ -213,6 +223,8 @@ function inspectEventMetrics(events) {
   const latestScrub = scrubs.at(-1) ?? {};
   return {
     windowSize,
+    recallEventScope,
+    currentBridgeRecallRunEvents: bridgeScopedRecallRuns.length,
     promptEvents: prompts.length,
     recallRunEvents: recallRuns.length,
     recallSkipEvents: recallSkips.length,
@@ -223,7 +235,10 @@ function inspectEventMetrics(events) {
     forcedRecallEvents,
     periodicRecallEvents,
     forcedOrPeriodicRecallEvents: forcedRecallEvents + periodicRecallEvents,
+    anchoredForcedOrPeriodicRecallEvents,
+    missingAnchorForcedOrPeriodicRecallEvents,
     unanchoredRecallEvents,
+    legacyUnanchoredRecallEvents,
     signalRecallEvents,
     domainRecallEvents,
     totalRecallMatches: sum(recallMatchCounts),
@@ -307,6 +322,8 @@ function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
     },
     retrieval: {
       recallRunEvents: eventMetrics.recallRunEvents ?? 0,
+      recallEventScope: eventMetrics.recallEventScope ?? "rolling-window",
+      currentBridgeRecallRunEvents: eventMetrics.currentBridgeRecallRunEvents ?? 0,
       recallSkipEvents: eventMetrics.recallSkipEvents ?? 0,
       recallRunRate: eventMetrics.recallRunRate ?? 0,
       userFacingRecallRunEvents: eventMetrics.userFacingRecallRunEvents ?? 0,
@@ -317,6 +334,8 @@ function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
       forcedRecallEvents: eventMetrics.forcedRecallEvents ?? 0,
       periodicRecallEvents: eventMetrics.periodicRecallEvents ?? 0,
       forcedOrPeriodicRecallEvents: eventMetrics.forcedOrPeriodicRecallEvents ?? 0,
+      anchoredForcedOrPeriodicRecallEvents: eventMetrics.anchoredForcedOrPeriodicRecallEvents ?? 0,
+      missingAnchorForcedOrPeriodicRecallEvents: eventMetrics.missingAnchorForcedOrPeriodicRecallEvents ?? 0,
       unanchoredRecallEvents: eventMetrics.unanchoredRecallEvents ?? 0,
       signalRecallEvents: eventMetrics.signalRecallEvents ?? 0,
       domainRecallEvents: eventMetrics.domainRecallEvents ?? 0,
@@ -371,6 +390,10 @@ function buildRelevanceHealth({
 }) {
   const activeRecallPolicy = String(doctor?.recallPolicy ?? "");
   const unanchoredRecallEvents = Number(eventMetrics.unanchoredRecallEvents ?? 0);
+  const forcedOrPeriodicRecallEvents = Number(eventMetrics.forcedOrPeriodicRecallEvents ?? 0);
+  const anchoredForcedOrPeriodicRecallEvents = Number(eventMetrics.anchoredForcedOrPeriodicRecallEvents ?? 0);
+  const missingAnchorForcedOrPeriodicRecallEvents = Number(eventMetrics.missingAnchorForcedOrPeriodicRecallEvents ?? 0);
+  const forcedOrPeriodicRecallAnchored = forcedOrPeriodicRecallEvents === anchoredForcedOrPeriodicRecallEvents;
   const canaryOrBenchmarkMemoryCount = Number(storeHealth.severeNoise.canaryOrBenchmarkMemoryCount ?? 0);
   const randomCanaryBenchmarkInjectionRisk = unanchoredRecallEvents > 0 && canaryOrBenchmarkMemoryCount > 0;
   const directLookupUseful = directLookupPassRate === 1 && quietLookupEmpty === true && failedScenarios.length === 0;
@@ -379,12 +402,14 @@ function buildRelevanceHealth({
     supportedRecallPolicy
     && contextQuality.ok === true
     && directLookupUseful
+    && forcedOrPeriodicRecallAnchored
     && unanchoredRecallEvents === 0
     && randomCanaryBenchmarkInjectionRisk === false;
   const rewireBlockers = [
     supportedRecallPolicy ? null : "recall-policy-not-supported",
     directLookupUseful ? null : "direct-lookup-not-useful",
     contextQuality.ok === true ? null : "context-quality-not-clean",
+    forcedOrPeriodicRecallAnchored ? null : "forced-or-periodic-recall-missing-task-anchor",
     unanchoredRecallEvents === 0 ? null : "unanchored-forced-or-periodic-recall-observed",
     randomCanaryBenchmarkInjectionRisk ? "benchmark-canary-memory-random-injection-risk" : null,
   ].filter(Boolean);
@@ -398,6 +423,10 @@ function buildRelevanceHealth({
     auditForcedRecallEvents: Number(eventMetrics.auditForcedRecallEvents ?? 0),
     forcedRecallEvents: Number(eventMetrics.forcedRecallEvents ?? 0),
     periodicRecallEvents: Number(eventMetrics.periodicRecallEvents ?? 0),
+    forcedOrPeriodicRecallEvents,
+    anchoredForcedOrPeriodicRecallEvents,
+    missingAnchorForcedOrPeriodicRecallEvents,
+    forcedOrPeriodicRecallAnchored,
     unanchoredRecallEvents,
     signalRecallEvents: Number(eventMetrics.signalRecallEvents ?? 0),
     domainRecallEvents: Number(eventMetrics.domainRecallEvents ?? 0),
@@ -412,6 +441,15 @@ function buildRelevanceHealth({
     policy:
       "Automatic prompt injection may run on a periodic-or-signal policy, but periodic or forced recalls must use a meaningful prompt/task anchor. Benchmark and canary memories are allowed only for matching benchmark/canary tasks.",
   };
+}
+
+function isForcedOrPeriodicRecallReason(reason) {
+  return ["forced", "first-run", "prompt-interval", "time-interval", "long-prompt"].includes(String(reason ?? ""));
+}
+
+function hasUsefulRecallAnchor(item) {
+  if (!Object.hasOwn(item, "anchorSource")) return false;
+  return ["prompt", "stored", "signal"].includes(String(item.anchorSource ?? ""));
 }
 
 function countNoise(texts) {
